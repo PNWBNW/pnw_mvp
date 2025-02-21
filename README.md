@@ -28,3 +28,21 @@ This is the **Minimum Viable Product (MVP)** for the **PNW Payroll System**, int
 ```sh
 chmod +x deploy.sh
 ./deploy.sh
+
+---
+
+📢 Development Notice: Time-Locked Shuffle Encryption
+
+We are actively developing a Time-Locked Shuffle Encryption System that integrates:
+✅ AES-style encryption for worker/employer confidentiality
+✅ zk-SNARK-based proof shuffling to anonymize payroll and transaction data
+✅ One-time shuffle maps to prevent traceability after decryption
+✅ Time-lock expiries to enforce controlled access and delayed key release
+
+This system is designed to enhance privacy, security, and fair enforcement of payroll distributions within the PNW ecosystem.
+
+⏳ Status: In Progress – Integration pending for SubDAO-managed payroll and trust fund distributions.
+
+
+---
+
