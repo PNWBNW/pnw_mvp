@@ -1,0 +1,30 @@
+### Proven National Worker (PNW) Aleo Payroll MVP License
+
+**License Type:** Proprietary – Affiliated with the **Proven National Worker (PNW) License**
+
+---
+
+This **Aleo Payroll MVP** is a **component** of the broader **Proven National Worker (PNW) system**. 
+It is **licensed under the same proprietary terms** as the full PNW project, with the following conditions:  
+
+1️⃣ **Affiliation with PNW License**  
+   - This MVP is a **subset** of the full **PNW software suite** and remains governed by the **same licensing structure**.  
+
+2️⃣ **Limited Use & Distribution**  
+   - Use, modification, and distribution of this **Aleo Payroll MVP** must **align with PNW licensing terms**.  
+   - Any modifications must **maintain affiliation** with the **PNW ecosystem**.  
+
+3️⃣ **No Open-Source Distribution**  
+   - This software is **not open-source** and cannot be publicly redistributed **outside** of the PNW framework.  
+
+4️⃣ **Integration with Future PNW Versions**  
+   - This MVP is intended to be expanded into **PNW V2**, including additional compliance mechanisms and integrations.  
+
+5️⃣ **Aleo SCALE Grant Usage**  
+   - This MVP is structured for **Aleo SCALE Grant evaluation** and is **not** intended for **independent commercial deployment** outside of the PNW ecosystem.  
+
+---
+
+### **Copyright & Enforcement**  
+© **2025 Proven National Worker (PNW) Initiative**.  
+Unauthorized use, modification, or distribution outside of the **PNW framework** is strictly prohibited.
