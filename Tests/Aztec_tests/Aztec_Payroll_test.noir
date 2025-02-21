@@ -1,0 +1,23 @@
+// Aztec Payroll Test
+mod aztec_payroll_test {
+
+    import aztec_payroll;
+    import subdao_circle_usdc_reserve;
+
+    fn test_aztec_payroll_execution() {
+        // Initialize test environment
+        let employer = Address::from("0x123...");
+        let worker = Address::from("0x456...");
+        let payroll_amount = 1000;
+
+        // Employer funds payroll
+        aztec_payroll::fund_payroll(employer, payroll_amount);
+
+        // Execute payroll
+        aztec_payroll::execute_payroll(worker, employer, payroll_amount);
+
+        // Verify worker received payroll
+        let worker_balance = aztec_payroll::verify_worker_balance(worker);
+        assert(worker_balance == payroll_amount);
+    }
+}
