@@ -23,14 +23,6 @@ This is the **Minimum Viable Product (MVP)** for the **PNW Payroll System**, int
 
 ---
 
-### **🛠 Deployment Guide**
-#### **🔹 Using Shell Script (`deploy.sh`)**
-```sh
-chmod +x deploy.sh
-./deploy.sh
-
----
-
 📢 Development Notice: Time-Locked Shuffle Encryption
 
 We are actively developing a Time-Locked Shuffle Encryption System that integrates:
@@ -42,6 +34,16 @@ We are actively developing a Time-Locked Shuffle Encryption System that integrat
 This system is designed to enhance privacy, security, and fair enforcement of payroll distributions within the PNW ecosystem.
 
 ⏳ Status: In Progress – Integration pending for SubDAO-managed payroll and trust fund distributions.
+
+
+### **🛠 Deployment Guide**
+#### **🔹 Using Shell Script (`deploy.sh`)**
+```sh
+chmod +x deploy.sh
+./deploy.sh
+
+---
+
 
 
 ---
