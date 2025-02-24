@@ -1,62 +1,57 @@
-program payroll_pools.leo;
+program payroll_pool.leo;
 
-// 🏷️ Payroll Pool Mappings (Per SubDAO)
-mapping payroll_balances: public hashmap<string, u64>;  // SubDAO payroll fund pools (ANS-based)
-mapping employer_obligations: public hashmap<address, u64>;  // Employer payroll obligations
-mapping restricted_employers: public hashmap<address, bool>;  // Employer restriction for non-compliance
+// Payroll Pool Mappings
+mapping payroll_balance: map[address, u64] = {};  // Singular payroll pool
+mapping employer_obligations: map[address, u64] = {};  // Employer payroll obligations
 
-/// @dev Deposits USDC into a specific SubDAO payroll pool
-function deposit_aleo_usdc(public employer: address, public subdao_ans: string, public amount: u64) -> bool {
-    let current_balance = payroll_balances.get_or_use(subdao_ans, 0u64);
-    payroll_balances.insert(subdao_ans, current_balance + amount);
+// Constants
+const SUBDAO_RESERVE: address = aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk;
+const OVERSIGHT_DAO: address = aleo1s8t86aza932zah3mv5knclvnn5zy4gedpl5a4wn5h2yrt08mxqzsw5amdd;
+const OVERSIGHT_ALLOCATION: u64 = 17; // 17% allocation to OversightDAO
+
+// Function: Deposit Aleo native tokens into the payroll pool
+function deposit_aleo_native(employer: address, amount: u64) -> bool {
+    assert(amount > 0, "Deposit amount must be greater than zero");
+    
+    let current_balance = payroll_balance.get_or_use(SUBDAO_RESERVE, 0u64);
+    payroll_balance[SUBDAO_RESERVE] = current_balance + amount;
+    
     return true;
 }
 
-/// @dev Withdraws USDC from a SubDAO payroll pool for payroll processing
-function withdraw_for_payroll(public employer: address, public subdao_ans: string, public amount: u64) -> bool {
-    let current_balance = payroll_balances.get_or_use(subdao_ans, 0u64);
+// Function: Withdraw from payroll pool for payroll processing
+function withdraw_for_payroll(employer: address, amount: u64) -> bool {
+    let current_balance = payroll_balance.get_or_use(SUBDAO_RESERVE, 0u64);
     let employer_obligation = employer_obligations.get_or_use(employer, 0u64);
-
-    // Ensure employer maintains 25% more than total obligations
-    let required_balance = employer_obligation * 125u64 / 100u64;
-    ensure!(current_balance >= required_balance, "SubDAO Payroll Pool is below the required threshold");
-    ensure!(current_balance >= amount, "Insufficient USDC balance in payroll pool");
-
-    payroll_balances.insert(subdao_ans, current_balance - amount);
+    
+    assert(current_balance >= amount, "Insufficient balance in payroll pool");
+    
+    // Deduct from payroll pool
+    payroll_balance[SUBDAO_RESERVE] = current_balance - amount;
+    
     return true;
 }
 
-/// @dev Sets the required employer payroll obligation
-function set_employer_obligation(public employer: address, public obligation: u64) -> bool {
-    employer_obligations.insert(employer, obligation);
+// Function: Allocate a percentage of payroll funds to OversightDAO
+function allocate_to_oversight() -> bool {
+    let current_balance = payroll_balance.get_or_use(SUBDAO_RESERVE, 0u64);
+    let oversight_amount = current_balance * OVERSIGHT_ALLOCATION / 100u64;
+    
+    assert(current_balance >= oversight_amount, "Insufficient balance for oversight allocation");
+    
+    payroll_balance[SUBDAO_RESERVE] -= oversight_amount;
+    payroll_balance[OVERSIGHT_DAO] += oversight_amount;
+    
     return true;
 }
 
-/// @dev Restricts an employer from using payroll funds due to non-compliance
-function restrict_employer(public employer: address) -> bool {
-    restricted_employers.insert(employer, true);
+// Function: Set employer payroll obligation
+function set_employer_obligation(employer: address, obligation: u64) -> bool {
+    employer_obligations[employer] = obligation;
     return true;
 }
 
-/// @dev Reinstates a previously restricted employer
-function reinstate_employer(public employer: address) -> bool {
-    ensure!(restricted_employers.contains(employer), "Employer is not restricted");
-    restricted_employers.insert(employer, false);
-    return true;
-}
-
-/// @dev Gets the payroll balance of a specific SubDAO payroll pool
-function get_subdao_payroll_balance(public subdao_ans: string) -> u64 {
-    return payroll_balances.get_or_use(subdao_ans, 0u64);
-}
-
-/// @dev Gets the required minimum balance for a SubDAO payroll pool
-function get_required_pool_balance(public employer: address) -> u64 {
-    let employer_obligation = employer_obligations.get_or_use(employer, 0u64);
-    return employer_obligation * 125u64 / 100u64;
-}
-
-/// @dev Checks if an employer is restricted from payroll access
-function is_employer_restricted(public employer: address) -> bool {
-    return restricted_employers.get_or_use(employer, false);
+// Function: Get payroll balance
+function get_payroll_balance() -> u64 {
+    return payroll_balance.get_or_use(SUBDAO_RESERVE, 0u64);
 }
