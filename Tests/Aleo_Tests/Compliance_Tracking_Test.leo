@@ -1,9 +1,9 @@
 // Compliance Tracking Test
-program compliance_tracking_test.aleo;
+program compliance_tracking_test.leo;
 
 import compliance_tracking;
 
-// ✅ Test: Verify Employer Compliance
+//  Test: Verify Employer Compliance
 function test_employer_compliance() {
     let employer = aleo::account::new();
 
@@ -15,7 +15,7 @@ function test_employer_compliance() {
     assert(is_compliant == true, "Employer compliance check failed");
 }
 
-// ✅ Test: Verify Worker Certification Compliance
+//  Test: Verify Worker Certification Compliance
 function test_worker_certification() {
     let worker = aleo::account::new();
     let certification = "USDA Organic";
@@ -28,7 +28,7 @@ function test_worker_certification() {
     assert(stored_certification == certification, "Worker certification mismatch");
 }
 
-// ✅ Test: Verify Worker ZPass Compliance
+//  Test: Verify Worker ZPass Compliance
 function test_worker_zpass_compliance() {
     let worker = aleo::account::new();
 
