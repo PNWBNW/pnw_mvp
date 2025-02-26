@@ -1,56 +1,89 @@
-program employer_agreement.leo;
+import main.leo;
+import credits.aleo;
 
-// Mappings
-mapping employer_registry: map[address, bool] = {};
+program employer_agreement.aleo {
+    // Mappings
+    mapping employer_registry: address => bool;
+    mapping employer_tax_compliance: address => bool;
 
-mapping employer_tax_compliance: map[address, bool] = {};
+    // ANS Mappings
+    mapping ans_registry: address => [u8; 32];
+    mapping ans_reverse_lookup: [u8; 32] => address;
+    mapping subDAO_ans_registry: address => [u8; 32];
+    mapping subDAO_reverse_lookup: [u8; 32] => address;
 
-// ANS Mappings
-mapping ans_registry: map[address, string] = {};
+    // Constants
+    const SUBDAO_ANS_NAME: [u8; 32] = *b"wa001_subdao.pnw.ans            ";
+    const SUBDAO_RESERVE: address = aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk;
 
-mapping ans_reverse_lookup: map[string, address] = {};
+    // Structs
+    struct Employer {
+        employer_address: address,
+        registered: bool,
+        tax_compliant: bool,
+        last_updated: u64
+    }
 
-mapping subDAO_ans_registry: map[address, string] = {};
+    // Transition: Register employer
+    transition register_employer(employer: address) -> Employer {
+        assert(!employer_registry.contains(employer));
+        employer_registry[employer] = true;
+        employer_tax_compliance[employer] = false;
+        
+        let employer_record: Employer = Employer {
+            employer_address: employer,
+            registered: true,
+            tax_compliant: false,
+            last_updated: block.height
+        };
+        return employer_record;
+    }
 
-mapping subDAO_reverse_lookup: map[string, address] = {};
+    // Transition: Verify employer tax compliance
+    transition verify_employer_tax(employer: address) -> Employer {
+        assert(employer_registry.contains(employer));
+        employer_tax_compliance[employer] = true;
+        
+        let employer_record: Employer = Employer {
+            employer_address: employer,
+            registered: true,
+            tax_compliant: true,
+            last_updated: block.height
+        };
+        return employer_record;
+    }
 
-// SubDAO ANS Name
-const SUBDAO_ANS_NAME: string = "wa001_subdao.pnw.ans";
+    // Transition: Register employer ANS
+    transition register_employer_ans(employer: address, ans_name: [u8; 32]) -> bool {
+        assert(employer_registry.contains(employer));
+        assert(!ans_reverse_lookup.contains(ans_name));
+        ans_registry[employer] = ans_name;
+        ans_reverse_lookup[ans_name] = employer;
+        return true;
+    }
 
-// SubDAO Reserve Wallet
-const SUBDAO_RESERVE: address = aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk;
+    // Transition: Employer funds SubDAO payroll pool
+    transition fund_payroll_pool(amount: u64) -> bool {
+        let employer: address = self.caller; // Employer is the caller
+        assert(employer_registry.contains(employer));
+        assert(employer_tax_compliance[employer]); // Must be tax-compliant
+        assert(amount > 0u64);
 
-// Structs
-struct Employer {
-    employer_address: address;
-    registered: bool;
-    tax_compliant: bool;
-    last_updated: u64;
-}
+        // Transfer credits to SUBDAO_RESERVE
+        credits.aleo::transfer_public(SUBDAO_RESERVE, amount);
+        
+        return true;
+    }
 
-// Function: Register employer
-function register_employer(employer: address) -> bool {
-    assert(!employer_registry.contains(employer), "Employer already registered");
-    employer_registry[employer] = true;
-    employer_tax_compliance[employer] = false; // Default to non-compliant until verified
-    return true;
-}
+    // Function: Lookup employer address by ANS
+    function lookup_employer_by_ans(ans_name: [u8; 32]) -> address {
+        assert(ans_reverse_lookup.contains(ans_name));
+        return ans_reverse_lookup[ans_name];
+    }
 
-// Function: Verify employer tax compliance
-function verify_employer_tax(employer: address) -> bool {
-    assert(employer_registry.contains(employer), "Employer not registered");
-    employer_tax_compliance[employer] = true;
-    return true;
-}
-
-// Function: Lookup employer address by ANS
-function lookup_employer_by_ans(ans_name: string) -> address {
-    assert(ans_reverse_lookup.contains(ans_name), "Employer ANS name not found");
-    return ans_reverse_lookup[ans_name];
-}
-
-// Function: Lookup SubDAO address by ANS
-function lookup_subDAO_by_ans(ans_name: string) -> address {
-    assert(subDAO_reverse_lookup.contains(ans_name), "SubDAO ANS name not found");
-    return subDAO_reverse_lookup[ans_name];
+    // Function: Lookup SubDAO address by ANS
+    function lookup_subDAO_by_ans(ans_name: [u8; 32]) -> address {
+        assert(subDAO_reverse_lookup.contains(ans_name));
+        return subDAO_reverse_lookup[ans_name];
+    }
 }
