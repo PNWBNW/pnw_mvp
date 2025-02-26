@@ -1,11 +1,10 @@
-// Compliance Tracking Test
-program compliance_tracking_test.leo;
-
 import compliance_tracking;
+
+program compliance_tracking_test.leo {
 
 //  Test: Verify Employer Compliance
 function test_employer_compliance() {
-    let employer = aleo::account::new();
+    let employer = caller();
 
     // Simulate setting compliance status
     compliance_tracking::set_employer_compliance(employer, true);
@@ -17,8 +16,8 @@ function test_employer_compliance() {
 
 //  Test: Verify Worker Certification Compliance
 function test_worker_certification() {
-    let worker = aleo::account::new();
-    let certification = "USDA Organic";
+    let worker = caller();
+    let certification: [u8; 20] = *b"USDA Organic        ";
 
     // Assign worker certification
     compliance_tracking::assign_worker_certification(worker, certification);
@@ -30,7 +29,7 @@ function test_worker_certification() {
 
 //  Test: Verify Worker ZPass Compliance
 function test_worker_zpass_compliance() {
-    let worker = aleo::account::new();
+    let worker = caller();
 
     // Set worker as ZPass verified
     compliance_tracking::set_worker_zpass(worker, true);
@@ -38,4 +37,6 @@ function test_worker_zpass_compliance() {
     // Verify worker compliance
     let is_verified = compliance_tracking::is_worker_zpass_verified(worker);
     assert(is_verified == true, "Worker ZPass compliance check failed");
+}
+
 }
