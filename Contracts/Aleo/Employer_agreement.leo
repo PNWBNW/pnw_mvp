@@ -1,5 +1,6 @@
 import main.leo;
 import credits.aleo;
+import subDAO_reserve.aleo;
 
 program employer_agreement.aleo {
     // Mappings
@@ -22,6 +23,18 @@ program employer_agreement.aleo {
         registered: bool,
         tax_compliant: bool,
         last_updated: u64
+    }
+
+    // Transition: Employer funds SubDAO reserve
+    transition fund_payroll_pool(subDAO: address, amount: u64) -> bool {
+        let employer: address = self.caller;
+        assert(employer_registry.contains(employer));
+        assert(employer_tax_compliance[employer]);
+        assert(amount > 0u64);
+
+        credits.aleo::transfer_public(subDAO, amount);
+        subDAO_reserve.aleo::deposit(subDAO, amount);
+        return true;
     }
 
     // Transition: Register employer
