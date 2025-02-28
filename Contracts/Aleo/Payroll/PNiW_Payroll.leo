@@ -1,50 +1,37 @@
-// PNiW Payroll Contract
-program pniw_payroll.leo;
+import credits.aleo;
+import employer_agreement.aleo;
+import subDAO_reserve.aleo;
+import main.leo;
 
-// Import necessary functions (e.g., from employer agreements or fund pools)
-import employer_agreement;
-import subdao_aleo_native_reserve;
+program pniw_payroll.aleo {
+    mapping employer_funding: address => u64;
+    mapping worker_balances: address => u64;
 
-// Constants
-const ALEO_NATIVE_TOKEN: address = "aleo1tokenaddress1234567890example"; // Replace with actual Aleo token address
+    transition fund_payroll(employer: address, amount: u64) -> bool {
+        assert(amount > 0u64);
+        assert(employer_agreement.aleo::employer_registry.contains(employer));
+        assert(employer_agreement.aleo::employer_tax_compliance[employer]);
 
-// Mappings
-mapping employer_funding: map[address, u64] = {}; // Employer payroll deposits
-mapping worker_balances: map[address, u64] = {}; // Worker payroll balances
+        let current_funding: u64 = employer_funding[employer];
+        employer_funding[employer] = current_funding + amount;
 
-// Function: Employer funds payroll
-function fund_payroll(employer: address, amount: u64) -> bool {
-    assert(amount > 0, "Funding amount must be greater than zero");
+        credits.aleo::transfer_public(subDAO_reserve.aleo::SUBDAO_RESERVE, amount);
+        subDAO_reserve.aleo::deposit(subDAO_reserve.aleo::SUBDAO_RESERVE, amount);
+        return true;
+    }
 
-    // Verify employer compliance before allowing funding
-    assert(employer_agreement::is_compliant(employer), "Employer is non-compliant");
+    transition execute_payroll(worker: address, employer: address, amount: u64) -> bool {
+        assert(main.leo::worker_type[worker] == 1u8); // PNiW only
+        assert(employer_funding[employer] >= amount);
 
-    // Add funds to employer payroll balance
-    employer_funding[employer] += amount;
+        employer_funding[employer] = employer_funding[employer] - amount;
+        worker_balances[worker] = worker_balances[worker] + amount;
 
-    // Deposit into SubDAO Aleo native token pool
-    subdao_aleo_native_reserve::deposit(employer, amount, ALEO_NATIVE_TOKEN);
-    
-    return true;
-}
+        credits.aleo::transfer_public(worker, amount);
+        return true;
+    }
 
-// Function: Execute payroll for a PNiW worker
-function execute_payroll(worker: address, employer: address, amount: u64) -> bool {
-    assert(employer_funding.get(employer).unwrap_or(0) >= amount, "Insufficient employer funds");
-
-    // Deduct employer's funded payroll balance
-    employer_funding[employer] -= amount;
-
-    // Transfer from SubDAO Aleo native token pool to worker
-    subdao_aleo_native_reserve::transfer(worker, amount, ALEO_NATIVE_TOKEN);
-
-    // Update worker balance for verification
-    worker_balances[worker] += amount;
-    
-    return true;
-}
-
-// Function: Verify worker received payroll
-function verify_worker_balance(worker: address) -> u64 {
-    return worker_balances.get(worker).unwrap_or(0);
+    function verify_worker_balance(worker: address) -> u64 {
+        return worker_balances[worker];
+    }
 }
