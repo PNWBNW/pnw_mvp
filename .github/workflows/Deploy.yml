@@ -36,10 +36,10 @@ jobs:
         leo build --network $NETWORK
         # Run tests with retry for credits or errors
         for test in main_test.test_register_worker main_test.test_pay_worker employer_agreement_test.test_register_employer subDAO_reserve_test.test_deposit weekly_payroll_pool_test.test_fund_weekly_pool; do
-          leo run --network $NETWORK --private-key $ALEO_PRIVATE_KEY $test aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk || echo "Test $test failed, continuing..."
+          leo run --network $NETWORK --private-key $ALEO_PRIVATE_KEY $test  || echo "Test $test failed, continuing..."
         done
         # Optional: Check balance (if Leo CLI supports)
-        # leo account balance --address aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk --network $NETWORK || echo "Balance check failed"
+        # leo account balance --address  --network $NETWORK || echo "Balance check failed"
 
     - name: Deploy to Aleo Testnet
       env:
