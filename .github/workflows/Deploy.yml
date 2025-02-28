@@ -17,24 +17,35 @@ jobs:
     - name: Install Leo CLI
       run: |
         # Ensure necessary dependencies with verbose output
-        sudo apt-get update -y && sudo apt-get install -y curl bash build-essential unzip
-        echo "Dependencies installed, attempting Leo install..."
-        # Install Leo with detailed debugging
-        curl -sSL https://install.aleo.org | bash -s -- -y --force || echo "Initial install failed, retrying..."
+        echo "Installing dependencies..."
+        sudo apt-get update -y && sudo apt-get install -y curl bash build-essential unzip git
+        # Check network connectivity for Aleo install
+        curl -I https://install.aleo.org || echo "Network check failed for aleo.org, trying alternative..."
+        # Attempt primary Leo install
+        curl -sSL https://install.aleo.org | bash -s -- -y --force || { echo "Primary install failed, trying GitHub release..."; curl -sSL https://github.com/ProvableHQ/leo/releases/latest/download/install.sh | bash -s -- -y --force; }
         if ! command -v leo &> /dev/null; then
-            echo "Leo CLI not found, retrying with explicit path and debug..."
-            curl -sSL https://install.aleo.org | bash -s -- -y --force
-            # Check all possible locations for leo
+            echo "Leo CLI not found, checking install location and retrying..."
+            # Try manual install or debug path
             find / -name leo 2>/dev/null || echo "Leo not installed anywhere"
+            # Fallback to building from source (requires Rust)
+            sudo apt-get install -y rustc cargo
+            git clone --recurse-submodules https://github.com/ProvableHQ/leo /tmp/leo
+            cd /tmp/leo && cargo install --path .
         fi
         # Ensure PATH is set and persistent across steps
         echo "$HOME/.aleo/bin" >> $GITHUB_PATH
         echo "$HOME/.aleo/bin" >> $GITHUB_ENV
-        echo "/usr/local/bin" >> $GITHUB_PATH  # Common bin location
+        echo "/usr/local/bin" >> $GITHUB_PATH
         echo "/usr/bin" >> $GITHUB_PATH
+        echo "/opt/aleo/bin" >> $GITHUB_PATH  # Possible alternative location
+        echo "/usr/local/cargo/bin" >> $GITHUB_PATH  # Rust cargo bin
         echo "Updated PATH: $PATH"
-        # Verify Leo CLI with exit on failure
-        leo --version || { echo "Leo CLI install failed, exiting..."; exit 1; }
+        # Verify Leo CLI with detailed output and exit on failure
+        if ! leo --version; then
+            echo "Leo CLI not found after all attempts, installation failed. PATH: $PATH"
+            find / -name leo 2>/dev/null || echo "Final check: Leo not found"
+            exit 1
+        fi
         echo "Leo CLI version: $(leo --version)"
 
     - name: Build and Test
