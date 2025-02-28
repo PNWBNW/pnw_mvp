@@ -1,0 +1,38 @@
+# Leo build artifacts
+build/
+dist/
+target/
+out/
+
+# Leo generated files
+*.lock
+*.log
+*.aleo.bak
+
+# Secrets and sensitive files
+.env
+secrets.json
+aleo_private_key.txt
+aleo_test_key.txt
+*.key
+*.wallet
+aleo_wallet.json
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# macOS clutter
+.DS_Store
+
+# Editor-specific
+.vscode/
+.idea/
+*.sublime-*
+
+# GitHub Actions cache (optional)
+*.cache
+
+# Testnet deployment artifacts (if any)
+deployments/
