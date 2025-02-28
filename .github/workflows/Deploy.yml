@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # Allow time for Leo source build
+    timeout-minutes: 45  # Allow time for Leo source build and testing
 
     steps:
     - name: Checkout code
@@ -34,18 +34,13 @@ jobs:
             echo "LEO_PATH=/usr/local/bin" >> $GITHUB_ENV
             echo "PATH=$PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" >> $GITHUB_ENV
         fi
-        # Clean and ensure PATH with no duplicates, formatted correctly
-        CURRENT_PATH="$PATH"
-        echo "Current PATH before cleanup: $CURRENT_PATH"
-        # Remove duplicates and ensure only valid paths
-        CLEAN_PATH=$(echo "$CURRENT_PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" | awk -v RS=: -v ORS=: '!seen[$0]++' | sed 's/:$//')
-        echo "Cleaned PATH: $CLEAN_PATH"
+        # Ensure PATH is set and persistent across steps, with clean format
         echo "LEO_PATH=/usr/local/bin" >> $GITHUB_ENV
-        echo "PATH=$CLEAN_PATH" >> $GITHUB_ENV
-        echo "Updated PATH: $CLEAN_PATH"
+        echo "PATH=$PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" >> $GITHUB_ENV
+        echo "Updated PATH: $PATH"
         # Verify Leo CLI with detailed output and exit on failure
         if ! leo --version; then
-            echo "Leo CLI not found after all attempts, installation failed. PATH: $CLEAN_PATH"
+            echo "Leo CLI not found after all attempts, installation failed. PATH: $PATH"
             find / -name leo 2>/dev/null || echo "Final check: Leo not found"
             exit 1
         fi
@@ -58,13 +53,13 @@ jobs:
       run: |
         echo "Starting build and test with PATH: $PATH"
         leo build --network $NETWORK || { echo "Build failed"; exit 1; }
-        # Derive test wallet address dynamically
-        TEST_WALLET_ADDRESS=$(leo account address --private-key $ALEO_PRIVATE_KEY --network $NETWORK 2>/dev/null || echo "aleo1default1234567890example")
+        # Derive test wallet address dynamically, fixing --private-key syntax
+        TEST_WALLET_ADDRESS=$(leo account address -- --private-key $ALEO_PRIVATE_KEY --network $NETWORK 2>/dev/null || echo "aleo1default1234567890example")
         echo "Using test wallet address: $TEST_WALLET_ADDRESS"
-        # Run tests with retries, debug, and fallback address
+        # Run tests with retries, debug, and corrected --private-key syntax
         for test in main_test.test_register_worker main_test.test_pay_worker employer_agreement_test.test_register_employer subDAO_reserve_test.test_deposit weekly_payroll_pool_test.test_fund_weekly_pool; do
           echo "Running test: $test with address $TEST_WALLET_ADDRESS"
-          leo run --network $NETWORK --private-key $ALEO_PRIVATE_KEY $test $TEST_WALLET_ADDRESS || echo "Test $test failed, continuing..."
+          leo run --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY $test $TEST_WALLET_ADDRESS || echo "Test $test failed, continuing..."
         done
         # Check balance (if supported, fallback if not)
         leo account balance --address $TEST_WALLET_ADDRESS --network $NETWORK 2>/dev/null || echo "Balance check failed or not supported"
@@ -75,4 +70,4 @@ jobs:
         ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
       run: |
         echo "Deploying with PATH: $PATH"
-        leo deploy --network $NETWORK --private-key $ALEO_PRIVATE_KEY || { echo "Deploy failed"; exit 1; }
+        leo deploy --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY || { echo "Deploy failed"; exit 1; }
