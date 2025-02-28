@@ -1,36 +1,33 @@
-program oversightdao_reserve.leo;
+import credits.aleo;
 
-// OversightDAO Liquidity Pool for 17% Aleo native reserve
+program oversightDAO_reserve.aleo {
+    // Mapping
+    mapping reserve_balance: address => u64;
 
-// Constants
-const OVERSIGHT_DAO: address = aleo1s8t86aza932zah3mv5knclvnn5zy4gedpl5a4wn5h2yrt08mxqzsw5amdd;
-const OVERSIGHT_ALLOCATION: u64 = 17; // 17% allocation to OversightDAO
+    // Constants
+    const OVERSIGHT_DAO: address = aleo1s8t86aza932zah3mv5knclvnn5zy4gedpl5a4wn5h2yrt08mxqzsw5amdd;
+    const OVERSIGHT_DAO_ANS: [u8; 32] = *b"oversightdao.pnw.ans            ";
 
-// Mappings
-mapping oversight_balance: map[address, u64] = {}; // OversightDAO balance storage
+    // Transition: Deposit funds into OversightDAO reserve
+    transition deposit(oversightDAO: address, amount: u64) -> bool {
+        assert(amount > 0u64);
+        assert(oversightDAO == OVERSIGHT_DAO);
+        let current_balance: u64 = reserve_balance[oversightDAO];
+        reserve_balance[oversightDAO] = current_balance + amount;
+        return true;
+    }
 
-// Function: Deposit employer contributions (100% Aleo native)
-function deposit_aleo_native(employer: address, amount: u64) -> bool {
-    assert(amount > 0, "Deposit amount must be greater than zero");
-    
-    let current_balance = oversight_balance.get_or_use(OVERSIGHT_DAO, 0u64);
-    oversight_balance[OVERSIGHT_DAO] = current_balance + amount;
-    
-    return true;
-}
+    // Transition: Withdraw funds for SubDAO use (future feature)
+    transition withdraw(subDAO: address, amount: u64) -> bool {
+        let current_balance: u64 = reserve_balance[OVERSIGHT_DAO];
+        assert(current_balance >= amount);
+        reserve_balance[OVERSIGHT_DAO] = current_balance - amount;
+        credits.aleo::transfer_public(subDAO, amount);
+        return true;
+    }
 
-// Function: Withdraw from OversightDAO pool
-function withdraw_for_oversight(amount: u64) -> bool {
-    let current_balance = oversight_balance.get_or_use(OVERSIGHT_DAO, 0u64);
-    
-    assert(current_balance >= amount, "Insufficient balance in OversightDAO reserve");
-    
-    oversight_balance[OVERSIGHT_DAO] = current_balance - amount;
-    
-    return true;
-}
-
-// Function: Get OversightDAO balance
-function get_oversight_balance() -> u64 {
-    return oversight_balance.get_or_use(OVERSIGHT_DAO, 0u64);
+    // Function: Get OversightDAO reserve balance
+    function get_reserve_balance() -> u64 {
+        return reserve_balance[OVERSIGHT_DAO];
+    }
 }
