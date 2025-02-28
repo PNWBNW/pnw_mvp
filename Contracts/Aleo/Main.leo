@@ -1,13 +1,16 @@
 import credits.aleo;
-import payroll_pool.aleo;
 import employer_agreement.aleo;
 import process_tax_compliance.aleo;
+import weekly_payroll_pool.aleo;
+import pncw_payroll.aleo;
+import pniw_payroll.aleo;
+import subDAO_reserve.aleo;
 
 program main.leo {
     // Mappings
     mapping worker_category: address => [u8; 20];
     mapping worker_zpass_verified: address => bool;
-    mapping worker_type: address => u8; // 0 = PNcW (Citizen), 1 = PNiW (Immigrant)
+    mapping worker_type: address => u8; // 0 = PNcW, 1 = PNiW
     mapping ans_registry: address => [u8; 32];
     mapping ans_reverse_lookup: [u8; 32] => address;
     mapping subDAO_ans_registry: address => [u8; 32];
@@ -16,7 +19,6 @@ program main.leo {
     // Constants
     const SUBDAO_RESERVE: address = aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk;
     const OVERSIGHT_DAO: address = aleo1s8t86aza932zah3mv5knclvnn5zy4gedpl5a4wn5h2yrt08mxqzsw5amdd;
-    const OVERSIGHT_ALLOCATION: u64 = 17u64; // 17% allocation
 
     // Structs
     struct Worker {
@@ -41,8 +43,7 @@ program main.leo {
             }
         }
         assert(is_valid);
-
-        assert(worker_type_flag == 0u8 || worker_type_flag == 1u8); // PNcW or PNiW
+        assert(worker_type_flag == 0u8 || worker_type_flag == 1u8);
 
         worker_category[worker] = category;
         worker_type[worker] = worker_type_flag;
@@ -69,32 +70,43 @@ program main.leo {
         return true;
     }
 
+    // Transition: Register SubDAO ANS
+    transition register_subDAO_ans(subDAO: address, ans_name: [u8; 32]) -> bool {
+        assert(!subDAO_ans_registry.contains(subDAO));
+        assert(!subDAO_reverse_lookup.contains(ans_name));
+        subDAO_ans_registry[subDAO] = ans_name;
+        subDAO_reverse_lookup[ans_name] = subDAO;
+        return true;
+    }
+
     // Transition: Pay worker
     transition pay_worker(worker: address, subDAO: address, amount: u64) -> bool {
         assert(amount > 0u64);
         assert(worker_category.contains(worker));
         assert(worker_zpass_verified[worker]);
 
-        let pool_balance: u64 = payroll_pool.aleo::get_payroll_balance(subDAO);
-        assert(pool_balance >= amount);
+        let employer: address = self.caller;
+        let worker_type_flag: u8 = worker_type[worker];
+        if worker_type_flag == 0u8 {
+            pncw_payroll.aleo::execute_payroll(worker, employer, amount);
+        } else if worker_type_flag == 1u8 {
+            pniw_payroll.aleo::execute_payroll(worker, employer, amount);
+        } else {
+            assert(false);
+        }
 
-        // Optional: Check employer tax compliance (uncomment if desired)
-        // let employer: address = self.caller; // Assume caller is employer
-        // assert(process_tax_compliance.aleo::check_compliance(employer));
-
-        payroll_pool.aleo::withdraw(subDAO, amount);
-        credits.aleo::transfer_public(worker, amount);
-        
-        // Process tax compliance based on worker type
-        // Uncomment when pncw/pniw payrolls are ready
-        // process_tax_compliance.aleo::process_tax_compliance(employer, worker_type[worker]);
-        
-        return true;
+        return weekly_payroll_pool.aleo::execute_weekly_payroll(worker, subDAO, amount);
     }
 
-    // Transition: Allocate funds to OversightDAO from a SubDAO pool
-    transition allocate_to_oversight(subDAO: address) -> bool {
-        return payroll_pool.aleo::allocate_to_oversight(subDAO);
+    // Transition: Fund weekly payroll pool
+    transition fund_weekly_pool(subDAO: address, amount: u64) -> bool {
+        subDAO_reserve.aleo::fund_weekly_payroll(subDAO, amount);
+        return weekly_payroll_pool.aleo::fund_weekly_pool(subDAO, amount);
+    }
+
+    // Transition: Process taxes for a SubDAO
+    transition process_taxes(subDAO: address) -> bool {
+        return subDAO_reserve.aleo::process_taxes(subDAO);
     }
 
     // Function: Lookup SubDAO address by ANS
