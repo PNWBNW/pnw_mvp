@@ -30,19 +30,22 @@ jobs:
             cd leo && cargo build --release
             # Install Leo binary
             sudo cp target/release/leo /usr/local/bin/leo
-            # Ensure PATH includes cargo bin
-            echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-            echo "$HOME/.cargo/bin" >> $GITHUB_ENV
-            echo "/usr/local/bin" >> $GITHUB_PATH
-            echo "/usr/bin" >> $GITHUB_PATH
+            # Ensure PATH includes cargo bin with proper format
+            echo "LEO_PATH=/usr/local/bin" >> $GITHUB_ENV
+            echo "PATH=$PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" >> $GITHUB_ENV
         fi
-        # Ensure PATH is set and persistent across steps, with clean format
+        # Clean and ensure PATH with no duplicates, formatted correctly
+        CURRENT_PATH="$PATH"
+        echo "Current PATH before cleanup: $CURRENT_PATH"
+        # Remove duplicates and ensure only valid paths
+        CLEAN_PATH=$(echo "$CURRENT_PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" | awk -v RS=: -v ORS=: '!seen[$0]++' | sed 's/:$//')
+        echo "Cleaned PATH: $CLEAN_PATH"
         echo "LEO_PATH=/usr/local/bin" >> $GITHUB_ENV
-        echo "PATH=$PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" >> $GITHUB_ENV
-        echo "Updated PATH: $PATH"
+        echo "PATH=$CLEAN_PATH" >> $GITHUB_ENV
+        echo "Updated PATH: $CLEAN_PATH"
         # Verify Leo CLI with detailed output and exit on failure
         if ! leo --version; then
-            echo "Leo CLI not found after all attempts, installation failed. PATH: $PATH"
+            echo "Leo CLI not found after all attempts, installation failed. PATH: $CLEAN_PATH"
             find / -name leo 2>/dev/null || echo "Final check: Leo not found"
             exit 1
         fi
