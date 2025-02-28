@@ -16,17 +16,25 @@ jobs:
 
     - name: Install Leo CLI
       run: |
-        # Ensure curl and bash are available
-        sudo apt-get update && sudo apt-get install -y curl bash
+        # Ensure necessary dependencies
+        sudo apt-get update && sudo apt-get install -y curl bash build-essential
+        # Install Leo with explicit force and debug
         curl -sSL https://install.aleo.org | bash -s -- -y --force
         if ! command -v leo &> /dev/null; then
-            echo "Leo CLI not found, retrying with explicit path..."
+            echo "Leo CLI not found, retrying with explicit path and debug..."
             curl -sSL https://install.aleo.org | bash -s -- -y --force
+            # Check installation location
+            find / -name leo 2>/dev/null || echo "Leo not installed anywhere"
         fi
+        # Ensure PATH is set and persistent
         echo "$HOME/.aleo/bin" >> $GITHUB_PATH
+        echo "$HOME/.aleo/bin" >> $GITHUB_ENV  # Add to environment for all steps
         echo "PATH is now: $PATH"
         # Verify Leo CLI
-        leo --version || echo "Leo CLI install failed"
+        leo --version || echo "Leo CLI install failed, exiting..."
+        if ! leo --version; then
+            exit 1
+        fi
 
     - name: Build and Test
       env:
@@ -34,12 +42,16 @@ jobs:
         ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
       run: |
         leo build --network $NETWORK
-        # Run tests with retry for credits or errors
+        # Derive test wallet address from ALEO_PRIVATE_KEY for dynamic testing
+        TEST_WALLET_ADDRESS=$(aleo account address --private-key $ALEO_PRIVATE_KEY --network $NETWORK)
+        echo "Using test wallet address: $TEST_WALLET_ADDRESS"
+        # Run tests with dynamic address, assuming ALEO_PRIVATE_KEY derives it
         for test in main_test.test_register_worker main_test.test_pay_worker employer_agreement_test.test_register_employer subDAO_reserve_test.test_deposit weekly_payroll_pool_test.test_fund_weekly_pool; do
-          leo run --network $NETWORK --private-key $ALEO_PRIVATE_KEY $test  || echo "Test $test failed, continuing..."
+          echo "Running test: $test with address $TEST_WALLET_ADDRESS"
+          leo run --network $NETWORK --private-key $ALEO_PRIVATE_KEY $test $TEST_WALLET_ADDRESS || echo "Test $test failed, continuing..."
         done
         # Optional: Check balance (if Leo CLI supports)
-        # leo account balance --address  --network $NETWORK || echo "Balance check failed"
+        leo account balance --address $TEST_WALLET_ADDRESS --network $NETWORK || echo "Balance check failed"
 
     - name: Deploy to Aleo Testnet
       env:
