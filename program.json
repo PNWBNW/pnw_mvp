@@ -1,0 +1,236 @@
+{
+  "programs": [
+    {
+      "program": "main.leo",
+      "version": "0.1.0",
+      "description": "PNW-MVP: Core orchestration for zero-knowledge payroll on Aleo testnet",
+      "network": "testnet",
+      "private_key": "",
+      "fee": 0.01,
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "employer_agreement.leo",
+        "process_tax_compliance.leo",
+        "weekly_payroll_pool.leo",
+        "pncw_payroll.leo",
+        "pniw_payroll.leo",
+        "subDAO_reserve.leo"
+      ],
+      "ans_name": "",
+      "test_addresses": [
+        "aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk"  // Example SubDAO address
+      ],
+      "test_mode": true,
+      "faucet_address": "https://faucet.aleo.network/",
+      "deployment_notes": "Entry point for PNW-MVP suite, handles worker payroll and orchestration.",
+      "test_files": [
+        "tests/main_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+    },
+    {
+      "program": "employer_agreement.leo",
+      "version": "0.1.0",
+      "description": "Employer funding entry for PNW-MVP",
+      "network": "testnet",
+      "private_key": "",
+      "fee": 0.01,
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "subDAO_reserve.leo",
+        "oversightDAO_reserve.leo"
+      ],
+      "ans_name": "",
+      "test_addresses": [
+        "aleo1employer1234567890example"
+      ],
+      "test_mode": true,
+      "faucet_address": "https://faucet.aleo.network/",
+      "deployment_notes": "Handles employer registration, compliance, and payroll funding.",
+      "test_files": [
+        "tests/employer_agreement_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+    },
+    {
+      "program": "oversightDAO_reserve.leo",
+      "version": "0.1.0",
+      "description": "OversightDAO backup/investment pool for PNW-MVP (ANS: oversightdao.pnw.ans)",
+      "network": "testnet",
+      "private_key": "",
+      "fee": 0.01,
+      "record": null,
+      "imports": [
+        "credits.aleo"
+      ],
+      "ans_name": "oversightdao.pnw.ans",
+      "test_addresses": [
+        "aleo1s8t86aza932zah3mv5knclvnn5zy4gedpl5a4wn5h2yrt08mxqzsw5amdd"
+      ],
+      "test_mode": true,
+      "faucet_address": "https://faucet.aleo.network/",
+      "deployment_notes": "Stores 17% backup funds for SubDAOs, future investments.",
+      "test_files": [
+        "tests/oversightDAO_reserve_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+    },
+    {
+      "program": "subDAO_reserve.leo",
+      "version": "0.1.0",
+      "description": "SubDAO payroll and tax management for PNW-MVP",
+      "network": "testnet",
+      "private_key": "",
+      "fee": 0.01,
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "weekly_payroll_pool.leo",
+        "process_tax_compliance.leo"
+      ],
+      "ans_name": "wa001_subdao.pnw.ans",
+      "test_addresses": [
+        "aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk"
+      ],
+      "test_mode": true,
+      "faucet_address": "https://faucet.aleo.network/",
+      "deployment_notes": "Manages payroll funds and taxes for SubDAOs.",
+      "test_files": [
+        "tests/subDAO_reserve_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+    },
+    {
+      "program": "weekly_payroll_pool.leo",
+      "version": "0.1.0",
+      "description": "Weekly worker payouts for PNW-MVP",
+      "network": "testnet",
+      "private_key": "",
+      "fee": 0.01,
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "subDAO_reserve.leo",
+        "main.leo",
+        "pncw_payroll.leo",
+        "pniw_payroll.leo"
+      ],
+      "ans_name": "",
+      "test_addresses": [
+        "aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk"
+      ],
+      "test_mode": true,
+      "faucet_address": "https://faucet.aleo.network/",
+      "deployment_notes": "Handles weekly payroll distributions to workers.",
+      "test_files": [
+        "tests/weekly_payroll_pool_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+    },
+    {
+      "program": "pncw_payroll.leo",
+      "version": "0.1.0",
+      "description": "PNcW (Citizen) payroll tracking for PNW-MVP",
+      "network": "testnet",
+      "private_key": "",
+      "fee": 0.01,
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "employer_agreement.leo",
+        "subDAO_reserve.leo",
+        "main.leo"
+      ],
+      "ans_name": "",
+      "test_addresses": [
+        "aleo1worker1234567890example"  // Example PNcW worker
+      ],
+      "test_mode": true,
+      "faucet_address": "https://faucet.aleo.network/",
+      "deployment_notes": "Tracks payroll for Citizen (PNcW) workers.",
+      "test_files": [
+        "tests/pncw_payroll_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+    },
+    {
+      "program": "pniw_payroll.leo",
+      "version": "0.1.0",
+      "description": "PNiW (Immigrant) payroll tracking for PNW-MVP",
+      "network": "testnet",
+      "private_key": "",
+      "fee": 0.01,
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "employer_agreement.leo",
+        "subDAO_reserve.leo",
+        "main.leo"
+      ],
+      "ans_name": "",
+      "test_addresses": [
+        "aleo1worker1234567890example"  // Example PNiW worker
+      ],
+      "test_mode": true,
+      "faucet_address": "https://faucet.aleo.network/",
+      "deployment_notes": "Tracks payroll for Immigrant (PNiW) workers.",
+      "test_files": [
+        "tests/pniw_payroll_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+    },
+    {
+      "program": "process_tax_compliance.leo",
+      "version": "0.1.0",
+      "description": "Tax compliance for PNW-MVP",
+      "network": "testnet",
+      "private_key": "",
+      "fee": 0.01,
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "employer_agreement.leo",
+        "subDAO_reserve.leo"
+      ],
+      "ans_name": "",
+      "test_addresses": [
+        "aleo1employer1234567890example"
+      ],
+      "test_mode": true,
+      "faucet_address": "https://faucet.aleo.network/",
+      "deployment_notes": "Manages tax compliance and payments for employers.",
+      "test_files": [
+        "tests/process_tax_compliance_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+    }
+  ],
+  "main": "main.leo",
+  "global_fee": 0.01,
+  "default_network": "testnet",
+  "test_mode": true,
+  "faucet_url": "https://faucet.aleo.network/",
+  "deployment_strategy": "batch",
+  "test_addresses": [
+    "aleo1worker1234567890example",
+    "aleo1employer1234567890example",
+    "aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk",
+    "aleo1s8t86aza932zah3mv5knclvnn5zy4gedpl5a4wn5h2yrt08mxqzsw5amdd"
+  ],
+  "test_files": [
+    "tests/main_test.leo",
+    "tests/employer_agreement_test.leo",
+    "tests/oversightDAO_reserve_test.leo",
+    "tests/subDAO_reserve_test.leo",
+    "tests/weekly_payroll_pool_test.leo",
+    "tests/pncw_payroll_test.leo",
+    "tests/pniw_payroll_test.leo",
+    "tests/process_tax_compliance_test.leo"
+  ],
+  "deployment_scripts": {
+    "batch": "leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}",
+    "single": "leo deploy <program>.leo --network testnet --private-key ${ALEO_PRIVATE_KEY}"
+  }
+}
