@@ -1,13 +1,11 @@
-import main.leo;
 import credits.aleo;
 import subDAO_reserve.aleo;
+import oversightDAO_reserve.aleo;
 
 program employer_agreement.aleo {
     // Mappings
     mapping employer_registry: address => bool;
     mapping employer_tax_compliance: address => bool;
-
-    // ANS Mappings
     mapping ans_registry: address => [u8; 32];
     mapping ans_reverse_lookup: [u8; 32] => address;
     mapping subDAO_ans_registry: address => [u8; 32];
@@ -16,6 +14,9 @@ program employer_agreement.aleo {
     // Constants
     const SUBDAO_ANS_NAME: [u8; 32] = *b"wa001_subdao.pnw.ans            ";
     const SUBDAO_RESERVE: address = aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk;
+    const OVERSIGHT_DAO: address = aleo1s8t86aza932zah3mv5knclvnn5zy4gedpl5a4wn5h2yrt08mxqzsw5amdd;
+    const OVERSIGHT_DAO_ANS: [u8; 32] = *b"oversightdao.pnw.ans            ";
+    const OVERSIGHT_ALLOCATION: u64 = 17u64;
 
     // Structs
     struct Employer {
@@ -23,18 +24,6 @@ program employer_agreement.aleo {
         registered: bool,
         tax_compliant: bool,
         last_updated: u64
-    }
-
-    // Transition: Employer funds SubDAO reserve
-    transition fund_payroll_pool(subDAO: address, amount: u64) -> bool {
-        let employer: address = self.caller;
-        assert(employer_registry.contains(employer));
-        assert(employer_tax_compliance[employer]);
-        assert(amount > 0u64);
-
-        credits.aleo::transfer_public(subDAO, amount);
-        subDAO_reserve.aleo::deposit(subDAO, amount);
-        return true;
     }
 
     // Transition: Register employer
@@ -75,15 +64,30 @@ program employer_agreement.aleo {
         return true;
     }
 
-    // Transition: Employer funds SubDAO payroll pool
-    transition fund_payroll_pool(amount: u64) -> bool {
-        let employer: address = self.caller; // Employer is the caller
+    // Transition: Register SubDAO ANS
+    transition register_subDAO_ans(subDAO: address, ans_name: [u8; 32]) -> bool {
+        assert(!subDAO_ans_registry.contains(subDAO));
+        assert(!subDAO_reverse_lookup.contains(ans_name));
+        subDAO_ans_registry[subDAO] = ans_name;
+        subDAO_reverse_lookup[ans_name] = subDAO;
+        return true;
+    }
+
+    // Transition: Fund payroll pool, splitting to OversightDAO and SubDAO
+    transition fund_payroll_pool(subDAO: address, amount: u64) -> bool {
+        let employer: address = self.caller;
         assert(employer_registry.contains(employer));
-        assert(employer_tax_compliance[employer]); // Must be tax-compliant
+        assert(employer_tax_compliance[employer]);
         assert(amount > 0u64);
 
-        // Transfer credits to SUBDAO_RESERVE
-        credits.aleo::transfer_public(SUBDAO_RESERVE, amount);
+        let oversight_amount: u64 = amount * OVERSIGHT_ALLOCATION / 100u64;
+        let subDAO_amount: u64 = amount - oversight_amount;
+
+        credits.aleo::transfer_public(OVERSIGHT_DAO, oversight_amount);
+        oversightDAO_reserve.aleo::deposit(OVERSIGHT_DAO, oversight_amount);
+
+        credits.aleo::transfer_public(subDAO, subDAO_amount);
+        subDAO_reserve.aleo::deposit(subDAO, subDAO_amount);
         
         return true;
     }
