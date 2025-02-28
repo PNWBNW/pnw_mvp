@@ -1,5 +1,5 @@
 import credits.aleo;
-import payroll_pools;
+import payroll_pool.aleo;
 
 program main.leo {
     // Mappings (defined at program level, used in transitions)
@@ -20,6 +20,25 @@ program main.leo {
         worker_address: address,
         category: [u8; 20],
         last_updated: u64
+    }
+
+    // Transition: Pay worker
+    transition pay_worker(worker: address, subDAO: address, amount: u64) -> bool {
+        assert(amount > 0u64);
+        assert(worker_category.contains(worker));
+        assert(worker_zpass_verified[worker]);
+
+        let pool_balance: u64 = payroll_pool.aleo::get_payroll_balance(subDAO);
+        assert(pool_balance >= amount);
+
+        payroll_pool.aleo::withdraw(subDAO, amount);
+        credits.aleo::transfer_public(worker, amount);
+        return true;
+    }
+
+    // Transition: Allocate to OversightDAO
+    transition allocate_to_oversight(subDAO: address) -> bool {
+        return payroll_pool.aleo::allocate_to_oversight(subDAO);
     }
 
     // Transition: Assign worker category
