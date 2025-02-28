@@ -1,0 +1,25 @@
+PNW-MVP/
+├── src/
+│   ├── main.leo
+│   ├── employer_agreement.leo
+│   ├── oversightDAO_reserve.leo
+│   ├── subDAO_reserve.leo
+│   ├── weekly_payroll_pool.leo
+│   ├── pncw_payroll.leo
+│   ├── pniw_payroll.leo
+│   ├── process_tax_compliance.leo
+├── tests/
+│   ├── main_test.leo
+│   ├── employer_agreement_test.leo
+│   ├── oversightDAO_reserve_test.leo
+│   ├── subDAO_reserve_test.leo
+│   ├── weekly_payroll_pool_test.leo
+│   ├── pncw_payroll_test.leo
+│   ├── pniw_payroll_test.leo
+│   ├── process_tax_compliance_test.leo
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── .gitignore
+├── README.md
+├── aleo.toml
