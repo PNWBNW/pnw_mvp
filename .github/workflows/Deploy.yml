@@ -52,17 +52,17 @@ jobs:
         ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
       run: |
         echo "Starting build and test with PATH: $PATH"
-        leo build --network $NETWORK || { echo "Build failed"; exit 1; }
+        leo build --network $NETWORK --endpoint https://api.explorer.provable.com/v1/testnet || { echo "Build failed"; exit 1; }
         # Derive test wallet address dynamically, fixing --private-key syntax
-        TEST_WALLET_ADDRESS=$(leo account address -- --private-key $ALEO_PRIVATE_KEY --network $NETWORK 2>/dev/null || echo "aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6")
+        TEST_WALLET_ADDRESS=$(leo account address -- --private-key $ALEO_PRIVATE_KEY --network $NETWORK --endpoint https://api.explorer.provable.com/v1/testnet 2>/dev/null || echo "aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6")
         echo "Using test wallet address: $TEST_WALLET_ADDRESS"
-        # Run tests with retries, debug, and corrected --private-key syntax, using your wallet
+        # Run tests with retries, debug, corrected --private-key syntax, and endpoint
         for test in main_test.test_register_worker main_test.test_pay_worker employer_agreement_test.test_register_employer subDAO_reserve_test.test_deposit weekly_payroll_pool_test.test_fund_weekly_pool; do
           echo "Running test: $test with address $TEST_WALLET_ADDRESS"
-          leo run --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY $test $TEST_WALLET_ADDRESS || echo "Test $test failed, continuing..."
+          leo run --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY --endpoint https://api.explorer.provable.com/v1/testnet $test $TEST_WALLET_ADDRESS || echo "Test $test failed, continuing..."
         done
         # Check balance (if supported, fallback if not)
-        leo account balance --address $TEST_WALLET_ADDRESS --network $NETWORK 2>/dev/null || echo "Balance check failed or not supported"
+        leo account balance --address $TEST_WALLET_ADDRESS --network $NETWORK --endpoint https://api.explorer.provable.com/v1/testnet 2>/dev/null || echo "Balance check failed or not supported"
 
     - name: Deploy to Aleo Testnet
       env:
@@ -70,4 +70,4 @@ jobs:
         ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
       run: |
         echo "Deploying with PATH: $PATH"
-        leo deploy --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY || { echo "Deploy failed"; exit 1; }
+        leo deploy --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY --endpoint https://api.explorer.provable.com/v1/testnet || { echo "Deploy failed"; exit 1; }
