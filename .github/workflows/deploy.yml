@@ -17,12 +17,12 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        sudo apt-get update -y
-        sudo apt-get install -y curl bash build-essential unzip git rustc cargo
+      sudo apt-get update -y
+      sudo apt-get install -y curl bash build-essential unzip git rustc cargo
 
-    - name: Install Leo CLI (Binary - Version 2.4.1)
+    - name: Install Leo CLI (Latest Testnet Version)
       run: |
-        curl -sSf https://github.com/ProvableHQ/leo/releases/download/2.4.1/install.sh | bash
+        cargo install leo-lang
         leo --version
 
     - name: Run Unit Tests
@@ -42,7 +42,7 @@ jobs:
           exit 1
         fi
         
-        # Corrected deploy command (no extra `--` before --private-key)
+        # Corrected deploy command for Aleo Testnet
         leo deploy --private-key "$PRIVATE_KEY" --network testnet || { echo "Deploy failed"; exit 1; }
 
         echo "Deployment completed—checking Aleoscan for programs and credit usage..."
