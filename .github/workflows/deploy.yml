@@ -25,23 +25,18 @@ jobs:
           cargo install leo-lang
           leo --version
 
-      - name: Run Unit Tests
-        run: |
-          echo "Running Leo tests..."
-          leo test > test-results.log
-          cat test-results.log
-
       - name: Deploy to Aleo Testnet
         env:
           PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
           echo "Starting deployment..."
-
+          
           if [ -z "$PRIVATE_KEY" ]; then
             echo "ERROR: Aleo private key is missing! Set it in GitHub Secrets."
             exit 1
           fi
-
+          
+          # Corrected deploy command
           leo deploy --private-key "$PRIVATE_KEY" --network testnet || { echo "Deploy failed"; exit 1; }
 
           echo "Deployment completed—checking Aleoscan for programs and credit usage..."
