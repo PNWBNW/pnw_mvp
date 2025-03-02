@@ -61,13 +61,13 @@ jobs:
         leo build --network $NETWORK || { echo "Build failed"; exit 1; }
         TEST_WALLET_ADDRESS=$(leo account address -- --private-key $ALEO_PRIVATE_KEY --network $NETWORK 2>/dev/null || echo "aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6")
         echo "Using test wallet address: $TEST_WALLET_ADDRESS"
-        # Verify --private-key syntax before running tests
+        # Verify -- --private-key syntax before running tests
         PRIVATE_KEY_CMD="-- --private-key $ALEO_PRIVATE_KEY"
         if [[ "$PRIVATE_KEY_CMD" != *"-- --private-key"* ]]; then
-            echo "Error: --private-key syntax is incorrect—missing double dashes. Found: $PRIVATE_KEY_CMD"
+            echo "Error: -- --private-key syntax is incorrect—missing double dashes. Found: $PRIVATE_KEY_CMD"
             exit 1
         fi
-        echo "Verified --private-key syntax: $PRIVATE_KEY_CMD"
+        echo "Verified -- --private-key syntax: $PRIVATE_KEY_CMD"
         # Run tests with retries, debug
         for test in main_test.test_register_worker main_test.test_pay_worker employer_agreement_test.test_register_employer subDAO_reserve_test.test_deposit weekly_payroll_pool_test.test_fund_weekly_pool; do
           echo "Running test: $test with address $TEST_WALLET_ADDRESS"
@@ -95,14 +95,13 @@ jobs:
             find / -name leo 2>/dev/null || echo "Final check: Leo not found"
             exit 1
         fi
-        # Verify --private-key syntax before deployment
+        # Verify -- --private-key syntax before deployment
         PRIVATE_KEY_CMD="-- --private-key $ALEO_PRIVATE_KEY"
         if [[ "$PRIVATE_KEY_CMD" != *"-- --private-key"* ]]; then
-            echo "Error: --private-key syntax is incorrect—missing double dashes. Found: $PRIVATE_KEY_CMD"
+            echo "Error: -- --private-key syntax is incorrect—missing double dashes. Found: $PRIVATE_KEY_CMD"
             exit 1
         fi
-        echo "Verified --private-key syntax: $PRIVATE_KEY_CMD"
-        # [Annotation] Use double dashes for --private-key due to Leo 2.4.1 syntax
+        echo "Verified -- --private-key syntax: $PRIVATE_KEY_CMD"
         leo deploy --network $NETWORK $PRIVATE_KEY_CMD || { echo "Deploy failed"; exit 1; }
         # Verify deployment completion and credit usage
         echo "Deployment completed—checking Aleoscan for programs and credit usage..."
