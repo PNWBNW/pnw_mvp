@@ -5,7 +5,7 @@
       "version": "0.1.0",
       "description": "PNW-MVP: Core orchestration for zero-knowledge payroll on Aleo testnet",
       "network": "testnet",
-      "private_key": "",  // Private key provided via ALEO_PRIVATE_KEY environment variable or -- --private-key flag
+      "private_key": "",  
       "fee": 0.01,
       "record": null,
       "imports": [
@@ -21,18 +21,18 @@
       "test_addresses": [],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
-      "deployment_notes": "Use -- --private-key ${ALEO_PRIVATE_KEY} due to Leo 2.4.1 syntax, verified programmatically in deploy.yml",
+      "deployment_notes": "Use -- --private-key ${ALEO_TEST_KEY} due to Leo 2.4.1 syntax, verified programmatically in deploy.yml",
       "test_files": [
         "tests/main_test.leo"
       ],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
+      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_TEST_KEY}"
     },
     {
       "program": "employer_agreement.leo",
       "version": "0.1.0",
       "description": "Employer funding entry for PNW-MVP",
       "network": "testnet",
-      "private_key": "",  // Private key provided via ALEO_PRIVATE_KEY environment variable or -- --private-key flag
+      "private_key": "",  
       "fee": 0.01,
       "record": null,
       "imports": [
@@ -44,18 +44,18 @@
       "test_addresses": [],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
-      "deployment_notes": "Use -- --private-key ${ALEO_PRIVATE_KEY} due to Leo 2.4.1 syntax, verified programmatically in deploy.yml",
+      "deployment_notes": "Use -- --private-key ${ALEO_TEST_KEY} due to Leo 2.4.1 syntax, verified programmatically in deploy.yml",
       "test_files": [
         "tests/employer_agreement_test.leo"
       ],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
+      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_TEST_KEY}"
     },
     {
       "program": "oversightDAO_reserve.leo",
       "version": "0.1.0",
       "description": "OversightDAO backup/investment pool for PNW-MVP (ANS: oversightdao.pnw.ans)",
       "network": "testnet",
-      "private_key": "",  // Private key provided via ALEO_PRIVATE_KEY environment variable or -- --private-key flag
+      "private_key": "",  
       "fee": 0.01,
       "record": null,
       "imports": [
