@@ -17,28 +17,21 @@ jobs:
 
     - name: Install Leo CLI
       run: |
-        # Ensure necessary dependencies with verbose output
         echo "Installing dependencies..."
         sudo apt-get update -y && sudo apt-get install -y curl bash build-essential unzip git rustc cargo
-        # Install Leo from GitHub release as primary method
         echo "Attempting to install Leo CLI from GitHub release..."
         curl -sSL https://github.com/ProvableHQ/leo/releases/latest/download/install.sh | bash -s -- -y --force || echo "GitHub release install failed, building from source..."
         if ! command -v leo &> /dev/null; then
             echo "Leo CLI not found, building from source..."
-            # Build Leo from source with Rust
             cd /tmp && git clone --recurse-submodules https://github.com/ProvableHQ/leo
             cd leo && cargo build --release
-            # Install Leo binary
             sudo cp target/release/leo /usr/local/bin/leo
-            # Ensure PATH includes cargo bin with proper format
             echo "LEO_PATH=/usr/local/bin" >> $GITHUB_ENV
             echo "PATH=$PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" >> $GITHUB_ENV
         fi
-        # Ensure PATH is set and persistent across steps, with clean format
         echo "LEO_PATH=/usr/local/bin" >> $GITHUB_ENV
         echo "PATH=$PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" >> $GITHUB_ENV
         echo "Updated PATH: $PATH"
-        # Verify Leo CLI with detailed output and exit on failure
         if ! leo --version; then
             echo "Leo CLI not found after all attempts, installation failed. PATH: $PATH"
             find / -name leo 2>/dev/null || echo "Final check: Leo not found"
@@ -52,7 +45,6 @@ jobs:
         ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
       run: |
         echo "Starting build and test with PATH: $PATH"
-        # Re-verify Leo CLI to ensure PATH persistence
         if ! command -v leo &> /dev/null; then
             echo "Leo CLI not found, rechecking PATH: $PATH"
             find / -name leo 2>/dev/null || echo "Final check: Leo not found"
@@ -61,22 +53,12 @@ jobs:
         leo build --network $NETWORK || { echo "Build failed"; exit 1; }
         TEST_WALLET_ADDRESS=$(leo account address -- --private-key $ALEO_PRIVATE_KEY --network $NETWORK 2>/dev/null || echo "aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6")
         echo "Using test wallet address: $TEST_WALLET_ADDRESS"
-        # Verify -- --private-key syntax before running tests
-        PRIVATE_KEY_CMD="-- --private-key $ALEO_PRIVATE_KEY"
-        if [[ "$PRIVATE_KEY_CMD" != *"-- --private-key"* ]]; then
-            echo "Error: -- --private-key syntax is incorrect—missing double dashes. Found: $PRIVATE_KEY_CMD"
-            exit 1
-        fi
-        echo "Verified -- --private-key syntax: $PRIVATE_KEY_CMD"
-        # Run tests with retries, debug
         for test in main_test.test_register_worker main_test.test_pay_worker employer_agreement_test.test_register_employer subDAO_reserve_test.test_deposit weekly_payroll_pool_test.test_fund_weekly_pool; do
           echo "Running test: $test with address $TEST_WALLET_ADDRESS"
-          leo run --network $NETWORK $PRIVATE_KEY_CMD $test $TEST_WALLET_ADDRESS || echo "Test $test failed, continuing..."
+          leo run --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY $test $TEST_WALLET_ADDRESS || echo "Test $test failed, continuing..."
         done
-        # Check balance and deployment completion
         echo "Checking balance for $TEST_WALLET_ADDRESS..."
         BALANCE=$(leo account balance --address $TEST_WALLET_ADDRESS --network $NETWORK 2>/dev/null || echo "Balance check failed or not supported")
-        echo "Balance: $BALANCE"
         if [ -z "$BALANCE" ] || [ "$BALANCE" = "Balance check failed or not supported" ]; then
             echo "Warning: Balance check failed—verify credits (20 expected) in Aleoscan."
         else
@@ -89,25 +71,15 @@ jobs:
         ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
       run: |
         echo "Deploying with PATH: $PATH"
-        # Re-verify Leo CLI to ensure PATH persistence
         if ! command -v leo &> /dev/null; then
             echo "Leo CLI not found, rechecking PATH: $PATH"
             find / -name leo 2>/dev/null || echo "Final check: Leo not found"
             exit 1
         fi
-        # Verify -- --private-key syntax before deployment
-        PRIVATE_KEY_CMD="-- --private-key $ALEO_PRIVATE_KEY"
-        if [[ "$PRIVATE_KEY_CMD" != *"-- --private-key"* ]]; then
-            echo "Error: -- --private-key syntax is incorrect—missing double dashes. Found: $PRIVATE_KEY_CMD"
-            exit 1
-        fi
-        echo "Verified -- --private-key syntax: $PRIVATE_KEY_CMD"
-        leo deploy --network $NETWORK $PRIVATE_KEY_CMD || { echo "Deploy failed"; exit 1; }
-        # Verify deployment completion and credit usage
+        leo deploy --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY || { echo "Deploy failed"; exit 1; }
         echo "Deployment completed—checking Aleoscan for programs and credit usage..."
         echo "Verify at: https://testnet.aleoscan.io/address/aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6"
         BALANCE=$(leo account balance --address aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6 --network $NETWORK 2>/dev/null || echo "Balance check failed or not supported")
-        echo "Post-deployment balance: $BALANCE"
         if [ -z "$BALANCE" ] || [ "$BALANCE" = "Balance check failed or not supported" ]; then
             echo "Warning: Post-deployment balance check failed—ensure 20 credits were used."
         else
