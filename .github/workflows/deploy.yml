@@ -12,48 +12,47 @@ jobs:
     timeout-minutes: 45
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Install Dependencies
-      run: |
-      sudo apt-get update -y
-      sudo apt-get install -y curl bash build-essential unzip git rustc cargo
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y curl bash build-essential unzip git rustc cargo
 
-    - name: Install Leo CLI (Latest Testnet Version)
-      run: |
-        cargo install leo-lang
-        leo --version
+      - name: Install Leo CLI (Latest Testnet Version)
+        run: |
+          cargo install leo-lang
+          leo --version
 
-    - name: Run Unit Tests
-      run: |
-        echo "Running Leo tests..."
-        leo test > test-results.log
-        cat test-results.log
+      - name: Run Unit Tests
+        run: |
+          echo "Running Leo tests..."
+          leo test > test-results.log
+          cat test-results.log
 
-    - name: Deploy to Aleo Testnet
-      env:
-        PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
-      run: |
-        echo "Starting deployment..."
-        
-        if [ -z "$PRIVATE_KEY" ]; then
-          echo "ERROR: Aleo private key is missing! Set it in GitHub Secrets."
-          exit 1
-        fi
-        
-        # Corrected deploy command for Aleo Testnet
-        leo deploy --private-key "$PRIVATE_KEY" --network testnet || { echo "Deploy failed"; exit 1; }
+      - name: Deploy to Aleo Testnet
+        env:
+          PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
+        run: |
+          echo "Starting deployment..."
 
-        echo "Deployment completed—checking Aleoscan for programs and credit usage..."
-        echo "Verify at: https://testnet.aleoscan.io/address/YOUR_ALEO_ADDRESS"
+          if [ -z "$PRIVATE_KEY" ]; then
+            echo "ERROR: Aleo private key is missing! Set it in GitHub Secrets."
+            exit 1
+          fi
 
-    - name: Post-Deployment Balance Check
-      run: |
-        BALANCE=$(leo account balance --address YOUR_ALEO_ADDRESS --network testnet 2>/dev/null || echo "Balance check failed or not supported")
+          leo deploy --private-key "$PRIVATE_KEY" --network testnet || { echo "Deploy failed"; exit 1; }
 
-        if [ -z "$BALANCE" ] || [ "$BALANCE" = "Balance check failed or not supported" ]; then
-          echo "Warning: Post-deployment balance check failed—ensure 20 credits were used."
-        else
-          echo "Confirmed post-deployment credits: $BALANCE"
-        fi
+          echo "Deployment completed—checking Aleoscan for programs and credit usage..."
+          echo "Verify at: https://testnet.aleoscan.io/address/YOUR_ALEO_ADDRESS"
+
+      - name: Post-Deployment Balance Check
+        run: |
+          BALANCE=$(leo account balance --address YOUR_ALEO_ADDRESS --network testnet 2>/dev/null || echo "Balance check failed or not supported")
+
+          if [ -z "$BALANCE" ] || [ "$BALANCE" = "Balance check failed or not supported" ]; then
+            echo "Warning: Post-deployment balance check failed—ensure 20 credits were used."
+          else
+            echo "Confirmed post-deployment credits: $BALANCE"
+          fi
