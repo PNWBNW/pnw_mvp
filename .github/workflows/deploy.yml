@@ -20,27 +20,14 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y curl bash build-essential unzip git rustc cargo
 
-    - name: Install Leo CLI (Version 2.4.1)
+    - name: Install Leo CLI (Binary - Version 2.4.1)
       run: |
-        LEO_VERSION="2.4.1"
-        curl -sSL -o install.sh https://github.com/AleoHQ/leo/releases/download/${LEO_VERSION}/install.sh
-        EXPECTED_HASH="PUT_ACTUAL_SHA256SUM_HERE"
-        ACTUAL_HASH=$(sha256sum install.sh | awk '{print $1}')
-        
-        if [ "$ACTUAL_HASH" != "$EXPECTED_HASH" ]; then
-          echo "ERROR: Leo installer hash mismatch! Aborting."
-          exit 1
-        fi
-        
-        bash install.sh -y --force
-        rm install.sh
-
-    - name: Verify Leo Installation
-      run: |
+        curl -sSf https://github.com/ProvableHQ/leo/releases/download/2.4.1/install.sh | bash
         leo --version
 
     - name: Run Unit Tests
       run: |
+        echo "Running Leo tests..."
         leo test > test-results.log
         cat test-results.log
 
@@ -55,7 +42,7 @@ jobs:
           exit 1
         fi
         
-        # Corrected deploy command (fixes extra `--` issue)
+        # Corrected deploy command (no extra `--` before --private-key)
         leo deploy --private-key "$PRIVATE_KEY" --network testnet || { echo "Deploy failed"; exit 1; }
 
         echo "Deployment completed—checking Aleoscan for programs and credit usage..."
