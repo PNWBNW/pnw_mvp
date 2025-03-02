@@ -181,7 +181,7 @@
   "test_mode": true,
   "faucet_url": "Discord #faucet (use /sendcredits command)",
   "deployment_strategy": "batch",
-  "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
+  "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
   "test_files": [
     "tests/main_test.leo",
     "tests/employer_agreement_test.leo",
