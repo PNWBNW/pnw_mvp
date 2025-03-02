@@ -9,79 +9,64 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 45  # Allow time for Leo source build and testing
+    timeout-minutes: 45
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Install Leo CLI
+    - name: Install Dependencies
       run: |
-        echo "Installing dependencies..."
-        sudo apt-get update -y && sudo apt-get install -y curl bash build-essential unzip git rustc cargo
-        echo "Attempting to install Leo CLI from GitHub release..."
-        curl -sSL https://github.com/ProvableHQ/leo/releases/latest/download/install.sh | bash -s -- -y --force || echo "GitHub release install failed, building from source..."
-        if ! command -v leo &> /dev/null; then
-            echo "Leo CLI not found, building from source..."
-            cd /tmp && git clone --recurse-submodules https://github.com/ProvableHQ/leo
-            cd leo && cargo build --release
-            sudo cp target/release/leo /usr/local/bin/leo
-            echo "LEO_PATH=/usr/local/bin" >> $GITHUB_ENV
-            echo "PATH=$PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" >> $GITHUB_ENV
-        fi
-        echo "LEO_PATH=/usr/local/bin" >> $GITHUB_ENV
-        echo "PATH=$PATH:/usr/local/bin:/usr/bin:/opt/aleo/bin:/home/runner/.cargo/bin" >> $GITHUB_ENV
-        echo "Updated PATH: $PATH"
-        if ! leo --version; then
-            echo "Leo CLI not found after all attempts, installation failed. PATH: $PATH"
-            find / -name leo 2>/dev/null || echo "Final check: Leo not found"
-            exit 1
-        fi
-        echo "Leo CLI version: $(leo --version)"
+        sudo apt-get update -y
+        sudo apt-get install -y curl bash build-essential unzip git rustc cargo
 
-    - name: Build and Test
-      env:
-        NETWORK: ${{ secrets.NETWORK || 'testnet' }}
-        ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
+    - name: Install Leo CLI (Version 2.4.1)
       run: |
-        echo "Starting build and test with PATH: $PATH"
-        if ! command -v leo &> /dev/null; then
-            echo "Leo CLI not found, rechecking PATH: $PATH"
-            find / -name leo 2>/dev/null || echo "Final check: Leo not found"
-            exit 1
+        LEO_VERSION="2.4.1"
+        curl -sSL -o install.sh https://github.com/AleoHQ/leo/releases/download/${LEO_VERSION}/install.sh
+        EXPECTED_HASH="PUT_ACTUAL_SHA256SUM_HERE"
+        ACTUAL_HASH=$(sha256sum install.sh | awk '{print $1}')
+        
+        if [ "$ACTUAL_HASH" != "$EXPECTED_HASH" ]; then
+          echo "ERROR: Leo installer hash mismatch! Aborting."
+          exit 1
         fi
-        leo build --network $NETWORK || { echo "Build failed"; exit 1; }
-        TEST_WALLET_ADDRESS=$(leo account address -- --private-key $ALEO_PRIVATE_KEY --network $NETWORK 2>/dev/null || echo "aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6")
-        echo "Using test wallet address: $TEST_WALLET_ADDRESS"
-        for test in main_test.test_register_worker main_test.test_pay_worker employer_agreement_test.test_register_employer subDAO_reserve_test.test_deposit weekly_payroll_pool_test.test_fund_weekly_pool; do
-          echo "Running test: $test with address $TEST_WALLET_ADDRESS"
-          leo run --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY $test $TEST_WALLET_ADDRESS || echo "Test $test failed, continuing..."
-        done
-        echo "Checking balance for $TEST_WALLET_ADDRESS..."
-        BALANCE=$(leo account balance --address $TEST_WALLET_ADDRESS --network $NETWORK 2>/dev/null || echo "Balance check failed or not supported")
-        if [ -z "$BALANCE" ] || [ "$BALANCE" = "Balance check failed or not supported" ]; then
-            echo "Warning: Balance check failed—verify credits (20 expected) in Aleoscan."
-        else
-            echo "Confirmed credits available: $BALANCE"
-        fi
+        
+        bash install.sh -y --force
+        rm install.sh
+
+    - name: Verify Leo Installation
+      run: |
+        leo --version
+
+    - name: Run Unit Tests
+      run: |
+        leo test > test-results.log
+        cat test-results.log
 
     - name: Deploy to Aleo Testnet
       env:
-        NETWORK: ${{ secrets.NETWORK || 'testnet' }}
-        ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
+        PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
       run: |
-        echo "Deploying with PATH: $PATH"
-        if ! command -v leo &> /dev/null; then
-            echo "Leo CLI not found, rechecking PATH: $PATH"
-            find / -name leo 2>/dev/null || echo "Final check: Leo not found"
-            exit 1
+        echo "Starting deployment..."
+        
+        if [ -z "$PRIVATE_KEY" ]; then
+          echo "ERROR: Aleo private key is missing! Set it in GitHub Secrets."
+          exit 1
         fi
-        leo deploy --network $NETWORK -- --private-key $ALEO_PRIVATE_KEY || { echo "Deploy failed"; exit 1; }
+        
+        # Corrected deploy command (fixes extra `--` issue)
+        leo deploy --private-key "$PRIVATE_KEY" --network testnet || { echo "Deploy failed"; exit 1; }
+
         echo "Deployment completed—checking Aleoscan for programs and credit usage..."
-        echo "Verify at: https://testnet.aleoscan.io/address/aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6"
-        BALANCE=$(leo account balance --address aleo1jtqxvdqdxdw34sh3smjltuh7t3rwrdraa4eq58694rdzf0vk2syq5ajvw6 --network $NETWORK 2>/dev/null || echo "Balance check failed or not supported")
+        echo "Verify at: https://testnet.aleoscan.io/address/YOUR_ALEO_ADDRESS"
+
+    - name: Post-Deployment Balance Check
+      run: |
+        BALANCE=$(leo account balance --address YOUR_ALEO_ADDRESS --network testnet 2>/dev/null || echo "Balance check failed or not supported")
+
         if [ -z "$BALANCE" ] || [ "$BALANCE" = "Balance check failed or not supported" ]; then
-            echo "Warning: Post-deployment balance check failed—ensure 20 credits were used."
+          echo "Warning: Post-deployment balance check failed—ensure 20 credits were used."
         else
-            echo "Confirmed post-deployment credits: $BALANCE"
+          echo "Confirmed post-deployment credits: $BALANCE"
         fi
