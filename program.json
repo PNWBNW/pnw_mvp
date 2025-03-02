@@ -209,7 +209,7 @@
     "tests/process_tax_compliance_test.leo"
   ],
   "deployment_scripts": {
-    "batch": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}",  // [Annotation] Use double dashes for --private-key due to Leo 2.4.1, verified programmatically
-    "single": "leo deploy <program>.leo --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"  // [Annotation] Use double dashes for --private-key due to Leo 2.4.1, verified programmatically
+    "batch": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}",
+    "single": "leo deploy <program>.leo --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
   }
-        }
+    }
