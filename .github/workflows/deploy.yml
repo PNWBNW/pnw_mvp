@@ -48,7 +48,7 @@ jobs:
 
     - name: Build and Test
       env:
-        NETWORK: testnet
+        NETWORK: ${{ secrets.NETWORK || 'testnet' }}
         ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
       run: |
         echo "Starting build and test with PATH: $PATH"
@@ -71,7 +71,7 @@ jobs:
 
     - name: Deploy to Aleo Testnet
       env:
-        NETWORK: testnet
+        NETWORK: ${{ secrets.NETWORK || 'testnet' }}
         ALEO_PRIVATE_KEY: ${{ secrets.Aleo_test_key }}
       run: |
         echo "Deploying with PATH: $PATH"
