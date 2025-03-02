@@ -27,12 +27,12 @@ jobs:
 
       - name: Deploy to Aleo Testnet
         env:
-          PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
+          PRIVATE_KEY: ${{ secrets.ALEO_TEST_KEY }}  # Updated to match your secret name
         run: |
           echo "Starting deployment..."
           
           if [ -z "$PRIVATE_KEY" ]; then
-            echo "ERROR: Aleo private key is missing! Set it in GitHub Secrets."
+            echo "ERROR: Aleo private key is missing! Set it in GitHub Secrets as 'ALEO_TEST_KEY'."
             exit 1
           fi
           
