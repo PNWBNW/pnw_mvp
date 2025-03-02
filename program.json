@@ -5,7 +5,7 @@
       "version": "0.1.0",
       "description": "PNW-MVP: Core orchestration for zero-knowledge payroll on Aleo testnet",
       "network": "testnet",
-      "fee": "0.01 credits",  // Deployment fee as string with units
+      "fee": "0.01",  // Simplified fee as string (no "credits")
       "record": null,  // Placeholder for Aleo record (null if not used)
       "imports": [
         "credits.aleo",
@@ -20,39 +20,15 @@
       "test_addresses": [""],  // Placeholder empty string for testing
       "test_mode": true,  // Boolean to enable test mode
       "faucet_address": "Discord #faucet (use /sendcredits command)",
-      "deployment_notes": "Use -- --private-key ${ALEO_TEST_KEY} due to Leo 2.4.1 syntax, verified programmatically in deploy.yml",
       "test_files": [
         "tests/main_test.leo"
       ],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_TEST_KEY}"
     },
-    {
-      "program": "employer_agreement.leo",
-      "version": "0.1.0",
-      "description": "Employer funding entry for PNW-MVP",
-      "network": "testnet",
-      "fee": "0.01 credits",
-      "record": null,
-      "imports": [
-        "credits.aleo",
-        "subDAO_reserve.leo",
-        "oversightDAO_reserve.leo"
-      ],
-      "ans_name": "",
-      "test_addresses": [""],
-      "test_mode": true,
-      "faucet_address": "Discord #faucet (use /sendcredits command)",
-      "deployment_notes": "Use -- --private-key ${ALEO_TEST_KEY} due to Leo 2.4.1 syntax, verified programmatically in deploy.yml",
-      "test_files": [
-        "tests/employer_agreement_test.leo"
-      ],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_TEST_KEY}"
-    },
     ...
-    // Repeat for all programs, removing "private_key": ""
   ],
   "main": "main.leo",
-  "global_fee": "0.01 credits",  // Global fee as string with units
+  "global_fee": "0.01",  // Simplified global fee as string (no "credits")
   "default_network": "testnet",
   "test_mode": true,  // Global test mode flag
   "faucet_url": "Discord #faucet (use /sendcredits command)",
