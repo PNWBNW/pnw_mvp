@@ -5,8 +5,8 @@
       "version": "0.1.0",
       "description": "PNW-MVP: Core orchestration for zero-knowledge payroll on Aleo testnet",
       "network": "testnet",
-      "fee": "1/100",  // Fee as a number (not string)
-      "record": null,  // Placeholder for Aleo record (null if not used)
+      "fee": "1",
+      "record": null,
       "imports": [
         "credits.aleo",
         "employer_agreement.leo",
@@ -30,7 +30,7 @@
       "version": "0.1.0",
       "description": "Employer funding entry for PNW-MVP",
       "network": "testnet",
-      "fee": "1/100",
+      "fee": "1",
       "record": null,
       "imports": [
         "credits.aleo",
@@ -51,7 +51,7 @@
       "version": "0.1.0",
       "description": "OversightDAO backup/investment pool for PNW-MVP (ANS: oversightdao.pnw.ans)",
       "network": "testnet",
-      "fee": "1/100",
+      "fee": "1",
       "record": null,
       "imports": [
         "credits.aleo"
@@ -70,7 +70,7 @@
       "version": "0.1.0",
       "description": "SubDAO payroll and tax management for PNW-MVP",
       "network": "testnet",
-      "fee": "1/100",
+      "fee": "1",
       "record": null,
       "imports": [
         "credits.leo",
@@ -91,7 +91,7 @@
       "version": "0.1.0",
       "description": "Weekly worker payouts for PNW-MVP",
       "network": "testnet",
-      "fee": "1/100",
+      "fee": "1",
       "record": null,
       "imports": [
         "credits.aleo",
@@ -114,7 +114,7 @@
       "version": "0.1.0",
       "description": "PNcW (Citizen) payroll tracking for PNW-MVP",
       "network": "testnet",
-      "fee": "1/100",
+      "fee": "1",
       "record": null,
       "imports": [
         "credits.aleo",
@@ -136,7 +136,7 @@
       "version": "0.1.0",
       "description": "PNiW (Immigrant) payroll tracking for PNW-MVP",
       "network": "testnet",
-      "fee": "1/100",
+      "fee": "1",
       "record": null,
       "imports": [
         "credits.aleo",
@@ -158,7 +158,7 @@
       "version": "0.1.0",
       "description": "Tax compliance for PNW-MVP",
       "network": "testnet",
-      "fee": "1/100",
+      "fee": "1",
       "record": null,
       "imports": [
         "credits.aleo",
@@ -176,7 +176,7 @@
     }
   ],
   "main": "main.leo",
-  "global_fee": 0.01,  // Global fee as a number (not string)
+  "global_fee": "1",
   "default_network": "testnet",
   "test_mode": true,  // Global test mode flag
   "faucet_url": "Discord #faucet (use /sendcredits command)",
