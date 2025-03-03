@@ -1,0 +1,19 @@
+{
+  "employer_name": "ACME Inc.",
+  "employer_id": "aleo1employerxyz...",
+  "dao_id": "aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk",
+  "workers": [
+    {
+      "worker_id": "W001",
+      "worker_address": "aleo1worker123...",
+      "category": 1,
+      "verified": true
+    },
+    {
+      "worker_id": "W002",
+      "worker_address": "aleo1worker456...",
+      "category": 2,
+      "verified": false
+    }
+  ]
+}
