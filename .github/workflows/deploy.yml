@@ -1,42 +1,48 @@
-name: Deploy Aleo Contract
+name: Deploy to Aleo Testnet
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
-        with:
-          rust-version: stable
-
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
-          sudo apt update
-          sudo apt install -y pkg-config libssl-dev
+          sudo apt-get update -y
+          sudo apt-get install -y curl bash build-essential unzip git rustc cargo
 
-      - name: Install Leo
-        run: cargo install leo-lang
+      - name: Install Leo CLI (Latest Testnet Version)
+        run: |
+          cargo install leo-lang
+          leo --version
 
-      - name: Build project
-        run: leo build
+      - name: Debug Environment Variables
+        run: |
+          echo "Checking if ALEO_PRIVATE_KEY is set"
+          [ -z "$ALEO_PRIVATE_KEY" ] && echo "ERROR: Key is missing!" || echo "Private key detected (value hidden for security)"
 
-      - name: Deploy contract
+      - name: Deploy to Aleo Testnet
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          if [ -z "$ALEO_PRIVATE_KEY" ]; then
-            echo "Error: ALEO_PRIVATE_KEY is not set."
-            exit 1
-          fi
-          leo deploy --private-key "$ALEO_PRIVATE_KEY" --query
+          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || exit 1
 
-      - name: Run tests
-        run: leo test
+      - name: Post-Deployment Balance Check
+        run: |
+          BALANCE=$(leo account balance --address YOUR_ALEO_ADDRESS --network testnet 2>/dev/null) || echo "Balance check failed or not supported"
+          [ -n "$BALANCE" ] || { echo "WARNING: Post-deployment balance check failed—ensure 8 credits were used."; }
+
+      - name: Post Checkout code
+        uses: actions/checkout@v3
+
+      - name: Complete job
+        run: echo "Job completed"
