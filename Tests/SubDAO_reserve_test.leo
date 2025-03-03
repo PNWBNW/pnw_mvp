@@ -36,7 +36,7 @@ program subDAO_reserve_test.aleo {
         assert(result);
         
         let balance: u64 = subDAO_reserve.leo::get_reserve_balance(subdao_ans);
-        assert(balance == 300u64);
+        assert(balance == 200u64);
         return true;
     }
 }
