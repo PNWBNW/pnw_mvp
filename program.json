@@ -196,4 +196,4 @@
     "batch": "leo deploy --network testnet -- --private-key ${ALEO_TEST_KEY}",
     "single": "leo deploy <program>.leo --network testnet -- --private-key ${ALEO_TEST_KEY}"
   }
-    }
+}
