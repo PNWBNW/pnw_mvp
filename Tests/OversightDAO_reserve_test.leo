@@ -6,7 +6,7 @@ program oversightDAO_reserve_test.aleo {
         let oversightDAO_ans: [u8; 32] = *b"oversightdao.pnw.ans";
         let amount: u64 = 170u64;
 
-        let result: bool = oversightDAO_reserve.leo::deposit(oversightDAO_ans, amount);
+        let (result, _) = oversightDAO_reserve.leo::deposit(oversightDAO_ans, amount);
         assert(result);
         
         let balance: u64 = oversightDAO_reserve.leo::get_reserve_balance();
@@ -18,8 +18,8 @@ program oversightDAO_reserve_test.aleo {
         let oversightDAO_ans: [u8; 32] = *b"oversightdao.pnw.ans";
         let amount: u64 = 100u64;
 
-        oversightDAO_reserve.leo::deposit(oversightDAO_ans, 200u64);
-        let result: bool = oversightDAO_reserve.leo::withdraw(subdao_ans, amount);
+        let (_, _) = oversightDAO_reserve.leo::deposit(oversightDAO_ans, 200u64);
+        let (result, _) = oversightDAO_reserve.leo::withdraw(subdao_ans, amount);
         assert(result);
         
         let balance: u64 = oversightDAO_reserve.leo::get_reserve_balance();
