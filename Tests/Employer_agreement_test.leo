@@ -4,7 +4,7 @@ import credits.aleo;
 program employer_agreement_test.aleo {
     transition test_register_employer() -> bool {
         let employer_ans: [u8; 32] = *b"employer001.pnw.ans";
-        let result: employer_agreement.leo::Employer = employer_agreement.leo::register_employer(employer_ans);
+        let (result, _) = employer_agreement.leo::register_employer(employer_ans);
         
         assert(result.employer_ans == employer_ans);
         assert(result.registered);
@@ -15,7 +15,7 @@ program employer_agreement_test.aleo {
     transition test_verify_employer_tax() -> bool {
         let employer_ans: [u8; 32] = *b"employer001.pnw.ans";
         employer_agreement.leo::register_employer(employer_ans);
-        let result: employer_agreement.leo::Employer = employer_agreement.leo::verify_employer_tax(employer_ans);
+        let (result, _) = employer_agreement.leo::verify_employer_tax(employer_ans);
         
         assert(result.tax_compliant);
         assert(result.last_updated > 0u64);
