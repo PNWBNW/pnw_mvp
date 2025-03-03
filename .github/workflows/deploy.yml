@@ -25,12 +25,16 @@ jobs:
           cargo install leo-lang
           leo --version
 
+      - name: Debug Environment Variables
+        run: |
+          echo "Checking if ALEO_TEST_KEY is set"
+          [ -z "$ALEO_TEST_KEY" ] && echo "ERROR: Key is missing!" || echo "Private key detected (value hidden for security)"
+
       - name: Deploy to Aleo Testnet
         env:
           ALEO_TEST_KEY: ${{ secrets.ALEO_TEST_KEY }}
         run: |
-          [ -z "$ALEO_TEST_KEY" ] && { echo "ERROR: Aleo private key is missing! Set it in GitHub Secrets as 'ALEO_TEST_KEY'."; exit 1; }
-          leo deploy --private-key "$ALEO_TEST_KEY" --network testnet || exit 1
+          leo deploy --private-key="${{ secrets.ALEO_TEST_KEY }}" --network testnet || exit 1
 
       - name: Post-Deployment Balance Check
         run: |
