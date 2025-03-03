@@ -11,6 +11,48 @@ This directory contains **custom employer-configured worker profiles**, using:
 ## **1️⃣ Customizing `employer_worker_config.json`**
 Each employer **must create and maintain** their own JSON file following this structure:
 
+Field Definitions
+
+
+---
+
+2️⃣ Running the CLI Script
+
+Aleo employers should use register_workers.sh to batch register workers.
+
+📌 Steps to Execute
+
+1. Ensure employer_worker_config.json is correctly formatted.
+
+
+2. Make the script executable:
+
+chmod +x register_workers.sh
+
+
+3. Run the script:
+
+./worker_profiles/register_workers.sh
+
+
+
+💡 How It Works
+
+Reads employer_worker_config.json
+
+Extracts each worker’s ANS name, ZPass ID, and wallet address
+
+Calls the Aleo contract register_worker transition:
+
+leo run register_worker <worker_address> <category> <subdao_ans> <zpass_id>
+
+
+---
+
+🚀 Need Help?
+
+For support, open an issue on the PNW-MVP GitHub Repository or contact the DAO administrator.
+
 ### **Example: `employer_worker_config.json`**
 ```json
 {
