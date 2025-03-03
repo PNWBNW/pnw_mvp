@@ -17,7 +17,7 @@
         "subDAO_reserve.leo"
       ],
       "ans_name": "",
-      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
+      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
@@ -38,7 +38,7 @@
         "oversightDAO_reserve.leo"
       ],
       "ans_name": "",
-      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
+      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
@@ -57,7 +57,7 @@
         "credits.aleo"
       ],
       "ans_name": "oversightdao.pnw.ans",
-      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
+      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
@@ -78,7 +78,7 @@
         "process_tax_compliance.leo"
       ],
       "ans_name": "wa001_subdao.pnw.ans",
-      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
+      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
@@ -101,7 +101,7 @@
         "pniw_payroll.leo"
       ],
       "ans_name": "",
-      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
+      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
@@ -123,7 +123,7 @@
         "main.leo"
       ],
       "ans_name": "",
-      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
+      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
@@ -145,7 +145,7 @@
         "main.leo"
       ],
       "ans_name": "",
-      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
+      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
@@ -161,12 +161,12 @@
       "fee": "1",
       "record": null,
       "imports": [
-        "credits.aleo",
+        "credits.leo",
         "employer_agreement.leo",
         "subDAO_reserve.leo"
       ],
       "ans_name": "",
-      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],  // subDAO_reserve (3 credits), PNcW workers (2 credits), PNiW workers (2 credits), Testnet Tax Sink (2 credits) to cover fees
+      "test_addresses": ["aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk", "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux", "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3", "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"],
       "test_mode": true,
       "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
