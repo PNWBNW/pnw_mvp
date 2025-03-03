@@ -1,48 +1,42 @@
-name: Deploy to Aleo Testnet
+name: Deploy Aleo Contract
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Install Dependencies
+      - name: Set up Rust
+        uses: actions/setup-rust@v1
+        with:
+          rust-version: stable
+
+      - name: Install dependencies
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y curl bash build-essential unzip git rustc cargo
+          sudo apt update
+          sudo apt install -y pkg-config libssl-dev
 
-      - name: Install Leo CLI (Latest Testnet Version)
-        run: |
-          cargo install leo-lang
-          leo --version
+      - name: Install Leo
+        run: cargo install leo-lang
 
-      - name: Debug Environment Variables
-        run: |
-          echo "Checking if ALEO_TEST_KEY is set"
-          [ -z "$ALEO_TEST_KEY" ] && echo "ERROR: Key is missing!" || echo "Private key detected (value hidden for security)"
+      - name: Build project
+        run: leo build
 
-      - name: Deploy to Aleo Testnet
+      - name: Deploy contract
         env:
-          ALEO_TEST_KEY: ${{ secrets.ALEO_TEST_KEY }}
+          ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          leo deploy --private-key="${{ secrets.ALEO_TEST_KEY }}" --network testnet || exit 1
+          if [ -z "$ALEO_PRIVATE_KEY" ]; then
+            echo "Error: ALEO_PRIVATE_KEY is not set."
+            exit 1
+          fi
+          leo deploy --private-key "$ALEO_PRIVATE_KEY" --query
 
-      - name: Post-Deployment Balance Check
-        run: |
-          BALANCE=$(leo account balance --address YOUR_ALEO_ADDRESS --network testnet 2>/dev/null) || echo "Balance check failed or not supported"
-          [ -n "$BALANCE" ] || { echo "WARNING: Post-deployment balance check failed—ensure 8 credits were used."; }
-
-      - name: Post Checkout code
-        uses: actions/checkout@v3
-
-      - name: Complete job
-        run: echo "Job completed"
+      - name: Run tests
+        run: leo test
