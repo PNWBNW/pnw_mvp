@@ -4,7 +4,7 @@ import credits.aleo;
 program subDAO_reserve_test.aleo {
     transition test_deposit() -> bool {
         let subdao_ans: [u8; 32] = *b"wa001_subdao.pnw.ans";
-        let amount: u64 = 830u64;
+        let amount: u64 = 1000u64;
 
         let result: bool = subDAO_reserve.leo::deposit(subdao_ans, amount);
         assert(result);
