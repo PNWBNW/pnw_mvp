@@ -1,38 +1,30 @@
-# Leo build artifacts
-build/
-dist/
-target/
-out/
+# Ignore Leo build artifacts
+/build/
+leo-package.json
+manifest.json
+program.json
+program.aleo
 
-# Leo generated files
-*.lock
-*.log
-*.aleo.bak
+# Ignore test outputs and logs
+/tests/*.aleo
+/tests/*.json
+/tests/*.log
+/tests/*.out
 
-# Secrets and sensitive files
-.env
-secrets.json
-aleo_private_key.txt
-aleo_test_key.txt
-*.key
-*.wallet
-aleo_wallet.json
-
-# Temporary files
-*.tmp
-*.bak
-*.swp
-
-# macOS clutter
-.DS_Store
-
-# Editor-specific
+# Ignore IDE and editor files
 .vscode/
 .idea/
-*.sublime-*
+*.iml
 
-# GitHub Actions cache (optional)
-*.cache
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
 
-# Testnet deployment artifacts (if any)
-deployments/
+# Ignore environment files (secrets)
+.env
+*.secret
+*.key
+
+# Ignore GitHub Actions workflow artifacts
+.github/workflows/*.log
+.github/workflows/*.cache
