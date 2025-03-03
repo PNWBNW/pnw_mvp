@@ -35,6 +35,8 @@ Each employer **must create and maintain** their own JSON file following this st
   ]
 }
 
+---
+
 Field Definitions
 
 
@@ -91,4 +93,3 @@ leo run register_worker <worker_address> <category> <subdao_ans> <zpass_id>
 🚀 Need Help?
 
 For support, open an issue on the PNW-MVP GitHub Repository or contact the DAO administrator.
-
