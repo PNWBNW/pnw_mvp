@@ -17,17 +17,20 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y tar curl
+          sudo apt-get install -y tar curl unzip
 
-      - name: Download and Install Leo CLI 2.4.1 (linux-gnu)
+      - name: Download and Install Leo CLI 2.4.1
         run: |
           set -e
           echo "Downloading Leo CLI..."
-          curl -L -o leo.tar.gz https://github.com/provableHQ/leo/releases/download/2.4.1/leo-2.4.1-linux-gnu.tar.gz
+          curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
+          echo "Download complete."
+          
           echo "Extracting Leo CLI..."
           tar -xzf leo.tar.gz
-          echo "Listing extracted files:"
+          echo "Extraction complete. Listing extracted files:"
           ls -R
+          
           echo "Searching for Leo binary..."
           LEO_PATH=$(find . -type f -name "leo" | head -n 1)
           if [ -z "$LEO_PATH" ]; then
@@ -35,9 +38,11 @@ jobs:
             exit 1
           fi
           echo "Found Leo binary at: $LEO_PATH"
+          
           echo "Moving Leo binary to /usr/local/bin..."
           sudo mv "$LEO_PATH" /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
+          
           echo "Verifying Leo CLI installation..."
           /usr/local/bin/leo --version
 
