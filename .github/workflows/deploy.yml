@@ -31,7 +31,10 @@ jobs:
           source $HOME/.cargo/env
           rustc --version
 
-      - name: Download and Install Leo 2.4.1
+      - name: Ensure `wget` is Installed (Backup)
+        run: sudo apt-get update && sudo apt-get install -y wget
+
+      - name: Download and Install Leo 2.4.1 (Using curl)
         run: |
           curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
           tar -xzf leo.tar.gz -C /usr/local/bin
