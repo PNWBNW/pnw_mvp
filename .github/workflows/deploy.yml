@@ -31,15 +31,23 @@ jobs:
           source $HOME/.cargo/env
           rustc --version
 
-      - name: Ensure `wget` is Installed (Backup)
-        run: sudo apt-get update && sudo apt-get install -y wget
+      - name: Ensure `wget` and Required Tools Are Installed
+        run: sudo apt-get update && sudo apt-get install -y wget tar
 
-      - name: Download and Install Leo 2.4.1 (Using curl)
+      - name: Download and Install Leo 2.4.1
         run: |
           curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
-          tar -xzf leo.tar.gz -C /usr/local/bin
-          chmod +x /usr/local/bin/leo
-          leo --version
+          file leo.tar.gz
+          tar -tzf leo.tar.gz
+          sudo tar -xzf leo.tar.gz -C /usr/local/bin
+          sudo chmod +x /usr/local/bin/leo
+          /usr/local/bin/leo --version
+
+      - name: Verify Leo Binary Permissions
+        run: ls -l /usr/local/bin/leo
+
+      - name: Check Leo Binary Dependencies
+        run: ldd /usr/local/bin/leo || echo "ldd not available, skipping dependency check"
 
       - name: Clean and Build Project
         run: |
@@ -50,4 +58,4 @@ jobs:
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet
+          /usr/local/bin/leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet
