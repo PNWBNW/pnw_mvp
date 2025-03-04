@@ -1,6 +1,7 @@
 {
   "program": "PNW-MVP",
   "version": "1.0.0",
+  "license": "Proprietary",
   "description": "Aleo-based payroll processing system using ANS and ZPass verification.",
   "functions": {
     "register_worker": {
