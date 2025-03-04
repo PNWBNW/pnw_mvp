@@ -33,7 +33,7 @@ jobs:
 
       - name: Download and Install Leo 2.4.1
         run: |
-          wget https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz -O leo.tar.gz
+          curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
           tar -xzf leo.tar.gz -C /usr/local/bin
           chmod +x /usr/local/bin/leo
           leo --version
