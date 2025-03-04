@@ -21,15 +21,17 @@ jobs:
 
       - name: Download and Install Leo 2.4.1
         run: |
+          set -e
+          echo "Downloading Leo 2.4.1..."
           curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
+          echo "Extracting Leo..."
           tar -xzf leo.tar.gz
-          echo "Listing extracted files:"
-          ls -R
-          echo "Checking for extracted directory..."
-          LEO_DIR=$(tar -tzf leo.tar.gz | head -1 | cut -f1 -d"/")
-          echo "Found extracted directory: $LEO_DIR"
-          sudo mv $LEO_DIR/leo /usr/local/bin/leo
+          echo "Contents of extracted directory:"
+          ls -l
+          echo "Moving Leo binary to /usr/local/bin..."
+          sudo mv leo /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
+          echo "Verifying Leo installation..."
           /usr/local/bin/leo --version
 
       - name: Cache Rust & Cargo Dependencies
