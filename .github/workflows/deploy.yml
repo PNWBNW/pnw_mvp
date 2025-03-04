@@ -10,39 +10,19 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
+      - name: Set up Rust and Install Leo CLI
         run: |
           sudo apt-get update -y
           sudo apt-get install -y curl bash build-essential unzip git rustc cargo
-
-      - name: Install Leo CLI (Latest Testnet Version)
-        run: |
           cargo install leo-lang
           leo --version
-
-      - name: Debug Environment Variables
-        run: |
-          echo "Checking if ALEO_PRIVATE_KEY is set"
-          [ -z "$ALEO_PRIVATE_KEY" ] && echo "ERROR: Key is missing!" || echo "Private key detected (value hidden for security)"
 
       - name: Deploy to Aleo Testnet
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || exit 1
-
-      - name: Post-Deployment Balance Check
-        run: |
-          BALANCE=$(leo account balance --address YOUR_ALEO_ADDRESS --network testnet 2>/dev/null) || echo "Balance check failed or not supported"
-          [ -n "$BALANCE" ] || { echo "WARNING: Post-deployment balance check failed—ensure 8 credits were used."; }
-
-      - name: Post Checkout code
-        uses: actions/checkout@v3
-
-      - name: Complete job
-        run: echo "Job completed"
+          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet
