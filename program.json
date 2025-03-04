@@ -1,91 +1,73 @@
 {
-  "program": "pnw_mvp",
-  "version": "1.0.0",
-  "license": "Proprietary",
-  "description": "Aleo-based payroll processing system using ANS and ZPass verification",
-  "functions": {
-    "register_worker": {
-      "inputs": ["[u8; 32]", "u8", "u8", "[u8; 64]"],
-      "outputs": ["bool"]
+  "license": "Proprietary License - PNW-MVP (c) 2025. All Rights Reserved.",
+  "programs": [
+    {
+      "program": "main.leo",
+      "version": "0.1.0",
+      "description": "PNW-MVP: Core orchestration for zero-knowledge payroll on Aleo testnet",
+      "network": "testnet",
+      "fee": "1",
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "employer_agreement.leo",
+        "process_tax_compliance.leo",
+        "weekly_payroll_pool.leo",
+        "pncw_payroll.leo",
+        "pniw_payroll.leo",
+        "subDAO_reserve.leo"
+      ],
+      "ans_name": "",
+      "test_addresses": [
+        "aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk",
+        "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux",
+        "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3",
+        "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"
+      ],
+      "test_mode": true,
+      "faucet_address": "Discord #faucet (use /sendcredits command)",
+      "test_files": [
+        "tests/main_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
-    "set_worker_zpass": {
-      "inputs": ["[u8; 32]", "[u8; 64]"],
-      "outputs": ["bool"]
-    },
-    "register_employer": {
-      "inputs": ["[u8; 32]"],
-      "outputs": ["bool"]
-    },
-    "verify_employer_tax": {
-      "inputs": ["[u8; 32]"],
-      "outputs": ["bool"]
-    },
-    "fund_payroll_pool": {
-      "inputs": ["[u8; 32]", "u64"],
-      "outputs": ["bool"]
-    },
-    "pay_worker": {
-      "inputs": ["[u8; 32]", "[u8; 32]", "u64", "[u8; 64]"],
-      "outputs": ["bool"]
-    },
-    "fund_weekly_pool": {
-      "inputs": ["[u8; 32]", "u64"],
-      "outputs": ["bool"]
-    },
-    "process_taxes": {
-      "inputs": ["[u8; 32]"],
-      "outputs": ["bool"]
-    },
-    "execute_payroll": {
-      "inputs": ["[u8; 32]", "[u8; 32]", "u64"],
-      "outputs": ["bool"]
+    {
+      "program": "employer_agreement.leo",
+      "version": "0.1.0",
+      "description": "Employer funding entry for PNW-MVP",
+      "network": "testnet",
+      "fee": "1",
+      "record": null,
+      "imports": [
+        "credits.aleo",
+        "subDAO_reserve.leo",
+        "oversightDAO_reserve.leo"
+      ],
+      "ans_name": "",
+      "test_files": [
+        "tests/employer_agreement_test.leo"
+      ],
+      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     }
-  },
-  "mappings": {
-    "worker_registry": {
-      "key": "[u8; 32]",
-      "value": "u8"
-    },
-    "worker_zpass_hash": {
-      "key": "[u8; 32]",
-      "value": "[u8; 64]"
-    },
-    "employer_registry": {
-      "key": "[u8; 32]",
-      "value": "bool"
-    },
-    "employer_tax_compliance": {
-      "key": "[u8; 32]",
-      "value": "bool"
-    },
-    "ans_registry": {
-      "key": "[u8; 32]",
-      "value": "[u8; 32]"
-    },
-    "ans_reverse_lookup": {
-      "key": "[u8; 32]",
-      "value": "[u8; 32]"
-    },
-    "subdao_ans_registry": {
-      "key": "[u8; 32]",
-      "value": "[u8; 32]"
-    },
-    "subdao_reverse_lookup": {
-      "key": "[u8; 32]",
-      "value": "[u8; 32]"
-    },
-    "weekly_balance": {
-      "key": "[u8; 32]",
-      "value": "u64"
-    },
-    "reserve_balance": {
-      "key": "[u8; 32]",
-      "value": "u64"
-    },
-    "tax_obligations": {
-      "key": "[u8; 32]",
-      "value": "u64"
-    }
-  },
-  "network": "testnet"
+  ],
+  "main": "main.leo",
+  "global_fee": "1",
+  "default_network": "testnet",
+  "test_mode": true,
+  "faucet_url": "Discord #faucet (use /sendcredits command)",
+  "deployment_strategy": "batch",
+  "test_addresses": [
+    "aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk",
+    "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux",
+    "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3",
+    "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"
+  ],
+  "test_files": [
+    "tests/main_test.leo",
+    "tests/employer_agreement_test.leo"
+  ],
+  "deployment_scripts": {
+    "batch": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}",
+    "single": "leo deploy <program>.leo --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
+  }
 }
