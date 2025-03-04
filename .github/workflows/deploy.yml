@@ -57,7 +57,7 @@ jobs:
       - name: Clean & Build PNW_MVP Project
         run: |
           leo clean
-          leo build
+          leo build --network testnet
 
       - name: Deploy to Aleo Testnet
         env:
