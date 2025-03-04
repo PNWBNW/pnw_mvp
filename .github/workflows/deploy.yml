@@ -9,48 +9,43 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40  # Increase time to allow source build
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y tar curl unzip
+          sudo apt-get install -y tar curl unzip build-essential
 
-      - name: Download and Install Leo CLI 2.4.1
+      - name: Install Rust & Cargo
         run: |
-          set -e
-          echo "Downloading Leo CLI..."
-          curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
-          
-          echo "Verifying download..."
-          ls -lh leo.tar.gz
-          
-          echo "Checking if the file is a valid tar archive..."
-          file leo.tar.gz
-          
-          echo "Extracting Leo CLI..."
-          tar -xzvf leo.tar.gz || { echo "Error: Extraction failed!"; exit 1; }
-          
+          rustc --version || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+          rustc --version
+
+      - name: Download & Extract Leo Source Code
+        run: |
+          echo "Downloading Leo Source Code..."
+          curl -L -o leo-source.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
+          echo "Extracting Source Code..."
+          tar -xzf leo-source.tar.gz
           echo "Extraction complete. Listing extracted files:"
           ls -R
-          
-          echo "Searching for Leo binary..."
-          LEO_PATH=$(find . -type f -name "leo" | head -n 1)
-          if [ -z "$LEO_PATH" ]; then
-            echo "Error: Leo binary not found!"
-            exit 1
-          fi
-          
-          echo "Found Leo binary at: $LEO_PATH"
+
+      - name: Build Leo from Source
+        run: |
+          cd leo-2.4.1
+          echo "Building Leo CLI..."
+          cargo build --release
+          echo "Build complete. Listing output:"
+          ls -l target/release
           echo "Moving Leo binary to /usr/local/bin..."
-          sudo mv "$LEO_PATH" /usr/local/bin/leo
+          sudo mv target/release/leo /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
-          
-          echo "Verifying Leo CLI installation..."
-          /usr/local/bin/leo --version || { echo "Error: Leo CLI installation failed!"; exit 1; }
+          echo "Leo CLI installed successfully!"
+          /usr/local/bin/leo --version
 
       - name: Cache Rust & Cargo Dependencies
         uses: actions/cache@v3
@@ -63,13 +58,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Install Rust (If Needed)
-        run: |
-          rustc --version || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source $HOME/.cargo/env
-          rustc --version
-
-      - name: Clean and Build Project
+      - name: Clean & Build PNW_MVP Project
         run: |
           leo clean
           leo build
@@ -78,4 +67,4 @@ jobs:
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || { echo "Error: Deployment failed!"; exit 1; }
+          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet
