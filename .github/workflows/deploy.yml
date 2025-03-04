@@ -31,23 +31,38 @@ jobs:
           source $HOME/.cargo/env
           rustc --version
 
-      - name: Ensure `wget` and Required Tools Are Installed
-        run: sudo apt-get update && sudo apt-get install -y wget tar
+      - name: Ensure 'tar' and 'curl' Are Installed
+        run: sudo apt-get update && sudo apt-get install -y tar curl
 
       - name: Download and Install Leo 2.4.1
         run: |
+          set -e
+          echo "Downloading leo-2.4.1.tar.gz..."
           curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
+          echo "Download completed."
+
+          echo "Verifying the downloaded file..."
           file leo.tar.gz
           tar -tzf leo.tar.gz
-          sudo tar -xzf leo.tar.gz -C /usr/local/bin
+          echo "Verification completed."
+
+          echo "Extracting leo.tar.gz..."
+          mkdir -p leo_extracted
+          tar -xzf leo.tar.gz -C leo_extracted
+          echo "Extraction completed."
+
+          echo "Listing extracted files..."
+          ls -l leo_extracted
+          echo "Listed extracted files."
+
+          echo "Installing Leo binary..."
+          sudo mv leo_extracted/leo /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
+          echo "Installation completed."
+
+          echo "Verifying Leo installation..."
           /usr/local/bin/leo --version
-
-      - name: Verify Leo Binary Permissions
-        run: ls -l /usr/local/bin/leo
-
-      - name: Check Leo Binary Dependencies
-        run: ldd /usr/local/bin/leo || echo "ldd not available, skipping dependency check"
+          echo "Leo version displayed."
 
       - name: Clean and Build Project
         run: |
@@ -58,4 +73,4 @@ jobs:
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          /usr/local/bin/leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet
+          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet
