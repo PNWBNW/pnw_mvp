@@ -9,17 +9,39 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Rust and Install Leo CLI
+      - name: Cache Rust & Cargo Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo
+            ~/.rustup
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Rust (Only If Not Cached)
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y curl bash build-essential unzip git rustc cargo
-          cargo install leo-lang
+          rustc --version || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+          rustc --version
+
+      - name: Download and Install Leo 2.4.1
+        run: |
+          wget https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz -O leo.tar.gz
+          tar -xzf leo.tar.gz -C /usr/local/bin
+          chmod +x /usr/local/bin/leo
           leo --version
+
+      - name: Clean and Build Project
+        run: |
+          leo clean
+          leo build
 
       - name: Deploy to Aleo Testnet
         env:
