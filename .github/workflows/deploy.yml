@@ -14,6 +14,34 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tar curl
+
+      - name: Install GitHub CLI
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install gh
+
+      - name: Authenticate GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh auth setup-git
+          gh auth status
+
+      - name: Download and Install Leo 2.4.1
+        run: |
+          gh release download leo-2.4.1 --repo PNWBNW/PNW_MVP --pattern 'leo-2.4.1.tar.gz'
+          tar -xzf leo-2.4.1.tar.gz
+          sudo mv leo /usr/local/bin/leo
+          sudo chmod +x /usr/local/bin/leo
+          leo --version
+
       - name: Cache Rust & Cargo Dependencies
         uses: actions/cache@v3
         with:
@@ -30,39 +58,6 @@ jobs:
           rustc --version || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           source $HOME/.cargo/env
           rustc --version
-
-      - name: Ensure 'tar' and 'curl' Are Installed
-        run: sudo apt-get update && sudo apt-get install -y tar curl
-
-      - name: Download and Install Leo 2.4.1
-        run: |
-          set -e
-          echo "Downloading leo-2.4.1.tar.gz..."
-          curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
-          echo "Download completed."
-
-          echo "Verifying the downloaded file..."
-          file leo.tar.gz
-          tar -tzf leo.tar.gz
-          echo "Verification completed."
-
-          echo "Extracting leo.tar.gz..."
-          mkdir -p leo_extracted
-          tar -xzf leo.tar.gz -C leo_extracted
-          echo "Extraction completed."
-
-          echo "Listing extracted files..."
-          ls -l leo_extracted
-          echo "Listed extracted files."
-
-          echo "Installing Leo binary..."
-          sudo mv leo_extracted/leo /usr/local/bin/leo
-          sudo chmod +x /usr/local/bin/leo
-          echo "Installation completed."
-
-          echo "Verifying Leo installation..."
-          /usr/local/bin/leo --version
-          echo "Leo version displayed."
 
       - name: Clean and Build Project
         run: |
