@@ -1,89 +1,89 @@
 {
-  "program": "PNW_MVP"
+  "program": "pnw_mvp"
   "version": "1.0.0"
   "license": "Proprietary"
   "description": "Aleo-based payroll processing system using ANS and ZPass verification."
   "functions": {
     "register_worker": {
-      "inputs": ["[u8; 32]", "u8", "u8", "[u8; 64]"],
+      "inputs": ["[u8; 32]", "u8", "u8", "[u8; 64]"]
       "outputs": ["bool"]
     },
     "set_worker_zpass": {
-      "inputs": ["[u8; 32]", "[u8; 64]"],
+      "inputs": ["[u8; 32]", "[u8; 64]"]
       "outputs": ["bool"]
     },
     "register_employer": {
-      "inputs": ["[u8; 32]"],
+      "inputs": ["[u8; 32]"]
       "outputs": ["bool"]
     },
     "verify_employer_tax": {
-      "inputs": ["[u8; 32]"],
+      "inputs": ["[u8; 32]"]
       "outputs": ["bool"]
     },
     "fund_payroll_pool": {
-      "inputs": ["[u8; 32]", "u64"],
+      "inputs": ["[u8; 32]", "u64"]
       "outputs": ["bool"]
     },
     "pay_worker": {
-      "inputs": ["[u8; 32]", "[u8; 32]", "u64", "[u8; 64]"],
+      "inputs": ["[u8; 32]", "[u8; 32]", "u64", "[u8; 64]"]
       "outputs": ["bool"]
     },
     "fund_weekly_pool": {
-      "inputs": ["[u8; 32]", "u64"],
+      "inputs": ["[u8; 32]", "u64"]
       "outputs": ["bool"]
     },
     "process_taxes": {
-      "inputs": ["[u8; 32]"],
+      "inputs": ["[u8; 32]"]
       "outputs": ["bool"]
     },
     "execute_payroll": {
-      "inputs": ["[u8; 32]", "[u8; 32]", "u64"],
+      "inputs": ["[u8; 32]", "[u8; 32]", "u64"]
       "outputs": ["bool"]
     }
   },
   "mappings": {
     "worker_registry": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "u8"
     },
     "worker_zpass_hash": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "[u8; 64]"
     },
     "employer_registry": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "bool"
     },
     "employer_tax_compliance": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "bool"
     },
     "ans_registry": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "[u8; 32]"
     },
     "ans_reverse_lookup": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "[u8; 32]"
     },
     "subDAO_ans_registry": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "[u8; 32]"
     },
     "subDAO_reverse_lookup": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "[u8; 32]"
     },
     "weekly_balance": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "u64"
     },
     "reserve_balance": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "u64"
     },
     "tax_obligations": {
-      "key": "[u8; 32]",
+      "key": "[u8; 32]"
       "value": "u64"
     }
   },
