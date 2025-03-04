@@ -24,10 +24,16 @@ jobs:
           set -e
           echo "Downloading Leo CLI..."
           curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
-          echo "Download complete."
+          
+          echo "Verifying download..."
+          ls -lh leo.tar.gz
+          
+          echo "Checking if the file is a valid tar archive..."
+          file leo.tar.gz
           
           echo "Extracting Leo CLI..."
-          tar -xzf leo.tar.gz
+          tar -xzvf leo.tar.gz || { echo "Error: Extraction failed!"; exit 1; }
+          
           echo "Extraction complete. Listing extracted files:"
           ls -R
           
@@ -37,14 +43,14 @@ jobs:
             echo "Error: Leo binary not found!"
             exit 1
           fi
-          echo "Found Leo binary at: $LEO_PATH"
           
+          echo "Found Leo binary at: $LEO_PATH"
           echo "Moving Leo binary to /usr/local/bin..."
           sudo mv "$LEO_PATH" /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
           
           echo "Verifying Leo CLI installation..."
-          /usr/local/bin/leo --version
+          /usr/local/bin/leo --version || { echo "Error: Leo CLI installation failed!"; exit 1; }
 
       - name: Cache Rust & Cargo Dependencies
         uses: actions/cache@v3
@@ -72,4 +78,4 @@ jobs:
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet
+          leo deploy --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || { echo "Error: Deployment failed!"; exit 1; }
