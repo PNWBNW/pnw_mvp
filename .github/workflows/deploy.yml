@@ -17,20 +17,34 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y tar curl
+          sudo apt-get install -y unzip curl
 
       - name: Download and Install Leo 2.4.1
         run: |
           set -e
-          echo "Downloading Leo 2.4.1..."
-          curl -L -o leo.tar.gz https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
+          echo "Downloading Leo 2.4.1 ZIP..."
+          curl -L -o leo.zip https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-2.4.1.zip
+          
           echo "Extracting Leo..."
-          tar -xzf leo.tar.gz
-          echo "Contents of extracted directory:"
-          ls -l
+          unzip leo.zip
+          
+          echo "Checking extracted contents..."
+          ls -R
+          
+          echo "Searching for Leo binary..."
+          LEO_PATH=$(find . -type f -name "leo" | head -n 1)
+
+          if [[ -z "$LEO_PATH" ]]; then
+            echo "Error: Leo binary not found!"
+            exit 1
+          fi
+
+          echo "Found Leo binary at: $LEO_PATH"
+
           echo "Moving Leo binary to /usr/local/bin..."
-          sudo mv leo /usr/local/bin/leo
+          sudo mv "$LEO_PATH" /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
+          
           echo "Verifying Leo installation..."
           /usr/local/bin/leo --version
 
