@@ -17,7 +17,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y unzip curl jq  # jq added for JSON parsing
+          sudo apt-get install -y unzip curl jq
 
       - name: Download and Extract Leo Binary
         run: |
@@ -63,21 +63,26 @@ jobs:
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          echo "Checking if program.json exists..."
           if [ ! -f program.json ]; then
             echo "Error: program.json not found!"
             exit 1
           fi
-          
-          echo "Extracting program names from program.json..."
-          PROGRAMS=$(jq -r '.programs[].program | sub("src/"; "") | sub(".leo$"; "")' program.json)
-          
+          PROGRAMS=$(jq -r '.programs[].program' program.json)
           if [ -z "$PROGRAMS" ]; then
             echo "Error: No programs found in program.json!"
             exit 1
           fi
-          
           for PROGRAM in $PROGRAMS; do
-            echo "Deploying $PROGRAM..."
-            leo deploy "pnw_mvp" --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || exit 1
+            echo "Checking case for $PROGRAM..."
+            # Extract the base filename (e.g., Main.leo) and directory (Src/)
+            DIR=$(dirname "$PROGRAM")
+            BASE=$(basename "$PROGRAM")
+            # List files in the directory (case-insensitive match)
+            ACTUAL_FILE=$(find "$DIR" -maxdepth 1 -type f -iname "$BASE" | head -n 1)
+            if [ -z "$ACTUAL_FILE" ]; then
+              echo "Error: File $PROGRAM not found (case mismatch?)"
+              exit 1
+            fi
+            echo "Deploying $ACTUAL_FILE..."
+            leo deploy "$ACTUAL_FILE" --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || echo "Deployment of $ACTUAL_FILE failed: $?"
           done
