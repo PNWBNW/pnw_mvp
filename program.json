@@ -1,4 +1,5 @@
 {
+  "program": "pnw_mvp",
   "license": "Proprietary License - PNW-MVP (c) 2025. All Rights Reserved.",
   "programs": [
     {
@@ -6,7 +7,7 @@
       "version": "0.1.0",
       "description": "PNW-MVP: Core orchestration for zero-knowledge payroll on Aleo testnet",
       "network": "testnet",
-      "fee": "1",
+      "fee": 1,
       "record": null,
       "imports": [
         "credits.aleo",
@@ -17,15 +18,6 @@
         "pniw_payroll.leo",
         "subDAO_reserve.leo"
       ],
-      "ans_name": "",
-      "test_addresses": [
-        "aleo1zay2jaxzyrsued32g3hmkfxr9apsaj8cjmwa9j68vrtlem5e5yys4yruyk",
-        "aleo1fkdyv54wvunvxku75ajndjyrwmayd57pwxjkqpzmhw7ch5cjrg8qwq7zux",
-        "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3",
-        "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"
-      ],
-      "test_mode": true,
-      "faucet_address": "Discord #faucet (use /sendcredits command)",
       "test_files": [
         "tests/main_test.leo"
       ],
@@ -36,14 +28,13 @@
       "version": "0.1.0",
       "description": "Employer funding entry for PNW-MVP",
       "network": "testnet",
-      "fee": "1",
+      "fee": 1,
       "record": null,
       "imports": [
         "credits.aleo",
         "subDAO_reserve.leo",
         "oversightDAO_reserve.leo"
       ],
-      "ans_name": "",
       "test_files": [
         "tests/employer_agreement_test.leo"
       ],
@@ -51,7 +42,7 @@
     }
   ],
   "main": "main.leo",
-  "global_fee": "1",
+  "global_fee": 1,
   "default_network": "testnet",
   "test_mode": true,
   "faucet_url": "Discord #faucet (use /sendcredits command)",
