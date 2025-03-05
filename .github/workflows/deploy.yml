@@ -17,7 +17,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y unzip curl jq  # Added jq for JSON parsing
+          sudo apt-get install -y unzip curl jq  # jq added for JSON parsing
 
       - name: Download and Extract Leo Binary
         run: |
@@ -63,8 +63,21 @@ jobs:
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
+          echo "Checking if program.json exists..."
+          if [ ! -f program.json ]; then
+            echo "Error: program.json not found!"
+            exit 1
+          fi
+          
+          echo "Extracting program names from program.json..."
           PROGRAMS=$(jq -r '.programs[].program' program.json)
+          
+          if [ -z "$PROGRAMS" ]; then
+            echo "Error: No programs found in program.json!"
+            exit 1
+          fi
+          
           for PROGRAM in $PROGRAMS; do
             echo "Deploying $PROGRAM..."
-            leo deploy "$PROGRAM" --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet
+            leo deploy "$PROGRAM" --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || exit 1
           done
