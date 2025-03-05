@@ -57,7 +57,11 @@ jobs:
       - name: Clean & Build PNW_MVP Project
         run: |
           leo clean
-          leo build --network testnet
+          leo build --network testnet || {
+            echo "Build failed. Checking logs for details..."
+            cat build/*.log || true  # Try to output build logs if they exist
+            exit 1
+          }
 
       - name: Deploy to Aleo Testnet
         env:
@@ -65,6 +69,16 @@ jobs:
         run: |
           if [ ! -f program.json ]; then
             echo "Error: program.json not found!"
+            exit 1
+          fi
+          # Check if ALEO_PRIVATE_KEY is set, not empty, and valid
+          if [ -z "$ALEO_PRIVATE_KEY" ]; then
+            echo "Error: ALEO_PRIVATE_KEY is not set or empty!"
+            exit 1
+          fi
+          # Validate ALEO_PRIVATE_KEY format (basic check for Aleo private key length)
+          if ! echo "$ALEO_PRIVATE_KEY" | grep -q "^APrivateKey1[0-9a-zA-Z]\{58\}$"; then
+            echo "Error: ALEO_PRIVATE_KEY is not a valid Aleo private key (expected format: APrivateKey1...)"
             exit 1
           fi
           PROGRAMS=$(jq -r '.programs[].program' program.json)
@@ -81,8 +95,15 @@ jobs:
             ACTUAL_FILE=$(find "$DIR" -maxdepth 1 -type f -iname "$BASE" | head -n 1)
             if [ -z "$ACTUAL_FILE" ]; then
               echo "Error: File $PROGRAM not found (case mismatch?)"
+              ls -l "$DIR"  # List directory contents for debugging
               exit 1
             fi
             echo "Deploying $ACTUAL_FILE..."
-            leo deploy "$ACTUAL_FILE" --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || echo "Deployment of $ACTUAL_FILE failed: $?"
+            # Simplify leo deploy command to ensure correct argument order
+            leo "$ACTUAL_FILE" deploy --private-key="$ALEO_PRIVATE_KEY" --network testnet || {
+              echo "Deployment of $ACTUAL_FILE failed: $?"
+              # Try to output Leo deploy logs if available
+              cat build/*.log || true
+              exit 1
+            }
           done
