@@ -34,105 +34,9 @@
       "record": null,
       "test_files": [],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
-    },
-    {
-      "program": "src/Employer_agreement.leo",
-      "version": "0.1.0",
-      "description": "Employer agreement for PNW-MVP payroll process (uses ALEO (Testnet) for testing)",
-      "network": "testnet",
-      "fee": 1,
-      "record": null,
-      "imports": [
-        "src/Credits.leo",
-        "src/SubDAO_reserve.leo",
-        "src/OversightDAO_reserve.leo"
-      ],
-      "test_files": [
-        "tests/employer_agreement_test.leo"
-      ],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
-    },
-    {
-      "program": "src/Weekly_payroll_pool.leo",
-      "version": "0.1.0",
-      "description": "Weekly payroll pool for aggregating worker payments (uses ALEO (Testnet) for testing)",
-      "network": "testnet",
-      "fee": 1,
-      "record": null,
-      "imports": [
-        "src/Credits.leo",
-        "src/Employer_agreement.leo"
-      ],
-      "test_files": [
-        "tests/weekly_payroll_pool_test.leo"
-      ],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
-    },
-    {
-      "program": "src/PNcW_Payroll.leo",
-      "version": "0.1.0",
-      "description": "Payroll contract for Permanent National Contract Workers (PNcW) (uses ALEO (Testnet) for testing)",
-      "network": "testnet",
-      "fee": 1,
-      "record": null,
-      "imports": [
-        "src/Credits.leo",
-        "src/Weekly_payroll_pool.leo"
-      ],
-      "test_files": [
-        "tests/pncw_payroll_test.leo"
-      ],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
-    },
-    {
-      "program": "src/PNiW_Payroll.leo",
-      "version": "0.1.0",
-      "description": "Payroll contract for Permanent National Independent Workers (PNiW) (uses ALEO (Testnet) for testing)",
-      "network": "testnet",
-      "fee": 1,
-      "record": null,
-      "imports": [
-        "src/Credits.leo",
-        "src/Weekly_payroll_pool.leo"
-      ],
-      "test_files": [
-        "tests/pniw_payroll_test.leo"
-      ],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
-    },
-    {
-      "program": "src/Process_tax_compliance.leo",
-      "version": "0.1.0",
-      "description": "Processes tax compliance for PNW-MVP payroll system (uses ALEO (Testnet) for testing)",
-      "network": "testnet",
-      "fee": 1,
-      "record": null,
-      "imports": [
-        "src/Credits.leo",
-        "src/PNcW_Payroll.leo",
-        "src/PNiW_Payroll.leo"
-      ],
-      "test_files": [
-        "tests/process_tax_compliance_test.leo"
-      ],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
-    },
-    {
-      "program": "src/Tax_Sink.leo",
-      "version": "0.1.0",
-      "description": "Tax sink program for routing tax payments (uses ALEO (Testnet) for testing)",
-      "network": "testnet",
-      "fee": 1,
-      "record": null,
-      "imports": [
-        "src/Credits.leo",
-        "src/Process_tax_compliance.leo"
-      ],
-      "test_files": [],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     }
   ],
-  "main": "src/Main.leo",
+  "main": "pnw_mvp",
   "global_fee": 1,
   "default_network": "testnet",
   "test_mode": true,
@@ -145,15 +49,10 @@
     "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"
   ],
   "test_files": [
-    "tests/main_test.leo",
-    "tests/employer_agreement_test.leo",
-    "tests/weekly_payroll_pool_test.leo",
-    "tests/pncw_payroll_test.leo",
-    "tests/pniw_payroll_test.leo",
-    "tests/process_tax_compliance_test.leo"
+    "tests/main_test.leo"
   ],
   "deployment_scripts": {
     "batch": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}",
-    "single": "leo deploy <program>.leo --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
+    "single": "leo deploy pnw_mvp --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
   }
 }
