@@ -70,7 +70,7 @@ jobs:
           fi
           
           echo "Extracting program names from program.json..."
-          PROGRAMS=$(jq -r '.programs[].program | sub("src/"; "")' program.json)
+          PROGRAMS=$(jq -r '.programs[].program | sub("src/"; "") | sub(".leo$"; ".aleo")' program.json)
           
           if [ -z "$PROGRAMS" ]; then
             echo "Error: No programs found in program.json!"
