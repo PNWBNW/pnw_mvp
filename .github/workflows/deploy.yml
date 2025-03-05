@@ -79,5 +79,5 @@ jobs:
           
           for PROGRAM in $PROGRAMS; do
             echo "Deploying $PROGRAM..."
-            leo deploy "$PROGRAM" --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || exit 1
+            leo deploy "pnw_mvp" --private-key="${{ secrets.ALEO_PRIVATE_KEY }}" --network testnet || exit 1
           done
