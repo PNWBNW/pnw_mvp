@@ -10,6 +10,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -19,31 +20,15 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y unzip curl jq
 
-      - name: Download and Extract Leo Binary
+      - name: Download and Install Leo CLI
         run: |
-          set -e
-          echo "Downloading Leo CLI..."
           curl -L -o leo.zip https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          
-          echo "Extracting Leo CLI..."
           unzip leo.zip
-          
-          echo "Searching for Leo binary..."
-          LEO_PATH=$(find . -type f -name "leo" | head -n 1)
-          if [ -z "$LEO_PATH" ]; then
-            echo "Error: Leo binary not found!"
-            exit 1
-          fi
-          
-          echo "Found Leo binary at: $LEO_PATH"
-          echo "Moving Leo binary to /usr/local/bin..."
-          sudo mv "$LEO_PATH" /usr/local/bin/leo
+          sudo mv leo /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
-          
-          echo "Verifying Leo CLI installation..."
-          /usr/local/bin/leo --version
+          leo --version
 
-      - name: Cache Rust & Cargo Dependencies
+      - name: Cache Dependencies
         uses: actions/cache@v3
         with:
           path: |
@@ -54,14 +39,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Clean & Build PNW_MVP Project
+      - name: Build PNW_MVP Project
         run: |
           leo clean
-          leo build --network testnet || {
-            echo "Build failed. Checking logs for details..."
-            cat build/*.log || true  # Try to output build logs if they exist
-            exit 1
-          }
+          leo build --network testnet
 
       - name: Deploy to Aleo Testnet
         env:
@@ -71,39 +52,18 @@ jobs:
             echo "Error: program.json not found!"
             exit 1
           fi
-          # Check if ALEO_PRIVATE_KEY is set, not empty, and valid
-          if [ -z "$ALEO_PRIVATE_KEY" ]; then
-            echo "Error: ALEO_PRIVATE_KEY is not set or empty!"
-            exit 1
-          fi
-          # Validate ALEO_PRIVATE_KEY format (basic check for Aleo private key length)
-          if ! echo "$ALEO_PRIVATE_KEY" | grep -q "^APrivateKey1[0-9a-zA-Z]\{58\}$"; then
-            echo "Error: ALEO_PRIVATE_KEY is not a valid Aleo private key (expected format: APrivateKey1...)"
-            exit 1
-          fi
+
           PROGRAMS=$(jq -r '.programs[].program' program.json)
+
           if [ -z "$PROGRAMS" ]; then
             echo "Error: No programs found in program.json!"
             exit 1
           fi
+
           for PROGRAM in $PROGRAMS; do
-            echo "Checking case for $PROGRAM..."
-            # Extract the base filename (e.g., Main.leo) and directory (Src/)
-            DIR=$(dirname "$PROGRAM")
-            BASE=$(basename "$PROGRAM")
-            # List files in the directory (case-insensitive match)
-            ACTUAL_FILE=$(find "$DIR" -maxdepth 1 -type f -iname "$BASE" | head -n 1)
-            if [ -z "$ACTUAL_FILE" ]; then
-              echo "Error: File $PROGRAM not found (case mismatch?)"
-              ls -l "$DIR"  # List directory contents for debugging
-              exit 1
-            fi
-            echo "Deploying $ACTUAL_FILE..."
-            # Simplify leo deploy command to ensure correct argument order
-            leo "$ACTUAL_FILE" deploy --private-key="$ALEO_PRIVATE_KEY" --network testnet || {
-              echo "Deployment of $ACTUAL_FILE failed: $?"
-              # Try to output Leo deploy logs if available
-              cat build/*.log || true
+            echo "Deploying $PROGRAM..."
+            leo deploy "$PROGRAM" --private-key="$ALEO_PRIVATE_KEY" --network testnet || {
+              echo "Deployment of $PROGRAM failed: $?"
               exit 1
             }
           done
