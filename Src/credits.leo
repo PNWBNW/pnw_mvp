@@ -1,30 +1,29 @@
-program credits.aleo;
+// credits.leo - Aleo program for handling ALEO (Testnet) tokens on Aleo Testnet
+// This program manages test tokens for PNW_MVP, obtained via the Leo Wallet Discord faucet.
 
-mapping balances:
-    address => u64;
+program credits.leo;  // Matches the file name credits.leo
 
-function mint(recipient: address, amount: u64) -> u64 {
-    let balance = balances.get_or_use(&recipient, 0u64);
-    let new_balance = balance + amount;
-    balances.set(&recipient, new_balance);
-    return new_balance;
-}
+// Define a private mapping to store ALEO (Testnet) balances for each address
+mapping balance:
+    // Key: Aleo address (public for identification)
+    public Key as address,
+    // Value: Private u64 for the balance (hidden via ZK proofs)
+    private Value as u64;
 
-function transfer(sender: address, recipient: address, amount: u64) -> bool {
-    let sender_balance = balances.get_or_use(&sender, 0u64);
-    if sender_balance < amount {
-        return false; // Insufficient funds
-    }
-    
-    let new_sender_balance = sender_balance - amount;
-    let recipient_balance = balances.get_or_use(&recipient, 0u64) + amount;
+// Initialize a new account with a balance of 0
+transition initialize_balance(address: address):
+    balance[address] = 0u64;
 
-    balances.set(&sender, new_sender_balance);
-    balances.set(&recipient, recipient_balance);
+// Transfer ALEO (Testnet) tokens from sender to recipient
+// Sender must have sufficient balance; recipient's balance increases
+transition transfer(sender: address, recipient: address, amount: u64):
+    // Ensure sender has enough balance
+    assert_eq(balance[sender], balance[sender] + amount, "Insufficient balance");
+    // Decrease sender's balance
+    balance[sender] -= amount;
+    // Increase recipient's balance
+    balance[recipient] += amount;
 
-    return true;
-}
-
-function check_balance(user: address) -> u64 {
-    return balances.get_or_use(&user, 0u64);
-}
+// Check the balance of an address (private query for privacy)
+transition get_balance(address: address) -> u64:
+    return balance[address];
