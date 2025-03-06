@@ -1,6 +1,6 @@
 import credits.aleo;
 
-program oversightDAO_reserve.aleo {
+program oversightdao_reserve.aleo {
     mapping reserve_balance: [u8; 32] => u64;
 
     const OVERSIGHT_DAO_ANS: [u8; 32] = *b"oversightdao.pnw.ans";
