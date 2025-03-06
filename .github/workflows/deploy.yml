@@ -10,7 +10,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -20,24 +19,13 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y unzip curl jq
 
-      - name: Download and Install Leo CLI
+      - name: Download and Setup Leo CLI
         run: |
           curl -L -o leo.zip https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
           unzip leo.zip
           sudo mv leo /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
           leo --version
-
-      - name: Cache Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
 
       - name: Build PNW_MVP Project
         run: |
@@ -53,7 +41,7 @@ jobs:
             exit 1
           fi
 
-          PROGRAMS=$(jq -r '.programs[].program' program.json)
+          PROGRAMS=$(jq -r '.programs[].program | split("/")[-1] | sub(".leo$"; "") | ascii_downcase' program.json)
 
           if [ -z "$PROGRAMS" ]; then
             echo "Error: No programs found in program.json!"
