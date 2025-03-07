@@ -14,10 +14,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install System Dependencies
+      - name: Install Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y unzip curl
+          sudo apt-get install -y unzip curl jq
 
       - name: Download and Setup Leo CLI
         run: |
@@ -27,21 +27,13 @@ jobs:
           sudo chmod +x /usr/local/bin/leo
           leo --version
 
-      - name: Clean and Build PNW_MVP Project
+      - name: Clean and Build Project
         run: |
           leo clean
           leo build --network testnet
 
-      - name: Deploy Programs Sequentially
+      - name: Deploy to Aleo Testnet
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          leo deploy --path src/main.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
-          leo deploy --path src/employer_agreement.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
-          leo deploy --path src/process_tax_compliance.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
-          leo deploy --path src/weekly_payroll_pool.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
-          leo deploy --path src/pncw_payroll.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
-          leo deploy --path src/pniw_payroll.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
-          leo deploy --path src/subdao_reserve.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
-          leo deploy --path src/oversightdao_reserve.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
-          leo deploy --path src/tax_sink.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --private-key "$ALEO_PRIVATE_KEY" --network testnet
