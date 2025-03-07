@@ -1,7 +1,7 @@
 import process_tax_compliance.leo;
-import credits.aleo;
+import credits.leo;
 
-program process_tax_compliance_test.aleo {
+program process_tax_compliance_test.leo {
     transition test_pay_taxes(employer_ans: [u8; 32]) -> bool {
         let amount: u64 = 100u64;
 
