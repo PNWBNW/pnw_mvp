@@ -1,8 +1,8 @@
-import credits.aleo;
-import subDAO_reserve.aleo;
-import oversightDAO_reserve.aleo;
+import credits.leo;
+import subdao_reserve.leo;
+import oversightdao_reserve.leo;
 
-program employer_agreement.aleo {
+program employer_agreement.leo {
     mapping employer_registry: [u8; 32] => bool;
     mapping employer_tax_compliance: [u8; 32] => bool;
     mapping ans_registry: [u8; 32] => [u8; 32];
@@ -78,13 +78,13 @@ program employer_agreement.aleo {
         assert(amount > 0u64);
 
         let oversight_amount: u64 = amount.checked_mul(OVERSIGHT_ALLOCATION).checked_div(100u64);
-        let subDAO_amount: u64 = amount.checked_sub(oversight_amount);
+        let subdao_amount: u64 = amount.checked_sub(oversight_amount);
 
-        credits.aleo::transfer_public(oversightDAO_reserve.aleo::lookup_subDAO_by_ans(OVERSIGHT_DAO_ANS), oversight_amount);
-        oversightDAO_reserve.aleo::deposit(OVERSIGHT_DAO_ANS, oversight_amount);
+        credits.leo::transfer_public(oversightdao_reserve.leo::lookup_subdao_by_ans(OVERSIGHT_DAO_ANS), oversight_amount);
+        oversightdao_reserve.leo::deposit(OVERSIGHT_DAO_ANS, oversight_amount);
 
-        credits.aleo::transfer_public(subDAO_reserve.aleo::lookup_subDAO_by_ans(subdao_ans), subDAO_amount);
-        subDAO_reserve.aleo::deposit(subdao_ans, subDAO_amount);
+        credits.leo::transfer_public(subdao_reserve.leo::lookup_subdao_by_ans(subdao_ans), subdao_amount);
+        subdao_reserve.leo::deposit(subdao_ans, subdao_amount);
 
         return true;
     }
@@ -94,8 +94,8 @@ program employer_agreement.aleo {
         return ans_reverse_lookup[ans_name];
     }
 
-    function lookup_subDAO_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
-        assert(subDAO_reverse_lookup.contains(ans_name));
-        return subDAO_reverse_lookup[ans_name];
+    function lookup_subdao_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
+        assert(subdao_reverse_lookup.contains(ans_name));
+        return subdao_reverse_lookup[ans_name];
     }
 }
