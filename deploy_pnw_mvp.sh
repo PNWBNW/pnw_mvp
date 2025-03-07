@@ -7,12 +7,14 @@ if [[ -z "${ALEO_PRIVATE_KEY}" ]]; then
     exit 1
 fi
 
-echo "🔥 Starting deployment funnel for PNW-MVP..."
-
-# Since Leo.toml is in the root, no need to cd into src.
+echo "🔥 Running Pre-Deployment Build Check..."
 leo clean
+if ! leo build; then
+    echo "🔴 Parsing error detected. Fix syntax issues before deploying!"
+    exit 248
+fi
 
-echo "🟢 Deploying all contracts..."
+echo "🔥 Starting deployment funnel for PNW-MVP..."
 leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}
 
 if [ $? -eq 0 ]; then
