@@ -1,17 +1,17 @@
-import credits.aleo;
+import credits.leo;
 
-program oversightdao_reserve.aleo {
+program oversightdao_reserve.leo {
     mapping reserve_balance: [u8; 32] => u64;
 
     const OVERSIGHT_DAO_ANS: [u8; 32] = *b"oversightdao.pnw.ans";
 
-    async transition deposit(oversightDAO_ans: [u8; 32], amount: u64) -> (bool, async transition) {
+    async transition deposit(oversightdao_ans: [u8; 32], amount: u64) -> (bool, async transition) {
         assert(amount > 0u64);
-        assert(oversightDAO_ans == OVERSIGHT_DAO_ANS);
+        assert(oversightdao_ans == OVERSIGHT_DAO_ANS);
 
-        let current_balance: u64 = reserve_balance[oversightDAO_ans];
+        let current_balance: u64 = reserve_balance[oversightdao_ans];
         let new_balance: u64 = current_balance.checked_add(amount);
-        Mapping::set(reserve_balance, oversightDAO_ans, new_balance);
+        Mapping::set(reserve_balance, oversightdao_ans, new_balance);
 
         return (true, deposit);
     }
@@ -25,7 +25,7 @@ program oversightdao_reserve.aleo {
         let new_balance: u64 = current_balance.checked_sub(amount);
         Mapping::set(reserve_balance, OVERSIGHT_DAO_ANS, new_balance);
 
-        credits.aleo::transfer_public(subdao_ans, amount);
+        credits.leo::transfer_public(subdao_ans, amount);
         return (true, withdraw);
     }
 
