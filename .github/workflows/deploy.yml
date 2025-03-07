@@ -11,30 +11,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 🛎️ Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Aleo private key
+      - name: 🔑 Set up Aleo private key
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      - name: Download & Install Custom Leo CLI
+      - name: 🛠️ Download & Install Custom Leo CLI (Tarball)
         run: |
-          curl -L -o leo.zip https://github.com/PNWBNW/pnw_mvp/releases/download/leo-2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          unzip leo.zip -d $HOME/.aleo
+          curl -L -o leo.tar.gz https://github.com/PNWBNW/pnw_mvp/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
+          mkdir -p $HOME/.aleo
+          tar -xzf leo.tar.gz -C $HOME/.aleo
           chmod +x $HOME/.aleo/leo
           echo "export PATH=$HOME/.aleo:\$PATH" >> $GITHUB_ENV
           echo "export PATH=$HOME/.aleo:\$PATH" >> ~/.bashrc
           source $GITHUB_ENV
 
-      - name: Verify Leo Installation
+      - name: 🔍 Verify Leo Installation
         run: |
           export PATH=$HOME/.aleo:$PATH
           leo --version
 
-      - name: Set script permissions
+      - name: 🔍 Set script permissions
         run: chmod +x deploy_pnw_mvp.sh
 
-      - name: Deploy PNW-MVP contracts
+      - name: 🚀 Deploy PNW-MVP contracts
         run: |
           export PATH=$HOME/.aleo:$PATH
           ./deploy_pnw_mvp.sh
