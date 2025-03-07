@@ -10,17 +10,17 @@ fi
 echo "🔥 Running Pre-Deployment Build Check..."
 leo clean
 
-cd src
+BUILD_LOG="build_errors.log"
 
-for contract in *.leo; do
-    echo "🛠️ Building $contract..."
-    if ! leo build --network testnet --path "$contract"; then
-        echo "❌ Parsing error detected in $contract! Fix syntax before deploying."
-        exit 248
-    fi
-done
+if ! leo build --network testnet --verbose 2>&1 | tee "$BUILD_LOG"; then
+    echo "🔴 Parsing error detected!"
+    echo "🔍 Debugging Info:"
 
-cd ..
+    # Extract the first error with file, line, and column numbers
+    grep -E "Error|line|column" "$BUILD_LOG" | head -n 10
+
+    exit 248
+fi
 
 echo "🔥 Starting deployment funnel for PNW-MVP..."
 leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}
