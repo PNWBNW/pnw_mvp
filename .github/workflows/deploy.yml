@@ -10,6 +10,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -21,13 +22,13 @@ jobs:
 
       - name: Download and Setup Leo CLI
         run: |
-          curl -L -o leo.zip https://github.com/PNWBNW/PNW_MVP/releases/download/leo-2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
+          curl -L -o leo.zip https://github.com/PNWBNW/pnw_mvp/releases/download/leo-2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
           unzip leo.zip
           sudo mv leo /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
           leo --version
 
-      - name: Build PNW_MVP Project
+      - name: Clean and Build PNW_MVP Project
         run: |
           leo clean
           leo build --network testnet
@@ -36,22 +37,13 @@ jobs:
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          if [ ! -f program.json ]; then
-            echo "Error: program.json not found!"
+          PROGRAM_NAME=$(jq -r '.program' program.json)
+          if [ -z "$PROGRAM_NAME" ]; then
+            echo "Error: 'program' not defined in program.json"
             exit 1
           fi
-
-          PROGRAMS=$(jq -r '.programs[].program | split("/")[-1] | sub(".leo$"; "") | ascii_downcase' program.json)
-
-          if [ -z "$PROGRAMS" ]; then
-            echo "Error: No programs found in program.json!"
+          echo "Deploying $PROGRAM_NAME..."
+          leo deploy "$PROGRAM_NAME" --private-key="$ALEO_PRIVATE_KEY" --network testnet || {
+            echo "Deployment of $PROGRAM_NAME failed."
             exit 1
-          fi
-
-          for PROGRAM in $PROGRAMS; do
-            echo "Deploying $PROGRAM..."
-            leo deploy "$PROGRAM" --private-key="$ALEO_PRIVATE_KEY" --network testnet || {
-              echo "Deployment of $PROGRAM failed: $?"
-              exit 1
-            }
-          done
+          }
