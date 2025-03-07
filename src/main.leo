@@ -4,7 +4,7 @@ import process_tax_compliance.leo;
 import weekly_payroll_pool.leo;
 import pncw_payroll.leo;
 import pniw_payroll.leo;
-import subDAO_reserve.leo;
+import subdao_reserve.leo;
 
 program main.leo {
     mapping worker_category: [u8; 32] => u8;
@@ -66,7 +66,7 @@ program main.leo {
         Mapping::set(subdao_ans_registry, subdao_ans, ans_name);
         Mapping::set(subdao_reverse_lookup, ans_name, subdao_ans);
 
-        return (true, register_subDAO_ans);
+        return (true, register_subdao_ans);
     }
 
     transition pay_worker(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 64]) -> bool {
@@ -90,7 +90,7 @@ program main.leo {
 
     transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
         assert(amount > 0u64);
-        subDAO_reserve.leo::fund_weekly_payroll(subdao_ans, amount);
+        subdao_reserve.leo::fund_weekly_payroll(subdao_ans, amount);
         return weekly_payroll_pool.leo::fund_weekly_pool(subdao_ans, amount);
     }
 
