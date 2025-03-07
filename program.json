@@ -5,10 +5,9 @@
     {
       "program": "src/main.leo",
       "version": "0.1.0",
-      "description": "PNW-MVP: Core orchestration for zero-knowledge payroll on Aleo testnet (uses ALEO (Testnet) for testing)",
+      "description": "Core orchestration for zero-knowledge payroll (testnet)",
       "network": "testnet",
       "fee": 1,
-      "record": null,
       "imports": [
         "src/credits.leo",
         "src/employer_agreement.leo",
@@ -20,116 +19,81 @@
         "src/oversightdao_reserve.leo",
         "src/tax_sink.leo"
       ],
-      "test_files": [
-        "tests/main_test.leo"
-      ],
+      "test_files": ["tests/main_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
     {
       "program": "src/employer_agreement.leo",
       "version": "0.1.0",
-      "description": "Employer funding entry for PNW-MVP (uses ALEO (Testnet) for testing)",
+      "description": "Employer funding management (testnet)",
       "network": "testnet",
       "fee": 1,
-      "record": null,
       "imports": [
         "src/credits.leo",
         "src/subdao_reserve.leo",
         "src/oversightdao_reserve.leo"
       ],
-      "test_files": [
-        "tests/employer_agreement_test.leo"
-      ],
+      "test_files": ["tests/employer_agreement_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
     {
       "program": "src/process_tax_compliance.leo",
       "version": "0.1.0",
-      "description": "Tax compliance processing for PNW-MVP (uses ALEO (Testnet) for testing)",
+      "description": "Tax compliance processing (testnet)",
       "network": "testnet",
       "fee": 1,
-      "record": null,
-      "imports": [
-        "src/credits.leo"
-      ],
-      "test_files": [
-        "tests/process_tax_compliance_test.leo"
-      ],
+      "imports": ["src/credits.leo"],
+      "test_files": ["tests/process_tax_compliance_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
     {
       "program": "src/weekly_payroll_pool.leo",
       "version": "0.1.0",
-      "description": "Weekly payroll pool management for PNW-MVP (uses ALEO (Testnet) for testing)",
+      "description": "Weekly payroll pool management (testnet)",
       "network": "testnet",
       "fee": 1,
-      "record": null,
-      "imports": [
-        "src/credits.leo"
-      ],
-      "test_files": [
-        "tests/weekly_payroll_pool_test.leo"
-      ],
+      "imports": ["src/credits.leo"],
+      "test_files": ["tests/weekly_payroll_pool_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
     {
       "program": "src/pncw_payroll.leo",
       "version": "0.1.0",
-      "description": "PNcW payroll processing for PNW-MVP (uses ALEO (Testnet) for testing)",
+      "description": "PNcW payroll processing (testnet)",
       "network": "testnet",
       "fee": 1,
-      "record": null,
-      "imports": [
-        "src/credits.leo"
-      ],
-      "test_files": [
-        "tests/pncw_payroll_test.leo"
-      ],
+      "imports": ["src/credits.leo"],
+      "test_files": ["tests/pncw_payroll_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
     {
       "program": "src/pniw_payroll.leo",
       "version": "0.1.0",
-      "description": "PNiW payroll processing for PNW-MVP (uses ALEO (Testnet) for testing)",
+      "description": "PNiW payroll processing (testnet)",
       "network": "testnet",
       "fee": 1,
-      "record": null,
-      "imports": [
-        "src/credits.leo"
-      ],
-      "test_files": [
-        "tests/pniw_payroll_test.leo"
-      ],
+      "imports": ["src/credits.leo"],
+      "test_files": ["tests/pniw_payroll_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
     {
       "program": "src/subdao_reserve.leo",
       "version": "0.1.0",
-      "description": "SubDAO reserve management for PNW-MVP (uses ALEO (Testnet) for testing)",
+      "description": "SubDAO reserve management (testnet)",
       "network": "testnet",
       "fee": 1,
-      "record": null,
-      "imports": [
-        "src/credits.leo"
-      ],
-      "test_files": [
-        "tests/subdao_reserve_test.leo"
-      ],
+      "imports": ["src/credits.leo"],
+      "test_files": ["tests/subdao_reserve_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
     {
       "program": "src/oversightdao_reserve.leo",
       "version": "0.1.0",
-      "description": "OversightDAO reserve management for PNW-MVP (uses ALEO (Testnet) for testing)",
+      "description": "OversightDAO reserve management (testnet)",
       "network": "testnet",
       "fee": 1,
-      "record": null,
-      "imports": [
-        "src/credits.leo"
-      ],
-      "test_files": [
-        "tests/oversightdao_reserve_test.leo"
-      ],
+      "imports": ["src/credits.leo"],
+      "test_files": ["tests/oversightdao_reserve_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     }
   ],
