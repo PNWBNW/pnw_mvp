@@ -9,10 +9,18 @@ fi
 
 echo "🔥 Running Pre-Deployment Build Check..."
 leo clean
-if ! leo build --network testnet; then
-    echo "🔴 Parsing error detected. Fix syntax issues before deploying!"
-    exit 248
-fi
+
+cd src
+
+for contract in *.leo; do
+    echo "🛠️ Building $contract..."
+    if ! leo build --network testnet --path "$contract"; then
+        echo "❌ Parsing error detected in $contract! Fix syntax before deploying."
+        exit 248
+    fi
+done
+
+cd ..
 
 echo "🔥 Starting deployment funnel for PNW-MVP..."
 leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}
