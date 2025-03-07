@@ -1,8 +1,8 @@
-import credits.aleo;
-import weekly_payroll_pool.aleo;
-import process_tax_compliance.aleo;
+import credits.leo;
+import weekly_payroll_pool.leo;
+import process_tax_compliance.leo;
 
-program subDAO_reserve.aleo {
+program subdao_reserve.leo {
     mapping reserve_balance: [u8; 32] => u64;
     mapping tax_obligations: [u8; 32] => u64;
 
@@ -30,7 +30,7 @@ program subDAO_reserve.aleo {
         let new_tax_obligation: u64 = tax_obligations[subdao_ans].checked_add(tax_amount);
         Mapping::set(tax_obligations, subdao_ans, new_tax_obligation);
 
-        credits.aleo::transfer_public(process_tax_compliance.aleo::TAX_SINK, tax_amount);
+        credits.leo::transfer_public(process_tax_compliance.leo::TAX_SINK, tax_amount);
         return (true, process_taxes);
     }
 
@@ -43,7 +43,7 @@ program subDAO_reserve.aleo {
         let new_balance: u64 = current_balance.checked_sub(amount);
         Mapping::set(reserve_balance, subdao_ans, new_balance);
 
-        weekly_payroll_pool.aleo::fund_weekly_pool(subdao_ans, amount);
+        weekly_payroll_pool.leo::fund_weekly_pool(subdao_ans, amount);
         return (true, fund_weekly_payroll);
     }
 
