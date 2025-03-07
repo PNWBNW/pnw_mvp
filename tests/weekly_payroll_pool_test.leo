@@ -1,8 +1,8 @@
 import weekly_payroll_pool.leo;
-import credits.aleo;
+import credits.leo;
 import main.leo;
 
-program weekly_payroll_pool_test.aleo {
+program weekly_payroll_pool_test.leo {
     transition test_fund_weekly_pool(subdao_ans: [u8; 32]) -> bool {
         let amount: u64 = 700u64;
         
