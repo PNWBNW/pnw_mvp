@@ -32,12 +32,15 @@ program pncw_payroll.leo {
         let updated_funding: u64 = current_funding.checked_sub(amount);
         Mapping::set(employer_funding, employer_ans, updated_funding);
 
-        let current_worker_balance: u64 = Mapping::get_or_use(worker_balances, worker_ans, 0u64);
-        let new_worker_balance: u64 = current_worker_balance.checked_add(amount);
-        Mapping::set(worker_balances, worker_ans, new_worker_balance);
+        let worker_balance: u64 = Mapping::get_or_use(worker_balances, worker_ans, 0u64).checked_add(amount);
+        Mapping::set(worker_balances, worker_ans, worker_balance);
 
-        credits.leo::transfer_public(worker_ans, amount);
+        credits.leo::transfer_public(main.leo::lookup_worker_by_ans(worker_ans), amount);
 
         return (true, execute_payroll);
+    }
+
+    function verify_worker_balance(worker_ans: [u8; 32]) -> u64 {
+        return Mapping::get_or_use(worker_balances, worker_ans, 0u64);
     }
 }
