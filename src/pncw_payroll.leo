@@ -9,36 +9,35 @@ program pncw_payroll.leo {
 
     async transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> (bool, async transition) {
         assert(amount > 0u64);
-        assert(employer_agreement.leo::employer_registry.contains(employer_ans));
-        assert(employer_agreement.leo::employer_tax_compliance[employer_ans]);
+        assert(Mapping::get_or_use(employer_agreement.leo::employer_registry, employer_ans, false));
+        assert(Mapping::get_or_use(employer_agreement.leo::employer_tax_compliance, employer_ans, false));
 
-        let current_funding: u64 = employer_funding[employer_ans];
+        let current_funding: u64 = Mapping::get_or_use(employer_funding, employer_ans, 0u64);
         let new_funding: u64 = current_funding.checked_add(amount);
         Mapping::set(employer_funding, employer_ans, new_funding);
 
-        credits.leo::transfer_public(subdao_reserve.leo::SUBDAO_RESERVE, amount);
-        subDAO_reserve.leo::deposit(subdao_reserve.leo::SUBDAO_RESERVE, amount);
-        
+        credits.leo::transfer_public(subdao_reserve.leo::SUBDAO_RESERVE_ANS, amount);
+        subdao_reserve.leo::deposit(subdao_reserve.leo::SUBDAO_RESERVE_ANS, amount);
+
         return (true, fund_payroll);
     }
 
-    async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) 
-        -> (bool, async transition) {
-        assert(main.leo::worker_type[worker_ans] == 0u8);
-        assert(employer_funding[employer_ans] >= amount);
+    async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> (bool, async transition) {
+        assert(amount > 0u64);
+        assert(Mapping::get_or_use(main.leo::worker_type, worker_ans, 0u8) == 0u8);
 
-        let updated_funding: u64 = employer_funding[employer_ans].checked_sub(amount);
+        let current_funding: u64 = Mapping::get_or_use(employer_funding, employer_ans, 0u64);
+        assert(current_funding >= amount);
+
+        let updated_funding: u64 = current_funding.checked_sub(amount);
         Mapping::set(employer_funding, employer_ans, updated_funding);
 
-        let worker_balance: u64 = worker_balances[worker_ans].checked_add(amount);
-        Mapping::set(worker_balances, worker_ans, worker_balance);
+        let current_worker_balance: u64 = Mapping::get_or_use(worker_balances, worker_ans, 0u64);
+        let new_worker_balance: u64 = current_worker_balance.checked_add(amount);
+        Mapping::set(worker_balances, worker_ans, new_worker_balance);
 
-        credits.leo::transfer_public(main.leo::lookup_worker_by_ans(worker_ans), amount);
-        
+        credits.leo::transfer_public(worker_ans, amount);
+
         return (true, execute_payroll);
-    }
-
-    function verify_worker_balance(worker_ans: [u8; 32]) -> u64 {
-        return worker_balances[worker_ans];
     }
 }
