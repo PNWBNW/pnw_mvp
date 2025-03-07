@@ -1,4 +1,3 @@
-// oversightdao_reserve.leo
 program oversightdao_reserve.leo {
     mapping reserve_balance: [u8; 32] => u64;
 
