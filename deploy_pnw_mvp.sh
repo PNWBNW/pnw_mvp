@@ -23,12 +23,12 @@ programs=(
 
 echo "🔥 Starting deployment funnel for PNW-MVP..."
 
+cd src  # Move into the src directory where all programs exist
+
 for contract in "${programs[@]}"
 do
   echo "🟢 Deploying $contract..."
-  cd src/$contract
   leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}
-  cd - > /dev/null  # Move back to the main directory silently
   if [ $? -eq 0 ]; then
       echo "✅ Successfully deployed $contract"
   else
@@ -36,5 +36,7 @@ do
       exit 1
   fi
 done
+
+cd ..  # Move back to the root directory after deployment
 
 echo "🎉 All contracts deployed successfully!"
