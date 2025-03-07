@@ -1,9 +1,9 @@
 import pncw_payroll.leo;
-import credits.aleo;
+import credits.leo;
 import employer_agreement.leo;
 import main.leo;
 
-program pncw_payroll_test.aleo {
+program pncw_payroll_test.leo {
     transition test_fund_payroll(employer_ans: [u8; 32]) -> bool {
         let amount: u64 = 1000u64;
 
