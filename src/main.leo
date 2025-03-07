@@ -12,8 +12,8 @@ program main.leo {
     mapping worker_type: [u8; 32] => u8;
     mapping ans_registry: [u8; 32] => [u8; 32];
     mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
-    mapping subDAO_ans_registry: [u8; 32] => [u8; 32];
-    mapping subDAO_reverse_lookup: [u8; 32] => [u8; 32];
+    mapping subdao_ans_registry: [u8; 32] => [u8; 32];
+    mapping subdao_reverse_lookup: [u8; 32] => [u8; 32];
 
     const SUBDAO_RESERVE_ANS: [u8; 32] = *b"subdao_reserve.pnw.ans";
     const OVERSIGHT_DAO_ANS: [u8; 32] = *b"oversightdao.pnw.ans";
