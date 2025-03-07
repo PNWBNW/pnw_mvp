@@ -17,19 +17,18 @@ jobs:
       - name: 🔑 Set Aleo private key from repository secret
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      - name: 🛠️ Install Leo CLI from provided zip
+      - name: 🛠️ Install Leo CLI from ProvableHQ GitHub (v2.4.1)
         run: |
-          curl -L -o leo.zip https://github.com/PNWBNW/pnw_mvp/releases/download/leo-2.4.1/leo-2.4.1.zip
-          unzip leo-2.4.1.zip -d $HOME/.aleo
+          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo.zip
+          unzip leo.zip -d $HOME/.aleo
           chmod +x $HOME/.aleo/leo
           echo "$HOME/.aleo" >> $GITHUB_PATH
 
       - name: ✅ Verify Leo Installation
-        run: |
-          leo --version
+        run: leo --version
 
       - name: 🔧 Set permissions for deployment script
         run: chmod +x deploy_pnw_mvp.sh
 
-      - name: 🚀 Deploy contracts using script
+      - name: 🚀 Deploy contracts using deployment script
         run: ./deploy_pnw_mvp.sh
