@@ -1,12 +1,12 @@
 {
   "program": "pnw_mvp",
   "version": "1.1.1",
-  "description": "Payroll Suite for Citizens and Migrant Workers",
+  "description": "PNW-MVP: Zero-knowledge payroll system running on Aleo Testnet.",
   "license": "Proprietary License - PNW-MVP (c) 2025. All Rights Reserved.",
   "programs": [
     {
       "program": "src/main.leo",
-      "version": "1.1.1",
+      "version": "1.0.0",
       "description": "Core orchestration for zero-knowledge payroll (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -26,22 +26,18 @@
     },
     {
       "program": "src/employer_agreement.leo",
-      "version": "1.1.1",
-      "description": "Employer funding management (testnet)",
+      "version": "1.0.0",
+      "description": "Employer agreement management (testnet)",
       "network": "testnet",
       "fee": 1,
-      "imports": [
-        "src/credits.leo",
-        "src/subdao_reserve.leo",
-        "src/oversightdao_reserve.leo"
-      ],
+      "imports": ["src/credits.leo", "src/subdao_reserve.leo", "src/oversightdao_reserve.leo"],
       "test_files": ["tests/employer_agreement_test.leo"],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     },
     {
       "program": "src/process_tax_compliance.leo",
-      "version": "1.1.1",
-      "description": "Tax compliance processing (testnet)",
+      "version": "1.0.0",
+      "description": "Process tax compliance logic (testnet)",
       "network": "testnet",
       "fee": 1,
       "imports": ["src/credits.leo"],
@@ -50,7 +46,7 @@
     },
     {
       "program": "src/weekly_payroll_pool.leo",
-      "version": "1.1.1",
+      "version": "1.0.0",
       "description": "Weekly payroll pool management (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -60,7 +56,7 @@
     },
     {
       "program": "src/pncw_payroll.leo",
-      "version": "1.1.1",
+      "version": "1.0.0",
       "description": "PNcW payroll processing (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -70,7 +66,7 @@
     },
     {
       "program": "src/pniw_payroll.leo",
-      "version": "1.1.1",
+      "version": "1.0.0",
       "description": "PNiW payroll processing (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -80,7 +76,7 @@
     },
     {
       "program": "src/subdao_reserve.leo",
-      "version": "1.1.1",
+      "version": "1.0.0",
       "description": "SubDAO reserve management (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -90,12 +86,22 @@
     },
     {
       "program": "src/oversightdao_reserve.leo",
-      "version": "1.1.1",
+      "version": "1.0.0",
       "description": "OversightDAO reserve management (testnet)",
       "network": "testnet",
       "fee": 1,
       "imports": ["src/credits.leo"],
       "test_files": ["tests/oversightdao_reserve_test.leo"],
+      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
+    },
+    {
+      "program": "src/tax_sink.leo",
+      "version": "1.0.0",
+      "description": "Tax sink for collecting processed taxes (testnet)",
+      "network": "testnet",
+      "fee": 1,
+      "imports": ["src/credits.leo"],
+      "test_files": [],
       "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
     }
   ],
@@ -111,4 +117,4 @@
     "aleo156kr2wlm4dq7kcnsqrjpl0vh4w9c6kk6rkzkqu7mz4g6h35gygqsjutzy3",
     "aleo1vkhc05vyt22hkr3cjzdsqkr66azmqv5j5jxd204dtgcugagrfqfqsvw38n"
   ]
-}
+    }
