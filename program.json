@@ -7,7 +7,6 @@
   "global_fee": 1,
   "default_network": "testnet",
   "test_mode": true,
-  "deployment_strategy": "batch",
   "faucet_url": "Discord #faucet (use /sendcredits command to obtain ALEO (Testnet) tokens)",
   "programs": [
     {
@@ -16,9 +15,8 @@
       "description": "Core orchestration for zero-knowledge payroll (testnet)",
       "network": "testnet",
       "fee": 1,
-      "imports": ["src/credits.leo"],
-      "test_files": ["tests/main_test.leo"],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
+      "imports": ["src/credits.leo", "src/employer_agreement.leo", "src/process_tax_compliance.leo"],
+      "test_files": ["tests/main_test.leo"]
     },
     {
       "program": "src/employer_agreement.leo",
@@ -26,9 +24,26 @@
       "description": "Employer agreement (testnet)",
       "network": "testnet",
       "fee": 1,
-      "imports": ["src/credits.leo"],
-      "test_files": ["tests/employer_agreement_test.leo"],
-      "deployment_script": "leo deploy --network testnet -- --private-key ${ALEO_PRIVATE_KEY}"
+      "imports": ["src/credits.leo", "src/process_tax_compliance.leo"],
+      "test_files": ["tests/employer_agreement_test.leo"]
+    },
+    {
+      "program": "src/pncw_payroll.leo",
+      "version": "1.0.0",
+      "description": "PNCW Payroll Logic",
+      "network": "testnet",
+      "fee": 1,
+      "imports": ["src/credits.leo", "src/main.leo"],
+      "test_files": ["tests/pncw_payroll_test.leo"]
+    },
+    {
+      "program": "src/pniw_payroll.leo",
+      "version": "1.0.0",
+      "description": "PNIW Payroll Logic",
+      "network": "testnet",
+      "fee": 1,
+      "imports": ["src/credits.leo", "src/main.leo"],
+      "test_files": ["tests/pniw_payroll_test.leo"]
     }
   ],
   "test_addresses": [
