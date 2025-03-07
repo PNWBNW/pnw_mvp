@@ -1,39 +1,24 @@
-name: Deploy to Aleo Testnet
+name: Deploy PNW-MVP
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y unzip curl jq
+      - name: Set up Aleo environment
+        run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      - name: Download and Setup Leo CLI
-        run: |
-          curl -L -o leo.zip https://github.com/PNWBNW/pnw_mvp/releases/download/leo-2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          unzip leo.zip
-          sudo mv leo /usr/local/bin/leo
-          sudo chmod +x /usr/local/bin/leo
-          leo --version
+      - name: Set script permissions
+        run: chmod +x deploy_pnw_mvp.sh
 
-      - name: Clean and Build Project
-        run: |
-          leo clean
-          leo build --network testnet
-
-      - name: Deploy to Aleo Testnet
-        env:
-          ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
-        run: |
-          leo deploy --private-key "$ALEO_PRIVATE_KEY" --network testnet
+      - name: Deploy PNW-MVP contracts
+        run: ./deploy_pnw_mvp.sh
