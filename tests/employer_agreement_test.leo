@@ -1,7 +1,7 @@
 import employer_agreement.leo;
-import credits.aleo;
+import credits.leo;
 
-program employer_agreement_test.aleo {
+program employer_agreement_test.leo {
     transition test_register_employer() -> bool {
         let employer_ans: [u8; 32] = *b"employer001.pnw.ans";
         let (result, _) = employer_agreement.leo::register_employer(employer_ans);
