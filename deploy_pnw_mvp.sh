@@ -9,7 +9,7 @@ fi
 
 echo "🔥 Running Pre-Deployment Build Check..."
 leo clean
-if ! leo build; then
+if ! leo build --network testnet; then
     echo "🔴 Parsing error detected. Fix syntax issues before deploying!"
     exit 248
 fi
