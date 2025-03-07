@@ -1,8 +1,8 @@
 import main.leo;
-import credits.aleo;
-import subDAO_reserve.aleo;
+import credits.leo;
+import subdao_reserve.leo;
 
-program main_test.aleo {
+program main_test.leo {
     transition test_register_worker() -> bool {
         let worker_ans: [u8; 32] = *b"johndoe.pniw.ans";
         let category: u8 = 0u8;
@@ -23,8 +23,8 @@ program main_test.aleo {
         let (_, _) = main.leo::register_worker(worker_ans, 0u8, 0u8, zpass_hash);
         let (_, _) = main.leo::set_worker_zpass(worker_ans, zpass_hash);
 
-        credits.aleo::transfer_public(subdao_ans, 1000u64);
-        let (_, _) = subDAO_reserve.aleo::deposit(subdao_ans, 1000u64);
+        credits.leo::transfer_public(subdao_ans, 1000u64);
+        let (_, _) = subdao_reserve.leo::deposit(subdao_ans, 1000u64);
         let (_, _) = main.leo::fund_weekly_pool(subdao_ans, 700u64);
 
         let result: bool = main.leo::pay_worker(worker_ans, subdao_ans, amount, zpass_hash);
