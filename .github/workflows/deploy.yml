@@ -14,8 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Aleo environment
+      - name: Set up Aleo private key
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
+
+      - name: Install dependencies (if needed)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl jq
+          # Optional: If using Aleo CLI
+          # curl -fsSL https://aleo.network/install.sh | sh
 
       - name: Set script permissions
         run: chmod +x deploy_pnw_mvp.sh
