@@ -31,10 +31,16 @@ jobs:
           export PATH=$HOME/.aleo:$PATH
           leo --version
 
-      - name: 🔧 Set permissions for deployment script
-        run: chmod +x deploy_pnw_mvp.sh
-
-      - name: 🚀 Deploy contracts using deployment script
+      - name: 🔥 Running Pre-Deployment Build Check
         run: |
           export PATH=$HOME/.aleo:$PATH
-          ./deploy_pnw_mvp.sh
+          leo clean
+          if ! leo build --network testnet --verbose; then
+              echo "🔴 Parsing error detected!"
+              exit 248
+          fi
+
+      - name: 🚀 Deploy PNW-MVP contracts
+        run: |
+          export PATH=$HOME/.aleo:$PATH
+          leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}
