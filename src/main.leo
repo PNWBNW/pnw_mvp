@@ -1,10 +1,10 @@
-import credits.aleo;
-import employer_agreement.aleo;
-import process_tax_compliance.aleo;
-import weekly_payroll_pool.aleo;
-import pncw_payroll.aleo;
-import pniw_payroll.aleo;
-import subDAO_reserve.aleo;
+import credits.leo;
+import employer_agreement.leo;
+import process_tax_compliance.leo;
+import weekly_payroll_pool.leo;
+import pncw_payroll.leo;
+import pniw_payroll.leo;
+import subDAO_reserve.leo;
 
 program main.leo {
     mapping worker_category: [u8; 32] => u8;
@@ -59,12 +59,12 @@ program main.leo {
         return (true, register_worker_ans);
     }
 
-    async transition register_subDAO_ans(subdao_ans: [u8; 32], ans_name: [u8; 32]) -> (bool, async transition) {
-        assert(!subDAO_ans_registry.contains(subdao_ans));
-        assert(!subDAO_reverse_lookup.contains(ans_name));
+    async transition register_subdao_ans(subdao_ans: [u8; 32], ans_name: [u8; 32]) -> (bool, async transition) {
+        assert(!subdao_ans_registry.contains(subdao_ans));
+        assert(!subdao_reverse_lookup.contains(ans_name));
 
-        Mapping::set(subDAO_ans_registry, subdao_ans, ans_name);
-        Mapping::set(subDAO_reverse_lookup, ans_name, subdao_ans);
+        Mapping::set(subdao_ans_registry, subdao_ans, ans_name);
+        Mapping::set(subdao_reverse_lookup, ans_name, subdao_ans);
 
         return (true, register_subDAO_ans);
     }
@@ -78,29 +78,29 @@ program main.leo {
         let worker_type_flag: u8 = worker_type[worker_ans];
 
         if worker_type_flag == 0u8 {
-            pncw_payroll.aleo::execute_payroll(worker_ans, employer_ans, amount);
+            pncw_payroll.leo::execute_payroll(worker_ans, employer_ans, amount);
         } else if worker_type_flag == 1u8 {
-            pniw_payroll.aleo::execute_payroll(worker_ans, employer_ans, amount);
+            pniw_payroll.leo::execute_payroll(worker_ans, employer_ans, amount);
         } else {
             assert(false);
         }
 
-        return weekly_payroll_pool.aleo::execute_weekly_payroll(worker_ans, subdao_ans, amount, zpass_hash);
+        return weekly_payroll_pool.leo::execute_weekly_payroll(worker_ans, subdao_ans, amount, zpass_hash);
     }
 
     transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
         assert(amount > 0u64);
-        subDAO_reserve.aleo::fund_weekly_payroll(subdao_ans, amount);
-        return weekly_payroll_pool.aleo::fund_weekly_pool(subdao_ans, amount);
+        subDAO_reserve.leo::fund_weekly_payroll(subdao_ans, amount);
+        return weekly_payroll_pool.leo::fund_weekly_pool(subdao_ans, amount);
     }
 
     transition process_taxes(subdao_ans: [u8; 32]) -> bool {
-        return subDAO_reserve.aleo::process_taxes(subdao_ans);
+        return subDAO_reserve.leo::process_taxes(subdao_ans);
     }
 
-    function lookup_subDAO_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
-        assert(subDAO_reverse_lookup.contains(ans_name));
-        return subDAO_reverse_lookup[ans_name];
+    function lookup_subdao_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
+        assert(subdao_reverse_lookup.contains(ans_name));
+        return subdao_reverse_lookup[ans_name];
     }
 
     function lookup_worker_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
