@@ -1,10 +1,10 @@
-import credits.aleo;
-import subDAO_reserve.aleo;
+import credits.leo;
+import subDAO_reserve.leo;
 import main.leo;
-import pncw_payroll.aleo;
-import pniw_payroll.aleo;
+import pncw_payroll.leo;
+import pniw_payroll.leo;
 
-program weekly_payroll_pool.aleo {
+program weekly_payroll_pool.leo {
     mapping weekly_balance: [u8; 32] => u64;
 
     async transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> (bool, async transition) {
@@ -29,15 +29,15 @@ program weekly_payroll_pool.aleo {
         let new_balance: u64 = weekly_funds.checked_sub(amount);
         Mapping::set(weekly_balance, subdao_ans, new_balance);
 
-        credits.aleo::transfer_public(main.leo::lookup_worker_by_ans(worker_ans), amount);
+        credits.leo::transfer_public(main.leo::lookup_worker_by_ans(worker_ans), amount);
 
         let employer_ans: [u8; 32] = main.leo::ans_reverse_lookup[self.caller];
         let worker_type: u8 = main.leo::worker_type[worker_ans];
 
         if worker_type == 0u8 {
-            pncw_payroll.aleo::execute_payroll(worker_ans, employer_ans, amount);
+            pncw_payroll.leo::execute_payroll(worker_ans, employer_ans, amount);
         } else if worker_type == 1u8 {
-            pniw_payroll.aleo::execute_payroll(worker_ans, employer_ans, amount);
+            pniw_payroll.leo::execute_payroll(worker_ans, employer_ans, amount);
         } else {
             assert(false);
         }
