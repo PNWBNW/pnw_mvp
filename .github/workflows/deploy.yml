@@ -10,7 +10,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -18,7 +17,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y unzip curl jq
+          sudo apt-get install -y unzip curl
 
       - name: Download and Setup Leo CLI
         run: |
@@ -33,17 +32,16 @@ jobs:
           leo clean
           leo build --network testnet
 
-      - name: Deploy to Aleo Testnet
+      - name: Deploy Programs Sequentially
         env:
           ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
         run: |
-          PROGRAM_NAME=$(jq -r '.program' program.json)
-          if [ -z "$PROGRAM_NAME" ]; then
-            echo "Error: 'program' not defined in program.json"
-            exit 1
-          fi
-          echo "Deploying $PROGRAM_NAME..."
-          leo deploy "$PROGRAM_NAME" --private-key="$ALEO_PRIVATE_KEY" --network testnet || {
-            echo "Deployment of $PROGRAM_NAME failed."
-            exit 1
-          }
+          leo deploy --path src/main.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --path src/employer_agreement.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --path src/process_tax_compliance.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --path src/weekly_payroll_pool.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --path src/pncw_payroll.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --path src/pniw_payroll.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --path src/subdao_reserve.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --path src/oversightdao_reserve.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
+          leo deploy --path src/tax_sink.leo --private-key "$ALEO_PRIVATE_KEY" --network testnet
