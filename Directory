@@ -1,25 +1,33 @@
 pnw_mvp/
-├── src/
-│   ├── main.leo
-│   ├── employer_agreement.leo
-│   ├── oversightdao_reserve.leo
-│   ├── subdao_reserve.leo
-│   ├── weekly_payroll_pool.leo
-│   ├── pncw_payroll.leo
-│   ├── pniw_payroll.leo
-│   ├── process_tax_compliance.leo
-├── tests/
-│   ├── main_test.leo
-│   ├── employer_agreement_test.leo
-│   ├── oversightdao_reserve_test.leo
-│   ├── subdao_reserve_test.leo
-│   ├── weekly_payroll_pool_test.leo
-│   ├── pncw_payroll_test.leo
-│   ├── pniw_payroll_test.leo
-│   ├── process_tax_compliance_test.leo
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml
-├── .gitignore
-├── README.md
 ├── aleo.toml
+├── directory
+├── license_pnw_mvp.txt
+├── program.json
+├── readme.md
+├── src/
+│   ├── credits.leo
+│   ├── employer_agreement.leo
+│   ├── main.leo
+│   ├── oversightdao_reserve.leo
+│   ├── pncw_payroll.leo
+│   ├── pniw_payroll.leo
+│   ├── process_tax_compliance.leo
+│   ├── subdao_reserve.leo
+│   ├── tax_sink.leo
+│   └── weekly_payroll_pool.leo
+├── tests/
+│   ├── employer_agreement_test.leo
+│   ├── main_test.leo
+│   ├── oversightdao_reserve_test.leo
+│   ├── pncw_payroll_test.leo
+│   ├── pniw_payroll_test.leo
+│   ├── process_tax_compliance_test.leo
+│   ├── subdao_reserve_test.leo
+│   └── weekly_payroll_pool_test.leo
+└── worker_profiles/
+    ├── employer_worker_config.json
+    ├── readme.md
+    └── register_workers.sh
