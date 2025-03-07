@@ -14,28 +14,22 @@ jobs:
       - name: 🛎️ Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🔑 Set up Aleo private key
+      - name: 🔑 Set Aleo private key from repository secret
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      - name: 🛠️ Download & Install Custom Leo CLI (Tarball)
+      - name: 🛠️ Install Leo CLI from provided zip
         run: |
-          curl -L -o leo.tar.gz https://github.com/PNWBNW/pnw_mvp/releases/download/leo-2.4.1/leo-2.4.1.tar.gz
-          mkdir -p $HOME/.aleo
-          tar -xzf leo.tar.gz -C $HOME/.aleo
+          curl -L -o leo.zip https://github.com/PNWBNW/pnw_mvp/releases/download/leo-2.4.1/leo-2.4.1.zip
+          unzip leo-2.4.1.zip -d $HOME/.aleo
           chmod +x $HOME/.aleo/leo
-          echo "export PATH=$HOME/.aleo:\$PATH" >> $GITHUB_ENV
-          echo "export PATH=$HOME/.aleo:\$PATH" >> ~/.bashrc
-          source $GITHUB_ENV
+          echo "$HOME/.aleo" >> $GITHUB_PATH
 
-      - name: 🔍 Verify Leo Installation
+      - name: ✅ Verify Leo Installation
         run: |
-          export PATH=$HOME/.aleo:$PATH
           leo --version
 
-      - name: 🔍 Set script permissions
+      - name: 🔧 Set permissions for deployment script
         run: chmod +x deploy_pnw_mvp.sh
 
-      - name: 🚀 Deploy PNW-MVP contracts
-        run: |
-          export PATH=$HOME/.aleo:$PATH
-          ./deploy_pnw_mvp.sh
+      - name: 🚀 Deploy contracts using script
+        run: ./deploy_pnw_mvp.sh
