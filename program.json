@@ -4,7 +4,7 @@
   "programs": [
     {
       "program": "src/main.leo",
-      "version": "0.1.0",
+      "version": "1.1.1",
       "description": "Core orchestration for zero-knowledge payroll (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -24,7 +24,7 @@
     },
     {
       "program": "src/employer_agreement.leo",
-      "version": "0.1.0",
+      "version": "1.1.1",
       "description": "Employer funding management (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -38,7 +38,7 @@
     },
     {
       "program": "src/process_tax_compliance.leo",
-      "version": "0.1.0",
+      "version": "1.1.1",
       "description": "Tax compliance processing (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -48,7 +48,7 @@
     },
     {
       "program": "src/weekly_payroll_pool.leo",
-      "version": "0.1.0",
+      "version": "1.1.1",
       "description": "Weekly payroll pool management (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -58,7 +58,7 @@
     },
     {
       "program": "src/pncw_payroll.leo",
-      "version": "0.1.0",
+      "version": "1.1.1",
       "description": "PNcW payroll processing (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -68,7 +68,7 @@
     },
     {
       "program": "src/pniw_payroll.leo",
-      "version": "0.1.0",
+      "version": "1.1.1",
       "description": "PNiW payroll processing (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -78,7 +78,7 @@
     },
     {
       "program": "src/subdao_reserve.leo",
-      "version": "0.1.0",
+      "version": "1.1.1",
       "description": "SubDAO reserve management (testnet)",
       "network": "testnet",
       "fee": 1,
@@ -88,7 +88,7 @@
     },
     {
       "program": "src/oversightdao_reserve.leo",
-      "version": "0.1.0",
+      "version": "1.1.1",
       "description": "OversightDAO reserve management (testnet)",
       "network": "testnet",
       "fee": 1,
