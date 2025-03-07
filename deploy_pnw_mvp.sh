@@ -10,25 +10,25 @@ fi
 
 # Programs deployment sequence
 programs=(
-  "credits"
-  "employer_agreement"
-  "process_tax_compliance"
-  "main"
-  "subdao_reserve"
-  "oversightdao_reserve"
-  "pncw_payroll"
-  "pniw_payroll"
-  "weekly_payroll_pool"
+  "credits.leo"
+  "employer_agreement.leo"
+  "process_tax_compliance.leo"
+  "main.leo"
+  "subdao_reserve.leo"
+  "oversightdao_reserve.leo"
+  "pncw_payroll.leo"
+  "pniw_payroll.leo"
+  "weekly_payroll_pool.leo"
 )
 
 echo "🔥 Starting deployment funnel for PNW-MVP..."
 
+cd src  # Move into the src directory where all programs exist
+
 for contract in "${programs[@]}"
 do
   echo "🟢 Deploying $contract..."
-  cd src/$contract
-  leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}
-  cd - > /dev/null  # Move back to project root silently
+  leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY} --path "$contract"
   if [ $? -eq 0 ]; then
       echo "✅ Successfully deployed $contract"
   else
@@ -37,5 +37,7 @@ do
       exit 1
   fi
 done
+
+cd ..  # Move back to project root after deployment
 
 echo "🎉 All contracts deployed successfully!"
