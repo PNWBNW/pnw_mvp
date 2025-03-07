@@ -7,8 +7,8 @@ program employer_agreement.leo {
     mapping employer_tax_compliance: [u8; 32] => bool;
     mapping ans_registry: [u8; 32] => [u8; 32];
     mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
-    mapping subDAO_ans_registry: [u8; 32] => [u8; 32];
-    mapping subDAO_reverse_lookup: [u8; 32] => [u8; 32];
+    mapping subdao_ans_registry: [u8; 32] => [u8; 32];
+    mapping subdao_reverse_lookup: [u8; 32] => [u8; 32];
 
     const OVERSIGHT_DAO_ANS: [u8; 32] = *b"oversightdao.pnw.ans";
     const OVERSIGHT_ALLOCATION: u64 = 17u64;
@@ -61,14 +61,14 @@ program employer_agreement.leo {
         return (true, register_employer_ans);
     }
 
-    async transition register_subDAO_ans(subdao_ans: [u8; 32], ans_name: [u8; 32]) -> (bool, async transition) {
+    async transition register_subdao_ans(subdao_ans: [u8; 32], ans_name: [u8; 32]) -> (bool, async transition) {
         assert(!subDAO_ans_registry.contains(subdao_ans));
         assert(!subDAO_reverse_lookup.contains(ans_name));
 
-        Mapping::set(subDAO_ans_registry, subdao_ans, ans_name);
-        Mapping::set(subDAO_reverse_lookup, ans_name, subdao_ans);
+        Mapping::set(subdao_ans_registry, subdao_ans, ans_name);
+        Mapping::set(subdao_reverse_lookup, ans_name, subdao_ans);
 
-        return (true, register_subDAO_ans);
+        return (true, register_subdao_ans);
     }
 
     transition fund_payroll_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
