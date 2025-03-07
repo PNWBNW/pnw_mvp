@@ -1,8 +1,8 @@
-import credits.aleo;
-import employer_agreement.aleo;
-import subDAO_reserve.aleo;
+import credits.leo;
+import employer_agreement.leo;
+import subDAO_reserve.leo;
 
-program process_tax_compliance.aleo {
+program process_tax_compliance.leo {
     mapping employer_tax: [u8; 32] => EmployerTaxRecord;
     mapping employer_zpass_verified: [u8; 32] => bool;
     mapping ans_registry: [u8; 32] => [u8; 32];
@@ -19,7 +19,7 @@ program process_tax_compliance.aleo {
 
     async transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> (bool, async transition) {
         assert(employer_zpass_verified[employer_ans]);
-        assert(employer_agreement.aleo::employer_registry.contains(employer_ans));
+        assert(employer_agreement.leo::employer_registry.contains(employer_ans));
 
         let mut tax_due: u64 = 0u64;
         if payroll_type == 0u8 {
@@ -56,14 +56,14 @@ program process_tax_compliance.aleo {
             is_compliant: employer_record.is_compliant
         });
 
-        credits.aleo::transfer_public(TAX_SINK, amount);
-        subDAO_reserve.aleo::deposit(TAX_SINK, amount);
+        credits.leo::transfer_public(TAX_SINK, amount);
+        subdao_reserve.leo::deposit(TAX_SINK, amount);
 
         return (true, pay_taxes);
     }
 
     async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32]) -> (bool, async transition) {
-        assert(employer_agreement.aleo::employer_registry.contains(employer_ans));
+        assert(employer_agreement.leo::employer_registry.contains(employer_ans));
         assert(!ans_reverse_lookup.contains(ans_name));
 
         Mapping::set(ans_registry, employer_ans, ans_name);
