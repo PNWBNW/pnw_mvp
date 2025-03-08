@@ -12,13 +12,13 @@ leo clean
 
 BUILD_LOG="build_errors.log"
 
-# Capture the output of `leo build`
+# Capture `leo build` output and filter errors
 if ! leo build --network testnet 2>&1 | tee "$BUILD_LOG"; then
     echo "🔴 Parsing error detected!"
-    echo "🔍 Debugging Info (First 15 Relevant Lines):"
+    echo "🔍 Debugging Info (Error + 3 Surrounding Lines):"
 
-    # Extract relevant error messages (filtering out unnecessary logs)
-    grep -E "error|Error|line|column" "$BUILD_LOG" | head -n 15
+    # Extract the first error with 3 lines before and after
+    grep -A 3 -B 3 -E "error:|Error" "$BUILD_LOG" | head -n 10
 
     exit 248
 fi
