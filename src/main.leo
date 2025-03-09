@@ -15,24 +15,28 @@ program main.aleo {
     mapping subdao_ans_registry: [u8; 32] => [u8; 32];
     mapping subdao_reverse_lookup: [u8; 32] => [u8; 32];
 
-    const SUBDAO_RESERVE_ANS: [u8; 32] = hash_poseidon(b"subdao:subdao_reserve:0");
-    const OVERSIGHT_DAO_ANS: [u8; 32] = hash_poseidon(b"subdao:oversightdao:0");
+    function hash_static_key(label: bytes) -> [u8; 32] {
+        return hash_poseidon(label);
+    }
+
+    const SUBDAO_RESERVE_ANS: [u8; 32] = hash_static_key(b"subdao:subdao_reserve:0");
+    const OVERSIGHT_DAO_ANS: [u8; 32] = hash_static_key(b"subdao:oversightdao:0");
 
     function hash_worker_ans(worker_name: bytes, height: u64) -> [u8; 32] {
         let key: bytes = b"worker:" ++ worker_name ++ b":" ++ height as string as bytes;
         return hash_poseidon(key);
     }
 
+    function hash_zpass(worker_ans: [u8; 32], secret: bytes) -> [u8; 64] {
+        let key: bytes = b"zpass:" ++ worker_ans ++ secret;
+        let part1: [u8; 32] = hash_poseidon(key ++ b":p1");
+        let part2: [u8; 32] = hash_poseidon(key ++ b":p2");
+        return part1 ++ part2;
+    }
+
     function hash_subdao_ans(subdao_name: bytes, height: u64) -> [u8; 32] {
         let key: bytes = b"subdao:" ++ subdao_name ++ b":" ++ height as string as bytes;
         return hash_poseidon(key);
-    }
-
-    function hash_zpass(worker_ans: [u8; 32], secret: bytes) -> [u8; 64] {
-        let key: bytes = b"zpass:" ++ worker_ans ++ secret;
-        let part1: [u8; 32] = hash_poseidon(key);
-        let part2: [u8; 32] = hash_poseidon(key ++ b":part2");
-        return part1 ++ part2;
     }
 
     function hash_ans_name(entity_type: bytes, ans_name: bytes) -> [u8; 32] {
@@ -104,7 +108,7 @@ program main.aleo {
         let zpass_hash: [u8; 64] = hash_zpass(hashed_worker, zpass_secret);
 
         assert(worker_exists(hashed_worker));
-        assert(worker_zpass_hash[hashed_worker] == zpass_hash);
+        assert(worker_zpass_hash[contains(hashed_worker)] == zpass_hash);
 
         let employer_ans: [u8; 32] = get_employer_ans(self.caller);
         let worker_type_flag: u8 = get_worker_type(hashed_worker);
@@ -122,7 +126,6 @@ program main.aleo {
 
     async transition fund_weekly_pool(subdao_name: bytes, amount: u64) -> bool {
         assert(amount > 0u64);
-
         let height: u64 = block.height;
         let hashed_subdao: [u8; 32] = hash_subdao_ans(subdao_name, height);
 
