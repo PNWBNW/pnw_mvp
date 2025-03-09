@@ -1,4 +1,4 @@
-program credits.leo {
+program credits.aleo {
     mapping balances: [u8; 32] => u64;
 
     async transition initialize_balance(user: [u8; 32]) -> bool {
