@@ -1,4 +1,4 @@
-program oversightdao_reserve.leo {
+program oversightdao_reserve.aleo {
     mapping reserve_balance: [u8; 32] => u64;
 
     const OVERSIGHT_DAO_ANS: [u8; 32] = *b"oversightdao.pnw.ans";
@@ -23,7 +23,7 @@ program oversightdao_reserve.leo {
         let new_balance: u64 = current_balance.checked_sub(amount);
         Mapping::set(reserve_balance, OVERSIGHT_DAO_ANS, new_balance);
 
-        credits.leo::transfer_public(subdao_ans, amount);
+        creditsa.aleo::transfer_public(subdao_ans, amount);
         return (true, withdraw);
     }
 }
