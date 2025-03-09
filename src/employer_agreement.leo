@@ -1,8 +1,8 @@
-import credits.leo;
-import subdao_reserve.leo;
-import oversightdao_reserve.leo;
+import credits.aleo;
+import subdao_reserve.aleo;
+import oversightdao_reserve.aleo;
 
-program employer_agreement.leo {
+program employer_agreement.aleo {
     mapping employer_registry: [u8; 32] => bool;
     mapping employer_tax_compliance: [u8; 32] => bool;
     mapping ans_registry: [u8; 32] => [u8; 32];
@@ -80,11 +80,11 @@ program employer_agreement.leo {
         let oversight_amount: u64 = amount.checked_mul(OVERSIGHT_ALLOCATION).checked_div(100u64);
         let subdao_amount: u64 = amount.checked_sub(oversight_amount);
 
-        credits.leo::transfer_public(oversightdao_reserve.leo::lookup_subdao_by_ans(OVERSIGHT_DAO_ANS), oversight_amount);
-        oversightdao_reserve.leo::deposit(OVERSIGHT_DAO_ANS, oversight_amount);
+        credits.aleo::transfer_public(oversightdao_reserve.aleo::lookup_subdao_by_ans(OVERSIGHT_DAO_ANS), oversight_amount);
+        oversightdao_reserve.aleo::deposit(OVERSIGHT_DAO_ANS, oversight_amount);
 
-        credits.leo::transfer_public(subdao_reserve.leo::lookup_subdao_by_ans(subdao_ans), subdao_amount);
-        subdao_reserve.leo::deposit(subdao_ans, subdao_amount);
+        credits.aleo::transfer_public(subdao_reserve.aleo::lookup_subdao_by_ans(subdao_ans), subdao_amount);
+        subdao_reserve.aleo::deposit(subdao_ans, subdao_amount);
 
         return true;
     }
