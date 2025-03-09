@@ -1,12 +1,12 @@
-import credits.leo;
-import employer_agreement.leo;
-import process_tax_compliance.leo;
-import weekly_payroll_pool.leo;
-import pncw_payroll.leo;
-import pniw_payroll.leo;
-import subdao_reserve.leo;
+import credits.aleo;
+import employer_agreement.aleo;
+import process_tax_compliance.aleo;
+import weekly_payroll_pool.aleo;
+import pncw_payroll.aleo;
+import pniw_payroll.aleo;
+import subdao_reserve.aleo;
 
-program main.leo {
+program main.aleo {
     mapping worker_category: [u8; 32] => u8;
     mapping worker_zpass_hash: [u8; 32] => [u8; 64];
     mapping worker_type: [u8; 32] => u8;
@@ -78,20 +78,20 @@ program main.leo {
         let worker_type_flag: u8 = worker_type[worker_ans];
 
         if worker_type_flag == 0u8 {
-            pncw_payroll.leo::execute_payroll(worker_ans, employer_ans, amount);
+            pncw_payroll.aleo::execute_payroll(worker_ans, employer_ans, amount);
         } else if worker_type_flag == 1u8 {
-            pniw_payroll.leo::execute_payroll(worker_ans, employer_ans, amount);
+            pniw_payroll.aleo::execute_payroll(worker_ans, employer_ans, amount);
         } else {
             assert(false);
         }
 
-        return weekly_payroll_pool.leo::execute_weekly_payroll(worker_ans, subdao_ans, amount, zpass_hash);
+        return weekly_payroll_pool.aleo::execute_weekly_payroll(worker_ans, subdao_ans, amount, zpass_hash);
     }
 
     transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
         assert(amount > 0u64);
         subdao_reserve.leo::fund_weekly_payroll(subdao_ans, amount);
-        return weekly_payroll_pool.leo::fund_weekly_pool(subdao_ans, amount);
+        return weekly_payroll_pool.aleo::fund_weekly_pool(subdao_ans, amount);
     }
 
     transition process_taxes(subdao_ans: [u8; 32]) -> bool {
