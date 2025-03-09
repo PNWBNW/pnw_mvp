@@ -1,8 +1,8 @@
-import credits.leo;
-import employer_agreement.leo;
-import subdao_reserve.leo;
+import credits.aleo;
+import employer_agreement.aleo;
+import subdao_reserve.aleo;
 
-program process_tax_compliance.leo {
+program process_tax_compliance.aleo {
     mapping employer_tax: [u8; 32] => EmployerTaxRecord;
     mapping employer_zpass_verified: [u8; 32] => bool;
     mapping ans_registry: [u8; 32] => [u8; 32];
@@ -19,7 +19,7 @@ program process_tax_compliance.leo {
 
     async transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> (bool, async transition) {
         assert(Mapping::get_or_use(employer_zpass_verified, employer_ans, false));
-        assert(Mapping::get_or_use(employer_agreement.leo::employer_registry, employer_ans, false));
+        assert(Mapping::get_or_use(employer_agreement.aleo::employer_registry, employer_ans, false));
 
         let tax_due: u64 = calculate_tax_due(employer_ans, payroll_type);
 
@@ -39,7 +39,7 @@ program process_tax_compliance.leo {
         });
 
         if (!is_compliant) {
-            credits.leo::transfer_public(TAX_SINK, tax_due);
+            credits.aleo::transfer_public(TAX_SINK, tax_due);
         }
 
         return (is_compliant, process_tax_compliance);
