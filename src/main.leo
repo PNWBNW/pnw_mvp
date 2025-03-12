@@ -15,33 +15,17 @@ program main.aleo {
     mapping subdao_ans_registry: [u8; 32] => [u8; 32];
     mapping subdao_reverse_lookup: [u8; 32] => [u8; 32];
 
-    function hash_static_key(label: bytes) -> [u8; 32] {
-        return hash_poseidon(label);
-    }
-
-    const SUBDAO_RESERVE_ANS: [u8; 32] = hash_static_key(b"subdao:subdao_reserve:0");
-    const OVERSIGHT_DAO_ANS: [u8; 32] = hash_static_key(b"subdao:oversightdao:0");
+    const WORKER_CATEGORY_FT: u8 = 1u8;
+    const WORKER_CATEGORY_CONTRACT: u8 = 2u8;
+    const PAYROLL_FUNCTION_PNCW: u8 = 10u8;
+    const PAYROLL_FUNCTION_PNIW: u8 = 20u8;
 
     function hash_worker_ans(worker_name: bytes, height: u64) -> [u8; 32] {
-        let key: bytes = b"worker:" ++ worker_name ++ b":" ++ height as string as bytes;
-        return hash_poseidon(key);
-    }
-
-    function hash_zpass(worker_ans: [u8; 32], secret: bytes) -> [u8; 64] {
-        let key: bytes = b"zpass:" ++ worker_ans ++ secret;
-        let part1: [u8; 32] = hash_poseidon(key ++ b":p1");
-        let part2: [u8; 32] = hash_poseidon(key ++ b":p2");
-        return part1 ++ part2;
+        return hash_blake3(worker_name ++ height as bytes);
     }
 
     function hash_subdao_ans(subdao_name: bytes, height: u64) -> [u8; 32] {
-        let key: bytes = b"subdao:" ++ subdao_name ++ b":" ++ height as string as bytes;
-        return hash_poseidon(key);
-    }
-
-    function hash_ans_name(entity_type: bytes, ans_name: bytes) -> [u8; 32] {
-        let key: bytes = entity_type ++ b":" ++ ans_name;
-        return hash_poseidon(key);
+        return hash_blake3(subdao_name ++ height as bytes);
     }
 
     function worker_exists(hashed_worker: [u8; 32]) -> bool {
@@ -49,52 +33,24 @@ program main.aleo {
     }
 
     function get_worker_type(hashed_worker: [u8; 32]) -> u8 {
-        return Mapping::get_or_use(worker_type, hashed_worker, 0u8);
+        return worker_type.get_or_use(hashed_worker, 0u8);
     }
 
     function get_employer_ans(caller: [u8; 32]) -> [u8; 32] {
-        return Mapping::get_or_use(ans_reverse_lookup, caller, [0u8; 32]);
+        return ans_reverse_lookup.get_or_use(caller, [0u8; 32]);
     }
 
     async transition register_worker(worker_name: bytes, category: u8, worker_type_flag: u8, zpass_secret: bytes) -> bool {
-        assert(category < 4u8);
-        assert(worker_type_flag == 0u8 || worker_type_flag == 1u8);
+        assert(category == WORKER_CATEGORY_FT || category == WORKER_CATEGORY_CONTRACT);
+        assert(worker_type_flag == PAYROLL_FUNCTION_PNCW || worker_type_flag == PAYROLL_FUNCTION_PNIW);
 
         let height: u64 = block.height;
         let hashed_worker: [u8; 32] = hash_worker_ans(worker_name, height);
-        let zpass_hash: [u8; 64] = hash_zpass(hashed_worker, zpass_secret);
+        let zpass_hash: [u8; 64] = hash_blake3(hashed_worker ++ zpass_secret);
 
-        Mapping::set(worker_category, hashed_worker, category);
-        Mapping::set(worker_type, hashed_worker, worker_type_flag);
-        Mapping::set(worker_zpass_hash, hashed_worker, zpass_hash);
-
-        return true;
-    }
-
-    async transition register_worker_ans(worker_name: bytes, ans_domain: bytes) -> bool {
-        let height: u64 = block.height;
-        let hashed_worker: [u8; 32] = hash_worker_ans(worker_name, height);
-        let hashed_ans: [u8; 32] = hash_ans_name(b"worker", ans_domain);
-
-        assert(worker_exists(hashed_worker));
-        assert(!ans_reverse_lookup.contains(hashed_ans));
-
-        Mapping::set(ans_registry, hashed_worker, hashed_ans);
-        Mapping::set(ans_reverse_lookup, hashed_ans, hashed_worker);
-
-        return true;
-    }
-
-    async transition register_subdao_ans(subdao_name: bytes, ans_domain: bytes) -> bool {
-        let height: u64 = block.height;
-        let hashed_subdao: [u8; 32] = hash_subdao_ans(subdao_name, height);
-        let hashed_ans: [u8; 32] = hash_ans_name(b"subdao", ans_domain);
-
-        assert(!subdao_ans_registry.contains(hashed_subdao));
-        assert(!subdao_reverse_lookup.contains(hashed_ans));
-
-        Mapping::set(subdao_ans_registry, hashed_subdao, hashed_ans);
-        Mapping::set(subdao_reverse_lookup, hashed_ans, hashed_subdao);
+        worker_category.set(hashed_worker, category);
+        worker_type.set(hashed_worker, worker_type_flag);
+        worker_zpass_hash.set(hashed_worker, zpass_hash);
 
         return true;
     }
@@ -105,37 +61,32 @@ program main.aleo {
         let height: u64 = block.height;
         let hashed_worker: [u8; 32] = hash_worker_ans(worker_name, height);
         let hashed_subdao: [u8; 32] = hash_subdao_ans(subdao_name, height);
-        let zpass_hash: [u8; 64] = hash_zpass(hashed_worker, zpass_secret);
+        let zpass_hash: [u8; 64] = hash_blake3(hashed_worker ++ zpass_secret);
 
         assert(worker_exists(hashed_worker));
-        assert(worker_zpass_hash[contains(hashed_worker)] == zpass_hash);
+        assert(worker_zpass_hash.get_or_use(hashed_worker, [0u8; 64]) == zpass_hash);
 
         let employer_ans: [u8; 32] = get_employer_ans(self.caller);
         let worker_type_flag: u8 = get_worker_type(hashed_worker);
 
-        if worker_type_flag == 0u8 {
+        if worker_type_flag == PAYROLL_FUNCTION_PNCW {
             pncw_payroll.aleo::execute_payroll(hashed_worker, employer_ans, amount);
-        } else if worker_type_flag == 1u8 {
+        } else if worker_type_flag == PAYROLL_FUNCTION_PNIW {
             pniw_payroll.aleo::execute_payroll(hashed_worker, employer_ans, amount);
         } else {
             assert(false);
         }
 
-        return weekly_payroll_pool.aleo::execute_weekly_payroll(hashed_worker, hashed_subdao, amount, zpass_hash);
+        return weekly_payroll_pool.aleo::execute_weekly_payroll(hashed_worker, hashed_subdao, amount, zpass_secret);
     }
 
-    async transition fund_weekly_pool(subdao_name: bytes, amount: u64) -> bool {
-        assert(amount > 0u64);
+    async transition finalize_payroll(worker_name: bytes, subdao_name: bytes, amount: u64) -> bool {
         let height: u64 = block.height;
+        let hashed_worker: [u8; 32] = hash_worker_ans(worker_name, height);
         let hashed_subdao: [u8; 32] = hash_subdao_ans(subdao_name, height);
 
-        subdao_reserve.aleo::fund_weekly_payroll(hashed_subdao, amount);
-        return weekly_payroll_pool.aleo::fund_weekly_pool(hashed_subdao, amount);
-    }
+        assert(worker_exists(hashed_worker));
 
-    async transition process_taxes(subdao_name: bytes) -> bool {
-        let height: u64 = block.height;
-        let hashed_subdao: [u8; 32] = hash_subdao_ans(subdao_name, height);
-        return subdao_reserve.aleo::process_taxes(hashed_subdao);
+        return process_tax_compliance.aleo::record_payroll_finalization(hashed_worker, hashed_subdao, amount);
     }
 }
