@@ -18,7 +18,60 @@ program employer_agreement.aleo {
         registered: bool,
         tax_compliant: bool,
         last_updated: u64
+    }import credits.aleo;
+import subdao_reserve.aleo;
+import oversightdao_reserve.aleo;
+
+program employer_agreement.aleo {
+    mapping employer_registry: [u8; 32] => bool;
+    mapping employer_tax_compliance: [u8; 32] => bool;
+    mapping ans_registry: [u8; 32] => [u8; 32];
+    mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
+
+    const OVERSIGHT_DAO_ANS: [u8; 32] = encode_ans(b"oversightdao.pnw.ans");
+
+    function encode_ans(ans_name: bytes) -> [u8; 32] {
+        return hash_arc721(ans_name);
     }
+
+    async transition register_employer(employer_ans: [u8; 32]) -> bool {
+        assert(!employer_registry.contains(employer_ans));
+
+        employer_registry.set(employer_ans, true);
+        employer_tax_compliance.set(employer_ans, false);
+
+        return true;
+    }
+
+    async transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> bool {
+        let encoded_ans: [u8; 32] = encode_ans(ans_name);
+
+        assert(employer_registry.contains(employer_ans));
+        assert(!ans_reverse_lookup.contains(encoded_ans));
+
+        ans_registry.set(employer_ans, encoded_ans);
+        ans_reverse_lookup.set(encoded_ans, employer_ans);
+
+        return true;
+    }
+
+    async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
+        assert(employer_registry.contains(employer_ans));
+        employer_tax_compliance.set(employer_ans, true);
+        return true;
+    }
+
+    async transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
+        assert(employer_registry.contains(employer_ans));
+        return true;
+    }
+
+    function lookup_employer_by_ans(ans_name: bytes) -> [u8; 32] {
+        let encoded_ans: [u8; 32] = encode_ans(ans_name);
+        assert(ans_reverse_lookup.contains(encoded_ans));
+        return ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+    }
+}
 
     async transition register_employer(employer_ans: [u8; 32]) -> (Employer, async transition) {
         assert(!employer_registry.contains(employer_ans));
