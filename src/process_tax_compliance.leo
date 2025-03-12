@@ -8,7 +8,7 @@ program process_tax_compliance.aleo {
     mapping ans_registry: [u8; 32] => [u8; 32];
     mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
-    const TAX_SINK: [u8; 32] = *b"govtax.pnw.ans";
+    const TAX_SINK: [u8; 32] = encode_ans(b"govtax.pnw.ans");
 
     struct EmployerTaxRecord {
         employer_ans: [u8; 32],
@@ -17,13 +17,17 @@ program process_tax_compliance.aleo {
         is_compliant: bool
     }
 
-    async transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> (bool, async transition) {
-        assert(Mapping::get_or_use(employer_zpass_verified, employer_ans, false));
-        assert(Mapping::get_or_use(employer_agreement.aleo::employer_registry, employer_ans, false));
+    function encode_ans(ans_name: bytes) -> [u8; 32] {
+        return hash_arc721(ans_name);
+    }
+
+    async transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> bool {
+        assert(employer_zpass_verified.get_or_use(employer_ans, false));
+        assert(employer_agreement.aleo::employer_registry.get_or_use(employer_ans, false));
 
         let tax_due: u64 = calculate_tax_due(employer_ans, payroll_type);
 
-        let employer_record: EmployerTaxRecord = Mapping::get_or_use(employer_tax, employer_ans, EmployerTaxRecord {
+        let employer_record: EmployerTaxRecord = employer_tax.get_or_use(employer_ans, EmployerTaxRecord {
             employer_ans,
             total_tax_paid: 0u64,
             last_payment_timestamp: 0u64,
@@ -31,9 +35,10 @@ program process_tax_compliance.aleo {
         });
 
         let is_compliant: bool = employer_record.total_tax_paid >= tax_due;
-        Mapping::set(employer_tax, employer_ans, EmployerTaxRecord {
+
+        employer_tax.set(employer_ans, EmployerTaxRecord {
             employer_ans,
-            total_tax_paid: employer_record.total_tax_paid,
+            total_tax_paid: employer_record.total_tax_paid + tax_due,
             last_payment_timestamp: block.timestamp,
             is_compliant
         });
@@ -42,11 +47,15 @@ program process_tax_compliance.aleo {
             credits.aleo::transfer_public(TAX_SINK, tax_due);
         }
 
-        return (is_compliant, process_tax_compliance);
+        return is_compliant;
+    }
+
+    async transition finalize_tax_compliance(employer_ans: [u8; 32]) -> bool {
+        assert(employer_tax.contains(employer_ans));
+        return true;
     }
 
     function calculate_tax_due(employer_ans: [u8; 32], payroll_type: u8) -> u64 {
-        // Example tax calculation based on payroll type
         if payroll_type == 0u8 {
             return 1000u64;
         } else if payroll_type == 1u8 {
