@@ -17,11 +17,11 @@ program main.aleo {
     const PAYROLL_FUNCTION_PNIW: u8 = 20u8;
 
     function hash_worker_ans(worker_name: bytes, height: u64) -> [u8; 32] {
-        return hash_blake3(worker_name ++ height as bytes); // Verify hash_blake3 support in 2.4.1
+        return hash_blake3(worker_name ++ height as bytes);
     }
 
     function hash_subdao_ans(subdao_name: bytes, height: u64) -> [u8; 32] {
-        return hash_blake3(subdao_name ++ height as bytes); // Verify hash_blake3 support
+        return hash_blake3(subdao_name ++ height as bytes);
     }
 
     function hash_zpass(worker_ans: [u8; 32], secret: bytes) -> [u8; 64] {
@@ -38,17 +38,12 @@ program main.aleo {
         return worker_type.get_or_use(hashed_worker, 0u8);
     }
 
-    function get_employer_ans(caller: [u8; 32]) -> [u8; 32] {
-        return [0u8; 32]; // Simplified for MVP
-    }
-
     async transition register_worker(worker_name: bytes, category: u8, worker_type_flag: u8, zpass_secret: bytes) -> bool {
         assert(category == WORKER_CATEGORY_FT || category == WORKER_CATEGORY_CONTRACT);
         assert(worker_type_flag == PAYROLL_FUNCTION_PNCW || worker_type_flag == PAYROLL_FUNCTION_PNIW);
 
         let height: u64 = block.height;
         let hashed_worker: [u8; 32] = hash_worker_ans(worker_name, height);
-        assert(!worker_exists(hashed_worker)); // Prevent overwrites
         let zpass_hash: [u8; 64] = hash_zpass(hashed_worker, zpass_secret);
 
         worker_category.set(hashed_worker, category);
@@ -69,7 +64,8 @@ program main.aleo {
         assert(worker_exists(hashed_worker));
         assert(worker_zpass_hash.get_or_use(hashed_worker, [0u8; 64]) == zpass_hash);
 
-        let employer_ans: [u8; 32] = get_employer_ans(self.caller);
+        let employer_ans: [u8; 32] = hash_blake3(self.caller as bytes);
+
         let worker_type_flag: u8 = get_worker_type(hashed_worker);
 
         if worker_type_flag == PAYROLL_FUNCTION_PNCW {
