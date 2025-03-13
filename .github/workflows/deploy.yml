@@ -31,38 +31,30 @@ jobs:
           which leo
           leo --version
 
-      - name: 📂 Debug Repo Directory Structure
+      - name: 📂 Set Working Directory for Deployment
         run: |
           echo "Current Directory: $(pwd)"
           ls -R
 
-      - name: 🛠 Temporarily Skip `register_workers.sh`
-        run: |
-          echo "🔄 Skipping register_workers.sh for debugging..."
-          mv worker_profiles/register_workers.sh worker_profiles/register_workers.sh.bak || true
-
-      - name: 🔥 Running Pre-Deployment Build Check
+      - name: 🔥 Running Pre-Deployment Build Check (Checking Each File)
         run: |
           export PATH=$HOME/.aleo:$PATH
           leo clean
-          echo "🔍 Running build... Saving logs."
-          if ! leo build --network testnet --path ./ 2>&1 | tee build_error.log; then
-              echo "🔴 Parsing error detected!"
-              echo "📝 Showing last 20 lines of build_error.log:"
-              tail -n 20 build_error.log
-              exit 248
-          fi
+          echo "🔍 Running build... Checking all files."
+          for file in src/*.leo; do
+              echo "Testing: $file"
+              if ! leo build --network testnet --path ./src/ 2>&1 | tee -a build_error.log; then
+                  echo "🚨 ERROR in $file!"
+                  exit 248
+              fi
+          done
 
-      - name: 🚀 Deploy Contracts from Root Directory
+      - name: 🚀 Deploy Contracts from Local Paths (No GitHub URLs)
         run: |
           export PATH=$HOME/.aleo:$PATH
           echo "🔥 Deploying All Contracts from Root Directory..."
 
-          # Debug check
-          echo "Current Directory: $(pwd)"
-          ls -R
-
-          # Deploy contracts from root
+          # Deploy contracts from local directory
           leo deploy --network testnet --path ./ --private-key ${ALEO_PRIVATE_KEY}
 
       - name: ✅ Deployment Completed Successfully
