@@ -48,17 +48,17 @@ jobs:
               exit 248
           fi
 
-      - name: 🚀 Deploy Contracts from Root Directory (Excluding Test Files)
+      - name: 🚀 Deploy Contracts from Root Directory (Fixing `--exclude` Issue)
         run: |
           export PATH=$HOME/.aleo:$PATH
-          echo "🔥 Deploying All Contracts from Root Directory (Without Tests)..."
+          echo "🔥 Deploying All Contracts from Root Directory..."
 
           # Debug check
           echo "Current Directory: $(pwd)"
           ls -R
 
-          # Deploy contracts from root, ensuring tests are ignored
-          leo deploy --network testnet --path ./ --exclude tests/ --private-key ${ALEO_PRIVATE_KEY}
+          # Deploy contracts without `--exclude`
+          leo deploy --network testnet --path ./ --private-key ${ALEO_PRIVATE_KEY}
 
       - name: ✅ Deployment Completed Successfully
         run: echo "✅ All contracts deployed successfully!"
