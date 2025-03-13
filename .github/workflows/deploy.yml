@@ -1,4 +1,4 @@
-name: Deploy pnw_mvp
+name: Deploy PNW-MVP
 
 on:
   push:
@@ -17,12 +17,19 @@ jobs:
       - name: 🔑 Set Aleo private key from repository secret
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
+      - name: 🛠️ Install Rust Toolchain (Required for Leo)
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+          rustc --version
+          cargo --version
+
       - name: 🛠️ Install Leo CLI from Source (`.tar.gz`)
         run: |
           curl -L -o leo.tar.gz https://github.com/ProvableHQ/leo/archive/refs/tags/v2.4.1.tar.gz
           tar -xzf leo.tar.gz
           cd leo-2.4.1
-          cargo build --release --no-default-features --features cli
+          cargo build --release
           mkdir -p $HOME/.aleo
           cp target/release/leo $HOME/.aleo
           chmod +x $HOME/.aleo/leo
