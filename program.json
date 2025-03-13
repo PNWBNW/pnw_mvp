@@ -1,6 +1,6 @@
 {
   "program": "pnw_mvp",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "PNW-MVP: Zero-knowledge payroll system running on Aleo Testnet.",
   "license": "Proprietary License - PNW-MVP (c) 2025. All Rights Reserved.",
   "main": "src/main.leo",
@@ -15,7 +15,16 @@
       "description": "Core orchestration for zero-knowledge payroll (testnet)",
       "network": "testnet",
       "fee": 1,
-      "imports": ["src/credits.leo", "src/employer_agreement.leo", "src/process_tax_compliance.leo"],
+      "imports": [
+        "src/credits.leo",
+        "src/employer_agreement.leo",
+        "src/process_tax_compliance.leo",
+        "src/pncw_payroll.leo",
+        "src/pniw_payroll.leo",
+        "src/weekly_payroll_pool.leo",
+        "src/subdao_reserve.leo",
+        "src/oversightdao_reserve.leo"
+      ],
       "test_files": ["tests/main_test.leo"]
     },
     {
@@ -24,7 +33,11 @@
       "description": "Employer agreement (testnet)",
       "network": "testnet",
       "fee": 1,
-      "imports": ["src/credits.leo", "src/process_tax_compliance.leo"],
+      "imports": [
+        "src/credits.leo",
+        "src/process_tax_compliance.leo",
+        "src/weekly_payroll_pool.leo"
+      ],
       "test_files": ["tests/employer_agreement_test.leo"]
     },
     {
@@ -33,7 +46,12 @@
       "description": "PNCW Payroll Logic",
       "network": "testnet",
       "fee": 1,
-      "imports": ["src/credits.leo", "src/main.leo"],
+      "imports": [
+        "src/credits.leo",
+        "src/main.leo",
+        "src/employer_agreement.leo",
+        "src/weekly_payroll_pool.leo"
+      ],
       "test_files": ["tests/pncw_payroll_test.leo"]
     },
     {
@@ -42,8 +60,60 @@
       "description": "PNIW Payroll Logic",
       "network": "testnet",
       "fee": 1,
-      "imports": ["src/credits.leo", "src/main.leo"],
+      "imports": [
+        "src/credits.leo",
+        "src/main.leo",
+        "src/employer_agreement.leo",
+        "src/weekly_payroll_pool.leo"
+      ],
       "test_files": ["tests/pniw_payroll_test.leo"]
+    },
+    {
+      "program": "src/process_tax_compliance.leo",
+      "version": "1.0.0",
+      "description": "Tax Compliance Processing",
+      "network": "testnet",
+      "fee": 1,
+      "imports": [
+        "src/credits.leo",
+        "src/employer_agreement.leo",
+        "src/oversightdao_reserve.leo"
+      ],
+      "test_files": ["tests/process_tax_compliance_test.leo"]
+    },
+    {
+      "program": "src/weekly_payroll_pool.leo",
+      "version": "1.0.0",
+      "description": "Weekly Payroll Pool",
+      "network": "testnet",
+      "fee": 1,
+      "imports": [
+        "src/credits.leo",
+        "src/main.leo",
+        "src/employer_agreement.leo",
+        "src/pncw_payroll.leo",
+        "src/pniw_payroll.leo",
+        "src/subdao_reserve.leo"
+      ],
+      "test_files": ["tests/weekly_payroll_pool_test.leo"]
+    },
+    {
+      "program": "src/subdao_reserve.leo",
+      "version": "1.0.0",
+      "description": "SubDAO Reserve",
+      "network": "testnet",
+      "fee": 1,
+      "imports": ["src/credits.leo"],
+      "test_files": ["tests/subdao_reserve_test.leo"]
+    },
+    {
+      "program": "src/oversightdao_reserve.leo",
+      "version": "1.0.0",
+      "description": "OversightDAO Reserve",
+      "network": "testnet",
+      "fee": 1,
+      "imports": ["src/credits.leo"],
+      "test_files": ["tests/oversightdao_reserve_test.leo"]
     }
   ],
   "test_addresses": [
