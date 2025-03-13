@@ -4,58 +4,40 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 🛎️ Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: 🔑 Set Aleo private key from repository secret
-        run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
-
-      - name: 🛠️ Install Precompiled Leo CLI (`.zip`)
+      - name: Set Up Aleo CLI
         run: |
-          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          unzip leo.zip -d $HOME/.aleo
+          export PATH=$HOME/.aleo:$PATH
+          curl -L -o leo.tar.gz https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.tar.gz
+          tar -xzf leo.tar.gz
+          mv leo $HOME/.aleo/
           chmod +x $HOME/.aleo/leo
           echo "export PATH=$HOME/.aleo:\$PATH" >> $GITHUB_ENV
           echo "$HOME/.aleo" >> $GITHUB_PATH
 
-      - name: ✅ Verify Leo Installation & Path
+      - name: Build & Deploy Contracts
         run: |
           export PATH=$HOME/.aleo:$PATH
-          which leo
-          leo --version
-
-      - name: 📂 Set Working Directory for Deployment
-        run: |
-          echo "Current Directory: $(pwd)"
-          ls -R
-
-      - name: 🔥 Running Pre-Deployment Build Check (Checking Each File)
-        run: |
-          export PATH=$HOME/.aleo:$PATH
-          leo clean
-          echo "🔍 Running build... Checking all files."
-          for file in src/*.leo; do
-              echo "Testing: $file"
-              if ! leo build --network testnet --path ./src/ 2>&1 | tee -a build_error.log; then
-                  echo "🚨 ERROR in $file!"
-                  exit 248
-              fi
+          echo "🔥 Deploying Contracts in Optimized Order..."
+          
+          # Deployment order (ensuring dependencies exist first)
+          for contract in \
+            "src/credits" \
+            "src/employer_agreement" \
+            "src/process_tax_compliance" \
+            "src/subdao_reserve" \
+            "src/oversightdao_reserve" \
+            "src/pncw_payroll" \
+            "src/pniw_payroll" \
+            "src/weekly_payroll_pool"
+          do
+            echo "🚀 Deploying $contract"
+            leo deploy --network testnet --path $contract --private-key ${ALEO_PRIVATE_KEY}
           done
-
-      - name: 🚀 Deploy Contracts from Local Paths (No GitHub URLs)
-        run: |
-          export PATH=$HOME/.aleo:$PATH
-          echo "🔥 Deploying All Contracts from Root Directory..."
-
-          # Deploy contracts from local directory
-          leo deploy --network testnet --path ./ --private-key ${ALEO_PRIVATE_KEY}
-
-      - name: ✅ Deployment Completed Successfully
-        run: echo "✅ All contracts deployed successfully!"
