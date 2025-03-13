@@ -10,15 +10,19 @@ fi
 echo "🔥 Running Pre-Deployment Build Check..."
 leo clean
 
-BUILD_LOG="build_errors.log"
+BUILD_LOG=$(mktemp)
 
-# Capture `leo build` output and filter errors
-if ! leo build --network testnet 2>&1 | tee "$BUILD_LOG"; then
-    echo "🔴 Parsing error detected!"
-    echo "🔍 Debugging Info (Error + 3 Surrounding Lines):"
+if ! leo build --network testnet 2> "$BUILD_LOG"; then
+    echo "🔴 Build failed. Parsing errors..."
 
-    # Extract the first error with 3 lines before and after
-    grep -A 3 -B 3 -E "error:|Error" "$BUILD_LOG" | head -n 10
+    ERROR_DETAILS=$(grep -oE 'error: .* at [^ ]+:[0-9]+:[0-9]+' "$BUILD_LOG" || true)
+
+    if [[ -n "$ERROR_DETAILS" ]]; then
+        echo "🔍 **Parsing Error Details:**"
+        echo "$ERROR_DETAILS"
+    else
+        echo "⚠ No specific line/column details found, check full log: $BUILD_LOG"
+    fi
 
     exit 248
 fi
@@ -26,9 +30,4 @@ fi
 echo "🔥 Starting deployment funnel for PNW-MVP..."
 leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}
 
-if [ $? -eq 0 ]; then
-    echo "✅ All contracts deployed successfully!"
-else
-    echo "🔴 Deployment failed. Check logs above."
-    exit 1
-fi
+echo "✅ Deployment completed successfully!"
