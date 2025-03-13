@@ -17,11 +17,14 @@ jobs:
       - name: 🔑 Set Aleo private key from repository secret
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      - name: 🛠️ Install Leo CLI (Correct Linux Binary)
+      - name: 🛠️ Install Leo CLI from Source (`.tar.gz`)
         run: |
-          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
+          curl -L -o leo.tar.gz https://github.com/ProvableHQ/leo/archive/refs/tags/v2.4.1.tar.gz
+          tar -xzf leo.tar.gz
+          cd leo-2.4.1
+          cargo build --release
           mkdir -p $HOME/.aleo
-          unzip leo.zip -d $HOME/.aleo
+          cp target/release/leo $HOME/.aleo
           chmod +x $HOME/.aleo/leo
           echo "export PATH=$HOME/.aleo:\$PATH" >> $GITHUB_ENV
           echo "$HOME/.aleo" >> $GITHUB_PATH
@@ -35,7 +38,7 @@ jobs:
         run: |
           export PATH=$HOME/.aleo:$PATH
           leo clean
-          if ! leo build --network testnet --verbose; then
+          if ! leo build --network testnet; then
               echo "🔴 Parsing error detected!"
               exit 248
           fi
