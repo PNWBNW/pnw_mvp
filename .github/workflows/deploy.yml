@@ -34,10 +34,15 @@ jobs:
       - name: 🔍 Debugging Aleo Program (Using Cheat Codes)
         run: |
           export PATH=$HOME/.aleo:$PATH
-          echo "🔎 Running Debugging Test..."
-          
-          # Create a debug test file
-          cat <<EOT > debug_test.leo
+          echo "🔎 Setting up Debugging Test..."
+
+          # Create a new Aleo project for debugging
+          mkdir debug_test
+          cd debug_test
+          leo new debug_test
+
+          # Replace `main.leo` with debug code
+          cat <<EOT > src/main.leo
           program debug_test.aleo {
               mapping worker_category: [u8; 32] => u8;
 
@@ -48,9 +53,11 @@ jobs:
           }
           EOT
 
-          leo build --network testnet debug_test.leo
-          leo run --network testnet debug_test.aleo test_mapping_debug
-
+          # Build and Run Debug Test
+          leo build --network testnet
+          leo run --network testnet test_mapping_debug
+          cd ..
+      
       - name: 🔥 Running Pre-Deployment Build Check (With Debugging)
         run: |
           export PATH=$HOME/.aleo:$PATH
