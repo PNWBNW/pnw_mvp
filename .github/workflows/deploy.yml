@@ -36,38 +36,29 @@ jobs:
           echo "Current Directory: $(pwd)"
           ls -R
 
-      - name: 🔥 Running Pre-Deployment Build Check (With Correct Path)
+      - name: 🔥 Running Pre-Deployment Build Check (Excluding Test Files)
         run: |
           export PATH=$HOME/.aleo:$PATH
           leo clean
-          echo "🔍 Running build... Saving logs."
-          if ! leo build --network testnet --path src/ 2>&1 | tee build_error.log; then
+          echo "🔍 Running build... Excluding test files..."
+          if ! leo build --network testnet --path ./ --exclude tests/ 2>&1 | tee build_error.log; then
               echo "🔴 Parsing error detected!"
               echo "📝 Showing last 20 lines of build_error.log:"
               tail -n 20 build_error.log
               exit 248
           fi
 
-      - name: 🚀 Deploy Contracts in New Order
+      - name: 🚀 Deploy Contracts from Root Directory (Excluding Test Files)
         run: |
           export PATH=$HOME/.aleo:$PATH
-          echo "🔥 Deploying Contracts in Optimized Order..."
+          echo "🔥 Deploying All Contracts from Root Directory (Without Tests)..."
 
-          # 1️⃣ Deploy Base Token System (Required for Payroll)
-          leo deploy --network testnet --path src/credits.aleo --private-key ${ALEO_PRIVATE_KEY}
+          # Debug check
+          echo "Current Directory: $(pwd)"
+          ls -R
 
-          # 2️⃣ Register Employers
-          leo deploy --network testnet --path src/employer_agreement.aleo --private-key ${ALEO_PRIVATE_KEY}
-
-          # 3️⃣ Disburse Funds to Compliance & Reserve Pools
-          leo deploy --network testnet --path src/process_tax_compliance.aleo --private-key ${ALEO_PRIVATE_KEY}
-          leo deploy --network testnet --path src/weekly_payroll_pool.aleo --private-key ${ALEO_PRIVATE_KEY}
-          leo deploy --network testnet --path src/subdao_reserve.aleo --private-key ${ALEO_PRIVATE_KEY}
-          leo deploy --network testnet --path src/oversightdao_reserve.aleo --private-key ${ALEO_PRIVATE_KEY}
-
-          # 4️⃣ Execute Payroll Contracts
-          leo deploy --network testnet --path src/pncw_payroll.aleo --private-key ${ALEO_PRIVATE_KEY}
-          leo deploy --network testnet --path src/pniw_payroll.aleo --private-key ${ALEO_PRIVATE_KEY}
+          # Deploy contracts from root, ensuring tests are ignored
+          leo deploy --network testnet --path ./ --exclude tests/ --private-key ${ALEO_PRIVATE_KEY}
 
       - name: ✅ Deployment Completed Successfully
         run: echo "✅ All contracts deployed successfully!"
