@@ -30,12 +30,22 @@ jobs:
           export PATH=$HOME/.aleo:$PATH
           leo --version
 
-      - name: 🔥 Running Pre-Deployment Build Check
+      - name: 🔥 Running Debug Tests (Using Cheat Codes)
+        run: |
+          export PATH=$HOME/.aleo:$PATH
+          echo "🔍 Running Debugging Test..."
+          leo run debug --network testnet "CheatCode::print_mapping(worker_category)"
+          leo run debug --network testnet "CheatCode::set_block_height(10000)"
+
+      - name: 🔥 Running Pre-Deployment Build Check (With Debugging)
         run: |
           export PATH=$HOME/.aleo:$PATH
           leo clean
-          if ! leo build --network testnet; then
+          echo "🔍 Running build... Saving logs."
+          if ! leo build --network testnet 2>&1 | tee build_error.log; then
               echo "🔴 Parsing error detected!"
+              echo "📝 Showing last 20 lines of build_error.log:"
+              tail -n 20 build_error.log
               exit 248
           fi
 
