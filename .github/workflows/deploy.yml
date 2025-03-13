@@ -36,19 +36,24 @@ jobs:
           echo "Current Directory: $(pwd)"
           ls -R
 
-      - name: 🔥 Running Pre-Deployment Build Check (Excluding Test Files)
+      - name: 🛠 Temporarily Skip `register_workers.sh`
+        run: |
+          echo "🔄 Skipping register_workers.sh for debugging..."
+          mv worker_profiles/register_workers.sh worker_profiles/register_workers.sh.bak || true
+
+      - name: 🔥 Running Pre-Deployment Build Check
         run: |
           export PATH=$HOME/.aleo:$PATH
           leo clean
-          echo "🔍 Running build... Excluding test files..."
-          if ! leo build --network testnet --path ./ --exclude tests/ 2>&1 | tee build_error.log; then
+          echo "🔍 Running build... Saving logs."
+          if ! leo build --network testnet --path ./ 2>&1 | tee build_error.log; then
               echo "🔴 Parsing error detected!"
               echo "📝 Showing last 20 lines of build_error.log:"
               tail -n 20 build_error.log
               exit 248
           fi
 
-      - name: 🚀 Deploy Contracts from Root Directory (Fixing `--exclude` Issue)
+      - name: 🚀 Deploy Contracts from Root Directory
         run: |
           export PATH=$HOME/.aleo:$PATH
           echo "🔥 Deploying All Contracts from Root Directory..."
@@ -57,7 +62,7 @@ jobs:
           echo "Current Directory: $(pwd)"
           ls -R
 
-          # Deploy contracts without `--exclude`
+          # Deploy contracts from root
           leo deploy --network testnet --path ./ --private-key ${ALEO_PRIVATE_KEY}
 
       - name: ✅ Deployment Completed Successfully
