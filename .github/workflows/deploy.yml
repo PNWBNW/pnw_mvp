@@ -25,17 +25,31 @@ jobs:
           echo "export PATH=$HOME/.aleo:\$PATH" >> $GITHUB_ENV
           echo "$HOME/.aleo" >> $GITHUB_PATH
 
-      - name: ✅ Verify Leo Installation
+      - name: ✅ Verify Leo Installation & Path
         run: |
           export PATH=$HOME/.aleo:$PATH
+          which leo
           leo --version
 
-      - name: 🔥 Running Debug Tests (Using Cheat Codes)
+      - name: 🔍 Debugging Aleo Program (Using Cheat Codes)
         run: |
           export PATH=$HOME/.aleo:$PATH
-          echo "🔍 Running Debugging Test..."
-          leo run debug --network testnet "CheatCode::print_mapping(worker_category)"
-          leo run debug --network testnet "CheatCode::set_block_height(10000)"
+          echo "🔎 Running Debugging Test..."
+          
+          # Create a debug test file
+          cat <<EOT > debug_test.leo
+          program debug_test.aleo {
+              mapping worker_category: [u8; 32] => u8;
+
+              function test_mapping_debug() -> u8 {
+                  CheatCode::print_mapping(worker_category);
+                  return 1u8;
+              }
+          }
+          EOT
+
+          leo build --network testnet debug_test.leo
+          leo run --network testnet debug_test.aleo test_mapping_debug
 
       - name: 🔥 Running Pre-Deployment Build Check (With Debugging)
         run: |
