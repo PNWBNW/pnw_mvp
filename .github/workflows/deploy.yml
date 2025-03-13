@@ -31,46 +31,43 @@ jobs:
           which leo
           leo --version
 
-      - name: 🔍 Debugging Aleo Program (Using Cheat Codes)
+      - name: 📂 Debug Repo Directory Structure
         run: |
-          export PATH=$HOME/.aleo:$PATH
-          echo "🔎 Setting up Debugging Test..."
+          echo "Current Directory: $(pwd)"
+          ls -R
 
-          # Create a new Aleo project for debugging
-          mkdir debug_test
-          cd debug_test
-          leo new debug_test
-
-          # Replace `main.leo` with debug code
-          cat <<EOT > src/main.leo
-          program debug_test.aleo {
-              mapping worker_category: [u8; 32] => u8;
-
-              function test_mapping_debug() -> u8 {
-                  CheatCode::print_mapping(worker_category);
-                  return 1u8;
-              }
-          }
-          EOT
-
-          # Build and Run Debug Test
-          leo build --network testnet
-          leo run --network testnet test_mapping_debug
-          cd ..
-      
-      - name: 🔥 Running Pre-Deployment Build Check (With Debugging)
+      - name: 🔥 Running Pre-Deployment Build Check (With Correct Path)
         run: |
           export PATH=$HOME/.aleo:$PATH
           leo clean
           echo "🔍 Running build... Saving logs."
-          if ! leo build --network testnet 2>&1 | tee build_error.log; then
+          if ! leo build --network testnet --path src/ 2>&1 | tee build_error.log; then
               echo "🔴 Parsing error detected!"
               echo "📝 Showing last 20 lines of build_error.log:"
               tail -n 20 build_error.log
               exit 248
           fi
 
-      - name: 🚀 Deploy PNW-MVP contracts
+      - name: 🚀 Deploy Contracts in New Order
         run: |
           export PATH=$HOME/.aleo:$PATH
-          leo deploy --network testnet --private-key ${ALEO_PRIVATE_KEY}
+          echo "🔥 Deploying Contracts in Optimized Order..."
+
+          # 1️⃣ Deploy Base Token System (Required for Payroll)
+          leo deploy --network testnet --path src/credits.aleo --private-key ${ALEO_PRIVATE_KEY}
+
+          # 2️⃣ Register Employers
+          leo deploy --network testnet --path src/employer_agreement.aleo --private-key ${ALEO_PRIVATE_KEY}
+
+          # 3️⃣ Disburse Funds to Compliance & Reserve Pools
+          leo deploy --network testnet --path src/process_tax_compliance.aleo --private-key ${ALEO_PRIVATE_KEY}
+          leo deploy --network testnet --path src/weekly_payroll_pool.aleo --private-key ${ALEO_PRIVATE_KEY}
+          leo deploy --network testnet --path src/subdao_reserve.aleo --private-key ${ALEO_PRIVATE_KEY}
+          leo deploy --network testnet --path src/oversightdao_reserve.aleo --private-key ${ALEO_PRIVATE_KEY}
+
+          # 4️⃣ Execute Payroll Contracts
+          leo deploy --network testnet --path src/pncw_payroll.aleo --private-key ${ALEO_PRIVATE_KEY}
+          leo deploy --network testnet --path src/pniw_payroll.aleo --private-key ${ALEO_PRIVATE_KEY}
+
+      - name: ✅ Deployment Completed Successfully
+        run: echo "✅ All contracts deployed successfully!"
