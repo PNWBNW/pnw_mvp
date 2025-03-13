@@ -15,12 +15,27 @@ jobs:
       - name: Set Up Aleo CLI
         run: |
           export PATH=$HOME/.aleo:$PATH
-          curl -L -o leo.tar.gz https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.tar.gz
-          tar -xzf leo.tar.gz
-          mv leo $HOME/.aleo/
+          echo "🔥 Downloading and Installing Leo CLI..."
+          
+          # Download the correct Leo version (ZIP format)
+          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
+          
+          # Extract the binary
+          unzip leo.zip -d leo_install
+          
+          # Move binary to Aleo path
+          mv leo_install/leo $HOME/.aleo/
           chmod +x $HOME/.aleo/leo
+          
+          # Add Leo CLI to system PATH
           echo "export PATH=$HOME/.aleo:\$PATH" >> $GITHUB_ENV
           echo "$HOME/.aleo" >> $GITHUB_PATH
+
+      - name: Verify Leo Installation
+        run: |
+          export PATH=$HOME/.aleo:$PATH
+          echo "✅ Checking Leo Version..."
+          leo --version
 
       - name: Build & Deploy Contracts
         run: |
