@@ -1,14 +1,14 @@
 [package]
 name = "pnw_mvp"
-version = "1.1.1"
-edition = "2023"
+version = "3.13.25"
+edition = "2025"
 
 [dependencies]
-credits = { path = "./src/credits.leo" }
-employer_agreement = { path = "./src/employer_agreement.leo" }
-process_tax_compliance = { path = "./src/process_tax_compliance.leo" }
-subdao_reserve = { path = "./src/subdao_reserve.leo" }
-oversightdao_reserve = { path = "./src/oversightdao_reserve.leo" }
-pncw_payroll = { path = "./src/pncw_payroll.leo" }
-pniw_payroll = { path = "./src/pniw_payroll.leo" }
-weekly_payroll_pool = { path = "./src/weekly_payroll_pool.leo" }
+credits = { path = "./src/credits/main.leo" }
+employer_agreement = { path = "./src/employer_agreement/main.leo" }
+process_tax_compliance = { path = "./src/process_tax_compliance/main.leo" }
+subdao_reserve = { path = "./src/subdao_reserve/main.leo" }
+oversightdao_reserve = { path = "./src/oversightdao_reserve/main.leo" }
+pncw_payroll = { path = "./src/pncw_payroll/main.leo" }
+pniw_payroll = { path = "./src/pniw_payroll/main.leo" }
+weekly_payroll_pool = { path = "./src/weekly_payroll_pool/main.leo" }
