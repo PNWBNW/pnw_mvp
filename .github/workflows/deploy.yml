@@ -1,4 +1,4 @@
-name: PNW-MVP Deployment
+name: 🚀 PNW-MVP Deployment
 
 on:
   push:
@@ -19,33 +19,56 @@ jobs:
       - name: 🔑 Set Aleo Private Key from Repository Secret
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
+      - name: 🌍 Create `.env` File for Network Configuration
+        run: echo "NETWORK=testnet" > pnw_mvp/.env
+
       - name: 🔧 Set Up Environment Variables
         run: |
           export PATH=pnw_mvp/directory/.aleo:$PATH
           echo "export PATH=pnw_mvp/directory/.aleo:\$PATH" >> $GITHUB_ENV
           echo "🔑 Aleo Private Key Set Successfully (Hidden for Security)"
 
-      - name: 🔥 Install Leo CLI (Using Lowercase Directory)
+      - name: 🔥 Install Leo CLI
         run: |
           echo "⬇️ Downloading and Installing Leo CLI..."
           curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          unzip leo.zip -d pnw_mvp/directory/leo_install  # ✅ Extract inside lowercase directory
-          mkdir -p pnw_mvp/directory/.aleo  # ✅ Ensure .aleo exists inside lowercase directory
+          unzip leo.zip -d pnw_mvp/directory/leo_install
+          mkdir -p pnw_mvp/directory/.aleo
           mv pnw_mvp/directory/leo_install/leo pnw_mvp/directory/.aleo/
           chmod +x pnw_mvp/directory/.aleo/leo
           echo "✅ Leo CLI Installed Successfully!"
 
+      - name: 📂 Debug Directory Structure Before Deployment
+        run: |
+          echo "📂 Listing All Files (Including Hidden)..."
+          ls -la pnw_mvp/ > directory_structure.log
+          cat directory_structure.log
+
       - name: 🚀 Deploy PNW-MVP Contracts
         run: |
           chmod +x deploy_pnw_mvp.sh
-          echo "🛠️ Running Deployment and Logging Output..."
-          pnw_mvp/directory/.aleo/leo deploy 2>&1 | tee deploy_log.txt
+          echo "🛠️ Running Deployment with Logging..."
+          ./deploy_pnw_mvp.sh 2>&1 | tee deploy_log.txt
 
-      - name: 📜 Upload Deployment Logs (For Debugging)
+      - name: 📜 Upload Deployment Logs (Including Hidden Files)
         uses: actions/upload-artifact@v4
         with:
           name: deploy_logs
           path: deploy_log.txt
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: true
+
+      - name: 📂 Upload Directory Structure Log (For Debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: directory_structure
+          path: directory_structure.log
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: true
 
       - name: ✅ Deployment Complete
         run: echo "🚀 All contracts successfully deployed!"
