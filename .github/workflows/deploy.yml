@@ -21,28 +21,28 @@ jobs:
 
       - name: 🔧 Set Up Environment Variables
         run: |
-          export PATH=$HOME/.aleo:$PATH
-          echo "export PATH=$HOME/.aleo:\$PATH" >> $GITHUB_ENV
-          echo "$HOME/.aleo" >> $GITHUB_PATH
+          export PATH=pnw_mvp/Directory/.aleo:$PATH
+          echo "export PATH=pnw_mvp/Directory/.aleo:\$PATH" >> $GITHUB_ENV
           echo "🔑 Aleo Private Key Set Successfully (Hidden for Security)"
 
-      - name: 🔥 Install Leo CLI (Fix Exec Format Error)
+      - name: 🔥 Install Leo CLI (Correct Directory)
         run: |
           echo "⬇️ Downloading and Installing Leo CLI..."
           curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          unzip leo.zip -d leo_install
-          mv leo_install/leo $HOME/.aleo/
-          chmod +x $HOME/.aleo/leo
+          unzip leo.zip -d pnw_mvp/Directory/leo_install  # ✅ Extract Leo into the correct directory
+          mkdir -p pnw_mvp/Directory/.aleo  # ✅ Ensure .aleo directory exists in the right location
+          mv pnw_mvp/Directory/leo_install/leo pnw_mvp/Directory/.aleo/  # ✅ Move Leo to the correct path
+          chmod +x pnw_mvp/Directory/.aleo/leo
           echo "✅ Leo CLI Installed Successfully!"
 
       - name: 🚀 Deploy PNW-MVP Contracts with Verbose Logging
         run: |
           chmod +x deploy_pnw_mvp.sh
           echo "🛠️ Running Deployment with Verbose Logging..."
-          ./deploy_pnw_mvp.sh --verbose 2>&1 | tee deploy_log.txt
+          pnw_mvp/Directory/.aleo/leo deploy --verbose 2>&1 | tee deploy_log.txt
 
       - name: 📜 Upload Deployment Logs (For Debugging)
-        uses: actions/upload-artifact@v4  # Update to v4 for latest compatibility
+        uses: actions/upload-artifact@v4  # Updated to v4 for stability
         with:
           name: deploy_logs
           path: deploy_log.txt
