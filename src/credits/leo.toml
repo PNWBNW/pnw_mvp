@@ -4,3 +4,7 @@ version = "25.03.13"
 edition = "2025.3"
 
 [dependencies]
+
+[build]
+# Ensures that Leo correctly recognizes the main contract file
+main = "main.leo"
