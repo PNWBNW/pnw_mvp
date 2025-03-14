@@ -1,6 +1,8 @@
-import credits.aleo;
-import employer_agreement.aleo;
-import subdao_reserve.aleo;
+import credits::*;
+import pncw_payroll::*;
+import pniw_payroll::*;
+import subdao_reserve::*;
+import worker_profiles::*;
 
 program process_tax_compliance {
     mapping employer_tax: [u8; 32] => EmployerTaxRecord;
