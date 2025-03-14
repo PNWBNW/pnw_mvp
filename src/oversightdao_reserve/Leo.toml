@@ -1,0 +1,7 @@
+[package]
+name = "oversightdao_reserve"
+version = "25.3.14"
+edition = "2025.3"
+
+[dependencies]
+credits = { path = "../credits" }
