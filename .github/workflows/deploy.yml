@@ -26,11 +26,13 @@ jobs:
           echo "$HOME/.aleo" >> $GITHUB_PATH
           echo "🔑 Aleo Private Key Set Successfully (Hidden for Security)"
 
-      - name: 🔥 Install Leo CLI
+      - name: 🔥 Install Leo CLI (Correct Binary Format)
         run: |
           echo "⬇️ Downloading and Installing Leo CLI..."
-          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo.zip
-          unzip leo.zip -d $HOME/.aleo
+          curl -L -o leo.tar.gz https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.tar.gz
+          tar -xzf leo.tar.gz
+          chmod +x leo
+          mv leo $HOME/.aleo/leo
           chmod +x $HOME/.aleo/leo
           echo "✅ Leo CLI Installed Successfully!"
 
