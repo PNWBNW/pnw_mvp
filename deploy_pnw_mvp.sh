@@ -2,6 +2,15 @@
 
 echo "🔥 Starting PNW-MVP Deployment Process..."
 
+# Load environment variables from .env file
+if [ -f "pnw_mvp/.env" ]; then
+    export $(grep -v '^#' pnw_mvp/.env | xargs)
+    echo "🌍 Using network: $NETWORK"
+else
+    echo "❌ Error: .env file not found!"
+    exit 1
+fi
+
 # Ensure Leo CLI is Executable
 chmod +x pnw_mvp/directory/.aleo/leo
 
@@ -17,11 +26,11 @@ CONTRACTS=(
     "src/pniw_payroll"
 )
 
-# Step 2: Deploy Contracts (Log Each Deployment)
+# Step 2: Deploy Contracts (Using Loaded $NETWORK Variable)
 echo "🚀 Deploying Contracts in Optimized Order..."
 for contract in "${CONTRACTS[@]}"; do
     echo "🚀 Deploying: $contract"
-    if ! pnw_mvp/directory/.aleo/leo deploy --network testnet --path $contract --private-key ${ALEO_PRIVATE_KEY} 2>&1 | tee -a deploy_log.txt; then
+    if ! pnw_mvp/directory/.aleo/leo deploy --network $NETWORK --path $contract --private-key ${ALEO_PRIVATE_KEY} 2>&1 | tee -a deploy_log.txt; then
         echo "🚨 Deployment failed for $contract!"
         exit 248
     fi
