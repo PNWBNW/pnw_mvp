@@ -153,8 +153,3 @@ Audit Logging for OversightDAO - Providing deeper visibility into payroll compli
 
 PNW-MVP delivers a decentralized, private, and compliant payroll solution using Aleo’s zk-SNARKs. By following this integration plan, developers can deploy, manage, and scale a privacy-preserving payroll system efficiently.
 
-
----
-
-🔥 Chef, this is a fully structured, deploy-ready technical document! Let me know if you'd like refinements. 🧑🏽‍🍳🚀
-
