@@ -1,0 +1,10 @@
+[package]
+name = "pncw_payroll"
+version = "25.3.14"
+edition = "2025.3"
+
+[dependencies]
+credits = { path = "../credits" }
+employer_agreement = { path = "../employer_agreement" }
+process_tax_compliance = { path = "../process_tax_compliance" }
+weekly_payroll_pool = { path = "../weekly_payroll_pool" }
