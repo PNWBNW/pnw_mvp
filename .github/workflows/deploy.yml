@@ -35,11 +35,11 @@ jobs:
           chmod +x pnw_mvp/directory/.aleo/leo
           echo "✅ Leo CLI Installed Successfully!"
 
-      - name: 🚀 Deploy PNW-MVP Contracts with Verbose Logging
+      - name: 🚀 Deploy PNW-MVP Contracts
         run: |
           chmod +x deploy_pnw_mvp.sh
-          echo "🛠️ Running Deployment with Verbose Logging..."
-          pnw_mvp/directory/.aleo/leo deploy --verbose 2>&1 | tee deploy_log.txt
+          echo "🛠️ Running Deployment and Logging Output..."
+          pnw_mvp/directory/.aleo/leo deploy 2>&1 | tee deploy_log.txt
 
       - name: 📜 Upload Deployment Logs (For Debugging)
         uses: actions/upload-artifact@v4
