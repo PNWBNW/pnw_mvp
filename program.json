@@ -1,53 +1,76 @@
 {
   "program": "pnw_mvp",
-  "version": "3.13.25",
-  "description": "PNW-MVP: Zero-knowledge payroll system running on Aleo Testnet.",
+  "version": "25.3.14",
+  "edition": "2025.3",
+  "description": "PNW-MVP: Zero-Knowledge Payroll System on Aleo Testnet.",
   "license": "Proprietary License - PNW-MVP (c) 2025. All Rights Reserved.",
-  "main": "src/credits/main.leo",
-  "global_fee": 1,
+  "main": "src/main.leo",
   "default_network": "testnet",
   "test_mode": true,
-  "faucet_url": "Discord #faucet (use /sendcredits command to obtain ALEO (Testnet) tokens)",
-  "programs": [
+  "deployment_strategy": "batch",
+  "faucet_url": "https://discord.com/invite/aleo",
+  "contracts": [
     {
-      "program": "src/credits/main.leo",
-      "version": "3.13.25",
-      "network": "testnet"
+      "name": "credits",
+      "path": "src/credits",
+      "dependencies": []
     },
     {
-      "program": "src/employer_agreement/main.leo",
-      "version": "3.13.25",
-      "network": "testnet"
+      "name": "employer_agreement",
+      "path": "src/employer_agreement",
+      "dependencies": ["credits"]
     },
     {
-      "program": "src/process_tax_compliance/main.leo",
-      "version": "3.13.25",
-      "network": "testnet"
+      "name": "process_tax_compliance",
+      "path": "src/process_tax_compliance",
+      "dependencies": ["credits", "employer_agreement"]
     },
     {
-      "program": "src/subdao_reserve/main.leo",
-      "version": "3.13.25",
-      "network": "testnet"
+      "name": "weekly_payroll_pool",
+      "path": "src/weekly_payroll_pool",
+      "dependencies": [
+        "credits",
+        "employer_agreement",
+        "process_tax_compliance",
+        "subdao_reserve",
+        "pncw_payroll",
+        "pniw_payroll"
+      ]
     },
     {
-      "program": "src/oversightdao_reserve/main.leo",
-      "version": "3.13.25",
-      "network": "testnet"
+      "name": "subdao_reserve",
+      "path": "src/subdao_reserve",
+      "dependencies": [
+        "credits",
+        "employer_agreement",
+        "process_tax_compliance",
+        "weekly_payroll_pool"
+      ]
     },
     {
-      "program": "src/pncw_payroll/main.leo",
-      "version": "3.13.25",
-      "network": "testnet"
+      "name": "oversightdao_reserve",
+      "path": "src/oversightdao_reserve",
+      "dependencies": ["credits"]
     },
     {
-      "program": "src/pniw_payroll/main.leo",
-      "version": "3.13.25",
-      "network": "testnet"
+      "name": "pncw_payroll",
+      "path": "src/pncw_payroll",
+      "dependencies": [
+        "credits",
+        "employer_agreement",
+        "process_tax_compliance",
+        "weekly_payroll_pool"
+      ]
     },
     {
-      "program": "src/weekly_payroll_pool/main.leo",
-      "version": "3.13.25",
-      "network": "testnet"
+      "name": "pniw_payroll",
+      "path": "src/pniw_payroll",
+      "dependencies": [
+        "credits",
+        "employer_agreement",
+        "process_tax_compliance",
+        "weekly_payroll_pool"
+      ]
     }
   ],
   "test_addresses": [
