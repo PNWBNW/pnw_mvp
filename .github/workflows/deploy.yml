@@ -41,7 +41,7 @@ jobs:
           ./deploy_pnw_mvp.sh --verbose 2>&1 | tee deploy_log.txt
 
       - name: 📜 Upload Deployment Logs (For Debugging)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Update to v4 for latest compatibility
         with:
           name: deploy_logs
           path: deploy_log.txt
