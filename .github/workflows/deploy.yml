@@ -68,19 +68,19 @@ jobs:
           echo "🔥 Deploying Contracts in Optimized Order..."
 
           CONTRACTS=(
-            "src/credits"
-            "src/employer_agreement"
-            "src/process_tax_compliance"
-            "src/weekly_payroll_pool"
-            "src/subdao_reserve"
-            "src/oversightdao_reserve"
-            "src/pncw_payroll"
-            "src/pniw_payroll"
+            "src/credits/main.leo"
+            "src/employer_agreement/main.leo"
+            "src/process_tax_compliance/main.leo"
+            "src/weekly_payroll_pool/main.leo"
+            "src/subdao_reserve/main.leo"
+            "src/oversightdao_reserve/main.leo"
+            "src/pncw_payroll/main.leo"
+            "src/pniw_payroll/main.leo"
           )
 
           for contract in "${CONTRACTS[@]}"; do
               echo "🚀 Deploying: $contract"
-              if ! leo deploy --network testnet --path $contract --private-key ${ALEO_PRIVATE_KEY}; then
+              if ! leo deploy --network testnet --path $(dirname "$contract") --private-key ${ALEO_PRIVATE_KEY}; then
                   echo "🚨 Deployment failed for $contract!"
                   exit 248
               fi
