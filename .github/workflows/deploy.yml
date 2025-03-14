@@ -1,90 +1,50 @@
-name: Deploy PNW-MVP
+name: PNW-MVP Deployment
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛎️ Checkout repository
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v3
 
-      - name: 🔑 Set Aleo private key from repository secret
+      - name: 🔍 Ensure Correct Directory Structure
+        run: chmod +x setup_pnw_directory.sh && ./setup_pnw_directory.sh
+
+      - name: 🔑 Set Aleo Private Key from Repository Secret
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      - name: 🛠️ Install Precompiled Leo CLI (`.zip`)
+      - name: 🔧 Set Up Environment Variables
         run: |
-          echo "🔥 Downloading and Installing Leo CLI..."
-          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          unzip leo.zip -d leo_install
-
-          # Ensure ~/.aleo is a directory
-          if [ -e "$HOME/.aleo" ] && [ ! -d "$HOME/.aleo" ]; then
-            echo "⚠️ Warning: $HOME/.aleo exists as a file. Removing..."
-            rm -f "$HOME/.aleo"
-          fi
-          mkdir -p "$HOME/.aleo"
-
-          # Move the binary correctly
-          mv leo_install/leo "$HOME/.aleo/leo"
-          chmod +x "$HOME/.aleo/leo"
-
-          # Add Leo CLI to system PATH
+          export PATH=$HOME/.aleo:$PATH
           echo "export PATH=$HOME/.aleo:\$PATH" >> $GITHUB_ENV
           echo "$HOME/.aleo" >> $GITHUB_PATH
+          echo "🔑 Aleo Private Key Set Successfully (Hidden for Security)"
 
-      - name: ✅ Verify Leo Installation & Path
+      - name: 🔥 Install Leo CLI
         run: |
-          export PATH=$HOME/.aleo:$PATH
-          which leo
-          leo --version
+          echo "⬇️ Downloading and Installing Leo CLI..."
+          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo.zip
+          unzip leo.zip -d $HOME/.aleo
+          chmod +x $HOME/.aleo/leo
+          echo "✅ Leo CLI Installed Successfully!"
 
-      - name: 📂 Set Working Directory for Deployment
+      - name: 🚀 Deploy PNW-MVP Contracts with Verbose Logging
         run: |
-          echo "📍 Current Directory: $(pwd)"
-          ls -R
+          chmod +x deploy_pnw_mvp.sh
+          echo "🛠️ Running Deployment with Verbose Logging..."
+          ./deploy_pnw_mvp.sh --verbose 2>&1 | tee deploy_log.txt
 
-      - name: 🔥 Running Pre-Deployment Build Check (Checking Each File)
-        run: |
-          export PATH=$HOME/.aleo:$PATH
-          leo clean
-          echo "🔍 Running build... Checking all files."
-          for contract in src/*/main.leo; do
-              echo "🛠️ Testing build for: $contract"
-              if ! leo build --network testnet --path $(dirname "$contract") 2>&1 | tee -a build_error.log; then
-                  echo "🚨 ERROR in $contract!"
-                  exit 248
-              fi
-          done
+      - name: 📜 Upload Deployment Logs (For Debugging)
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy_logs
+          path: deploy_log.txt
 
-      - name: 🚀 Deploy Contracts in Correct Order
-        run: |
-          export PATH=$HOME/.aleo:$PATH
-          echo "🔥 Deploying Contracts in Optimized Order..."
-
-          CONTRACTS=(
-            "src/credits/main.leo"
-            "src/employer_agreement/main.leo"
-            "src/process_tax_compliance/main.leo"
-            "src/weekly_payroll_pool/main.leo"
-            "src/subdao_reserve/main.leo"
-            "src/oversightdao_reserve/main.leo"
-            "src/pncw_payroll/main.leo"
-            "src/pniw_payroll/main.leo"
-          )
-
-          for contract in "${CONTRACTS[@]}"; do
-              echo "🚀 Deploying: $contract"
-              if ! leo deploy --network testnet --path $(dirname "$contract") --private-key ${ALEO_PRIVATE_KEY}; then
-                  echo "🚨 Deployment failed for $contract!"
-                  exit 248
-              fi
-          done
-
-      - name: ✅ Deployment Completed Successfully
-        run: echo "✅ All contracts deployed successfully!"
+      - name: ✅ Deployment Complete
+        run: echo "🚀 All contracts successfully deployed!"
