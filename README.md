@@ -16,28 +16,6 @@ This document serves as both a technical integration plan and a deployment guide
 
 ---
 
-📂 Project Structure
-
-Each contract is modular and self-contained, ensuring flexibility and clear dependency management. Every contract exists within its own directory, containing a main.leo file for logic and a leo.toml for package management.
-
-pnw_mvp/
-├── src/
-│   ├── credits/
-│   ├── employer_agreement/
-│   ├── process_tax_compliance/
-│   ├── weekly_payroll_pool/
-│   ├── subdao_reserve/
-│   ├── oversightdao_reserve/
-│   ├── pncw_payroll/
-│   ├── pniw_payroll/
-├── deploy_pnw_mvp.sh
-├── deploy.yml
-├── program.json
-├── README.md
-
-
----
-
 🔄 Contract Dependencies & Functionality
 
 Credits Contract
