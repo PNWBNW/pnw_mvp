@@ -26,13 +26,12 @@ jobs:
           echo "$HOME/.aleo" >> $GITHUB_PATH
           echo "🔑 Aleo Private Key Set Successfully (Hidden for Security)"
 
-      - name: 🔥 Install Leo CLI (Correct Binary Format)
+      - - name: 🔥 Install Leo CLI (Fix Exec Format Error)
         run: |
           echo "⬇️ Downloading and Installing Leo CLI..."
-          curl -L -o leo.tar.gz https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.tar.gz
-          tar -xzf leo.tar.gz
-          chmod +x leo
-          mv leo $HOME/.aleo/leo
+          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
+          unzip leo.zip -d leo_install
+          mv leo_install/leo $HOME/.aleo/
           chmod +x $HOME/.aleo/leo
           echo "✅ Leo CLI Installed Successfully!"
 
