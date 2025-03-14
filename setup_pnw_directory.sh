@@ -1,34 +1,22 @@
 #!/bin/bash
 
-echo "🔍 Checking and Configuring PNW-MVP Directory..."
+echo "🔧 Setting up PNW-MVP Directory Structure..."
 
-# Define the correct root directory
-PNW_DIR="$HOME/pnw_mvp/Directory"
-
-# Ensure PNW-MVP Directory exists
-if [ -e "$PNW_DIR" ] && [ ! -d "$PNW_DIR" ]; then
-    echo "⚠️ Warning: $PNW_DIR exists as a file. Removing..."
-    rm -f "$PNW_DIR"
+# Step 1: Check for and Rename Incorrect `Directory` File
+if [ -f "pnw_mvp/Directory" ]; then
+    echo "⚠️ Warning: 'Directory' exists as a file. Renaming it to prevent conflicts..."
+    mv pnw_mvp/Directory pnw_mvp/Directory.bak
 fi
 
-# Create PNW-MVP Directory if it doesn't exist
-mkdir -p "$PNW_DIR"
+# Step 2: Ensure Correct Directory Structure
+if [ ! -d "pnw_mvp/directory" ]; then
+    echo "📁 Creating 'pnw_mvp/directory/'..."
+    mkdir -p pnw_mvp/directory
+fi
 
-# Ensure subdirectories exist for contract deployments and logs
-mkdir -p "$PNW_DIR/contracts"
-mkdir -p "$PNW_DIR/logs"
+if [ ! -d "pnw_mvp/directory/.aleo" ]; then
+    echo "📁 Creating 'pnw_mvp/directory/.aleo/'..."
+    mkdir -p pnw_mvp/directory/.aleo
+fi
 
-# Verify directory structure
-echo "✅ PNW-MVP directory is properly set up at: $PNW_DIR"
-ls -la "$PNW_DIR"
-
-echo "✅ Contracts directory: $PNW_DIR/contracts"
-ls -la "$PNW_DIR/contracts"
-
-echo "✅ Logs directory: $PNW_DIR/logs"
-ls -la "$PNW_DIR/logs"
-
-# Ensure correct permissions
-chmod 700 "$PNW_DIR"
-
-echo "🚀 PNW-MVP directory setup complete!"
+echo "✅ PNW-MVP Directory Setup Complete!"
