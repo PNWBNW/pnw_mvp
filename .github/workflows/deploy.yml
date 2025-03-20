@@ -1,74 +1,40 @@
-name: 🚀 PNW-MVP Deployment
+name: 🚀 Deploy PNW-MVP to Testnet
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v3
 
-      - name: 🔍 Ensure Correct Directory Structure
-        run: chmod +x setup_pnw_directory.sh && ./setup_pnw_directory.sh
-
       - name: 🔑 Set Aleo Private Key from Repository Secret
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      - name: 🌍 Create `.env` File for Network Configuration
-        run: echo "NETWORK=testnet" > pnw_mvp/.env
-
-      - name: 🔧 Set Up Environment Variables
+      - name: 🌍 Set Network from .env
         run: |
-          export PATH=pnw_mvp/directory/.aleo:$PATH
-          echo "export PATH=pnw_mvp/directory/.aleo:\$PATH" >> $GITHUB_ENV
-          echo "🔑 Aleo Private Key Set Successfully (Hidden for Security)"
+          if [ -f "$GITHUB_WORKSPACE/.env" ]; then
+            export $(grep -v '^#' "$GITHUB_WORKSPACE/.env" | xargs)
+            echo "NETWORK=$NETWORK" >> $GITHUB_ENV
+          else
+            echo "❌ .env file not found!"
+            exit 1
+          fi
 
-      - name: 🔥 Install Leo CLI
+      - name: 🔽 Download and Install Leo CLI
         run: |
-          echo "⬇️ Downloading and Installing Leo CLI..."
           curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          unzip leo.zip -d pnw_mvp/directory/leo_install
-          mkdir -p pnw_mvp/directory/.aleo
-          mv pnw_mvp/directory/leo_install/leo pnw_mvp/directory/.aleo/
-          chmod +x pnw_mvp/directory/.aleo/leo
+          unzip leo.zip -d leo_install
+          mv leo_install/leo $GITHUB_WORKSPACE/directory/.aleo/
+          chmod +x $GITHUB_WORKSPACE/directory/.aleo/leo
           echo "✅ Leo CLI Installed Successfully!"
 
-      - name: 📂 Debug Directory Structure Before Deployment
+      - name: 🛠 Run Deployment Script
         run: |
-          echo "📂 Listing All Files (Including Hidden)..."
-          ls -la pnw_mvp/ > directory_structure.log
-          cat directory_structure.log
-
-      - name: 🚀 Deploy PNW-MVP Contracts
-        run: |
-          chmod +x deploy_pnw_mvp.sh
-          echo "🛠️ Running Deployment with Logging..."
-          ./deploy_pnw_mvp.sh 2>&1 | tee deploy_log.txt
-
-      - name: 📜 Upload Deployment Logs (Including Hidden Files)
-        uses: actions/upload-artifact@v4
-        with:
-          name: deploy_logs
-          path: deploy_log.txt
-          if-no-files-found: warn
-          compression-level: 6
-          overwrite: false
-          include-hidden-files: true
-
-      - name: 📂 Upload Directory Structure Log (For Debugging)
-        uses: actions/upload-artifact@v4
-        with:
-          name: directory_structure
-          path: directory_structure.log
-          if-no-files-found: warn
-          compression-level: 6
-          overwrite: false
-          include-hidden-files: true
-
-      - name: ✅ Deployment Complete
-        run: echo "🚀 All contracts successfully deployed!"
+          chmod +x $GITHUB_WORKSPACE/deploy_pnw_mvp.sh
+          $GITHUB_WORKSPACE/deploy_pnw_mvp.sh
