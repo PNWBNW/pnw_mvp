@@ -5,7 +5,7 @@ echo "🔥 Starting PNW-MVP Deployment Process..."
 # Load environment variables
 if [ -f "$GITHUB_WORKSPACE/.env" ]; then
     export $(grep -v '^#' "$GITHUB_WORKSPACE/.env" | xargs)
-    echo "🌍 Using network: $NETWORK"
+    echo "🌍 Using network: ${NETWORK:-testnet}"  # Defaults to testnet if NETWORK is unset
 else
     echo "❌ Error: .env file not found!"
     exit 1
@@ -47,8 +47,8 @@ for contract_dir in "${CONTRACTS[@]}"; do
         exit 248
     fi
 
-    # Execute Deployment from Correct Path
-    if ! "$GITHUB_WORKSPACE/directory/.aleo/leo" deploy --network $NETWORK --path "$contract_dir" --private-key ${ALEO_PRIVATE_KEY} 2>&1 | tee -a deploy_log.txt; then
+    # Execute Deployment with Explicit Testnet Usage
+    if ! "$GITHUB_WORKSPACE/directory/.aleo/leo" deploy --network testnet --path "$contract_dir" --private-key ${ALEO_PRIVATE_KEY} 2>&1 | tee -a deploy_log.txt; then
         echo "🚨 Deployment failed for $contract_dir!"
         exit 248
     fi
