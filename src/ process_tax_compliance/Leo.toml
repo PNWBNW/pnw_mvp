@@ -2,6 +2,7 @@
 name = "process_tax_compliance"
 version = "25.03.13"
 edition = "2025.3"
+main = "src/process_tax_compliance/main.leo"   # Explicitly set the main entry file
 
 [dependencies]
 credits = { path = "../credits" }
