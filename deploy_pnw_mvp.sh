@@ -14,16 +14,19 @@ fi
 # Ensure Leo CLI is Executable
 chmod +x "$GITHUB_WORKSPACE/directory/.aleo/leo"
 
+# Change Directory to the Repository Root
+cd "$GITHUB_WORKSPACE" || { echo "❌ Error: Could not enter repository root!"; exit 1; }
+
 # Define Deployment Contracts with Correct Paths
 CONTRACTS=(
-    "$GITHUB_WORKSPACE/src/credits"
-    "$GITHUB_WORKSPACE/src/employer_agreement"
-    "$GITHUB_WORKSPACE/src/process_tax_compliance"
-    "$GITHUB_WORKSPACE/src/weekly_payroll_pool"
-    "$GITHUB_WORKSPACE/src/subdao_reserve"
-    "$GITHUB_WORKSPACE/src/oversightdao_reserve"
-    "$GITHUB_WORKSPACE/src/pncw_payroll"
-    "$GITHUB_WORKSPACE/src/pniw_payroll"
+    "src/credits"
+    "src/employer_agreement"
+    "src/process_tax_compliance"
+    "src/weekly_payroll_pool"
+    "src/subdao_reserve"
+    "src/oversightdao_reserve"
+    "src/pncw_payroll"
+    "src/pniw_payroll"
 )
 
 echo "🚀 Deploying Contracts in Optimized Order..."
@@ -44,7 +47,7 @@ for contract_dir in "${CONTRACTS[@]}"; do
         exit 248
     fi
 
-    # Execute Deployment
+    # Execute Deployment from Correct Path
     if ! "$GITHUB_WORKSPACE/directory/.aleo/leo" deploy --network $NETWORK --path "$contract_dir" --private-key ${ALEO_PRIVATE_KEY} 2>&1 | tee -a deploy_log.txt; then
         echo "🚨 Deployment failed for $contract_dir!"
         exit 248
