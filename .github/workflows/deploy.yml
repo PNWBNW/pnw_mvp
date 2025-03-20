@@ -16,18 +16,32 @@ jobs:
       - name: 🔑 Set Aleo Private Key from Repository Secret
         run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-      - name: 🌍 Set Network from .env
+      - name: 🌍 Load Environment Variables from .env
         run: |
           if [ -f "$GITHUB_WORKSPACE/.env" ]; then
             export $(grep -v '^#' "$GITHUB_WORKSPACE/.env" | xargs)
             echo "NETWORK=$NETWORK" >> $GITHUB_ENV
+            echo "ALEO_CLI_PATH=$GITHUB_WORKSPACE/directory/.aleo/leo" >> $GITHUB_ENV
+            echo "DEPLOYMENT_ROOT=$GITHUB_WORKSPACE/src" >> $GITHUB_ENV
+            echo "DEPLOYMENT_LOGS=$GITHUB_WORKSPACE/deploy_logs" >> $GITHUB_ENV
+            echo "✅ .env file loaded successfully."
           else
-            echo "❌ .env file not found!"
+            echo "❌ .env file not found! Deployment aborted."
             exit 1
+          fi
+
+      - name: 🔎 Validate .env Testnet Configuration
+        run: |
+          if [ "$NETWORK" != "testnet" ]; then
+            echo "❌ NETWORK is not set to 'testnet'. Deployment aborted!"
+            exit 1
+          else
+            echo "✅ NETWORK is correctly set to 'testnet'."
           fi
 
       - name: 🔽 Download and Install Leo CLI
         run: |
+          echo "⬇️ Downloading and Installing Leo CLI..."
           curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
           unzip leo.zip -d leo_install
           mv leo_install/leo $GITHUB_WORKSPACE/directory/.aleo/
