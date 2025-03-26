@@ -1,12 +1,11 @@
-
 [package]
 name = "employer_agreement"
-version = "25.03.20"
+version = "25.03.25"
 edition = "2025.3"
-main = "src/employer_agreement/main.leo"   # Explicitly set the main entry file
+main = "main.leo"  # Relative path, not absolute
 
 [dependencies]
-subdao_reserve = { path = "../subdao_reserve" }  # Links employer agreements to subDAO reserves
-weekly_payroll_pool = { path = "../weekly_payroll_pool" }  # Handles payroll disbursements
-oversightdao_reserve = { path = "../oversightdao_reserve" }  # Ensures compliance oversight
-process_tax_compliance = { path = "../process_tax_compliance" }  # Verifies tax compliance
+subdao_reserve = { path = "../subdao_reserve" }
+weekly_payroll_pool = { path = "../weekly_payroll_pool" }
+oversightdao_reserve = { path = "../oversightdao_reserve" }
+process_tax_compliance = { path = "../process_tax_compliance" }
