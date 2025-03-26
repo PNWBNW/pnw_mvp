@@ -2,5 +2,6 @@
 name = "credits"
 version = "25.03.25"
 edition = "2025.3"
+main = "main.leo"
 
 [dependencies]
