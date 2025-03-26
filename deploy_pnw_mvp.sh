@@ -1,39 +1,23 @@
 #!/bin/bash
-set -euo pipefail
 
-# Colors for clarity in output
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-echo -e "${GREEN}🔥 Starting PNW-MVP Deployment Process...${NC}"
+echo "🔥 Starting PNW-MVP Deployment Process..."
 
 # Load environment variables from .env
 if [ -f "$GITHUB_WORKSPACE/.env" ]; then
-    set -a
-    source "$GITHUB_WORKSPACE/.env"
-    set +a
-    echo -e "${YELLOW}🌍 Using network: ${NETWORK:-testnet}${NC}"  # Fallback to testnet if unset
+    export $(grep -v '^#' "$GITHUB_WORKSPACE/.env" | xargs)
+    echo "🌍 Using network: ${NETWORK:-testnet}"
 else
-    echo -e "${RED}❌ Error: .env file not found!${NC}"
+    echo "❌ Error: .env file not found!"
     exit 1
 fi
 
-# Validate Leo CLI
-LEO_CLI="$GITHUB_WORKSPACE/directory/.aleo/leo"
-if [ ! -x "$LEO_CLI" ]; then
-    echo -e "${RED}❌ Error: Leo CLI not found or not executable at $LEO_CLI!${NC}"
-    exit 1
-fi
+# Ensure Leo CLI is executable
+chmod +x "$GITHUB_WORKSPACE/directory/.aleo/leo"
 
-# Ensure we're in the repository root
-cd "$GITHUB_WORKSPACE" || {
-    echo -e "${RED}❌ Error: Could not enter repository root!${NC}"
-    exit 1
-}
+# Change to the workspace root
+cd "$GITHUB_WORKSPACE" || { echo "❌ Could not enter repository root."; exit 1; }
 
-# Define contract deployment order
+# Define contract paths relative to workspace root
 CONTRACTS=(
     "src/credits"
     "src/employer_agreement"
@@ -45,32 +29,37 @@ CONTRACTS=(
     "src/pniw_payroll"
 )
 
-echo -e "${GREEN}🚀 Deploying Contracts in Optimized Order...${NC}"
+echo "🚀 Deploying Contracts in Optimized Order..."
 for contract_dir in "${CONTRACTS[@]}"; do
-    echo -e "${YELLOW}🚀 Deploying: $contract_dir${NC}"
+    echo "🚀 Deploying: $contract_dir"
 
-    # Show files in folder
-    echo -e "${YELLOW}🔍 Listing files in $contract_dir:${NC}"
-    ls -la "$contract_dir" || {
-        echo -e "${RED}⚠️ Warning: $contract_dir does not exist!${NC}"
-        continue
-    }
+    # List contents for debugging
+    echo "🔍 Listing files in $contract_dir:"
+    ls -la "$contract_dir"
 
-    # Validate files
+    echo "📄 Content of $contract_dir/leo.toml:"
+    cat "$contract_dir/leo.toml"
+
+    # Check required files
     if [ ! -f "$contract_dir/leo.toml" ]; then
-        echo -e "${RED}❌ Error: Missing leo.toml in $contract_dir!${NC}"
-        exit 248
-    fi
-    if [ ! -f "$contract_dir/main.leo" ]; then
-        echo -e "${RED}❌ Error: Missing main.leo in $contract_dir!${NC}"
+        echo "❌ Error: Missing leo.toml in $contract_dir!"
         exit 248
     fi
 
-    # Deploy the contract
-    if ! "$LEO_CLI" deploy --network "${NETWORK:-testnet}" --path "$contract_dir" --private-key "${ALEO_PRIVATE_KEY}" 2>&1 | tee -a deploy_log.txt; then
-        echo -e "${RED}🚨 Deployment failed for $contract_dir!${NC}"
+    if [ ! -f "$contract_dir/main.leo" ]; then
+        echo "❌ Error: Missing main.leo in $contract_dir!"
+        exit 248
+    fi
+
+    # Run deployment
+    if ! "$GITHUB_WORKSPACE/directory/.aleo/leo" deploy \
+        --network testnet \
+        --path "$contract_dir" \
+        --private-key "$ALEO_PRIVATE_KEY" \
+        2>&1 | tee -a deploy_log.txt; then
+        echo "🚨 Deployment failed for $contract_dir!"
         exit 248
     fi
 done
 
-echo -e "${GREEN}✅ PNW-MVP Deployment Complete!${NC}"
+echo "✅ PNW-MVP Deployment Complete!"
