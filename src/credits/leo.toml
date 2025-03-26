@@ -2,11 +2,5 @@
 name = "credits"
 version = "25.03.25"
 edition = "2025.3"
-description = "Aleo base token contract for managing balances"
-license = "Proprietary"
-readme = "../../README.md"
-
-# Main entry point must be relative to THIS directory
-main = "main.leo"
 
 [dependencies]
