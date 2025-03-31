@@ -46,9 +46,14 @@ pnw_mvp/
 │   ├── subdao_reserve_test.leo
 │   ├── weekly_payroll_pool_test.leo
 ├── deploy_pnw_mvp.sh
+├── .gitignore
+├── .env
 ├── .github
-│   ├── workflow/
+│   ├── workflows/
 │   │   ├── deploy.yml
 ├── integration_plan.md
 ├── program.json
 ├── README.md
+├── Directory/
+│   ├── .aleo/
+├── LICENSE_PNW_MVP.txt
