@@ -46,7 +46,9 @@ pnw_mvp/
 │   ├── subdao_reserve_test.leo
 │   ├── weekly_payroll_pool_test.leo
 ├── deploy_pnw_mvp.sh
-├── deploy.yml
+├── .github
+│   ├── workflow/
+│   │   ├── deploy.yml
 ├── integration_plan.md
 ├── program.json
 ├── README.md
