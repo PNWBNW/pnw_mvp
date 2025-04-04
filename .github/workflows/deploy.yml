@@ -14,7 +14,7 @@ jobs:
         run: |
           curl -L https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip -o leo.zip
           unzip leo.zip -d /tmp
-          sudo mv /tmp/leo-mainnet-x86_64-unknown-linux-gnu /usr/local/bin/leo
+          sudo mv /tmp/leo /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
       - name: Verify Leo Installation
         run: leo --version || echo "Leo installation failed"
