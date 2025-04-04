@@ -20,6 +20,17 @@ jobs:
         run: leo --version || echo "Leo installation failed"
       - name: Debug Directory Structure
         run: ls -R src/
+      - name: Normalize leo.toml File Names
+        run: |
+          for dir in src/*/Leo.toml; do
+            if [ -f "$dir" ]; then
+              mv "$dir" "${dir%Leo.toml}leo.toml"
+              echo "Renamed $dir to ${dir%Leo.toml}leo.toml"
+            fi
+          done
+      - name: Debug leo.toml for credits
+        working-directory: ./src/credits
+        run: cat leo.toml || echo "leo.toml not found"
       - name: Build credits
         working-directory: ./src/credits
         run: leo build --network testnet
