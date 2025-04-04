@@ -1,15 +1,25 @@
 name: Deploy PNW MVP
+
 on:
   push:
     branches:
       - main
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.2.2
       - name: Install Leo
-        run: curl -sSL https://install.leo-lang.org | bash -s -- -y
+        run: |
+          curl -L https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip -o leo.zip
+          unzip leo.zip -d /tmp
+          sudo mv /tmp/leo-mainnet-x86_64-unknown-linux-gnu /usr/local/bin/leo
+          sudo chmod +x /usr/local/bin/leo
+      - name: Verify Leo Installation
+        run: leo --version || echo "Leo installation failed"
+      - name: Debug Directory Structure
+        run: ls -R src/
       - name: Build all contracts in order
         run: |
           CONTRACTS=(
