@@ -1,7 +1,11 @@
 [package]
 name = "credits"
-version = "25.03.25"
-edition = "2025.3"
+version = "25.04.04"
+edition = "2025.4"
+authors = ["PNWBNW"]
+description = "Core token management and balance handling for PNW-MVP, including token transfers and balance initialization."
 main = "main.leo"
+license = "MIT"
 
 [dependencies]
+aleo_std = { git = "https://github.com/ProvableHQ/aleo-std", tag = "v0.1.16" }
