@@ -20,23 +20,27 @@ jobs:
         run: leo --version || echo "Leo installation failed"
       - name: Debug Directory Structure
         run: ls -R src/
-      - name: Build all contracts in order
-        run: |
-          CONTRACTS=(
-            "credits"
-            "employer_agreement"
-            "oversightdao_reserve"
-            "process_tax_compliance"
-            "subdao_reserve"
-            "weekly_payroll_pool"
-            "pncw_payroll"
-            "pniw_payroll"
-          )
-          for dir in "${CONTRACTS[@]}"; do
-            if [ -f "src/$dir/leo.toml" ]; then
-              echo "Building src/$dir"
-              cd "src/$dir" && leo build && cd ../..
-            else
-              echo "Warning: src/$dir/leo.toml not found, skipping"
-            fi
-          done
+      - name: Build credits
+        working-directory: ./src/credits
+        run: leo build --network testnet
+      - name: Build employer_agreement
+        working-directory: ./src/employer_agreement
+        run: leo build --network testnet
+      - name: Build oversightdao_reserve
+        working-directory: ./src/oversightdao_reserve
+        run: leo build --network testnet
+      - name: Build process_tax_compliance
+        working-directory: ./src/process_tax_compliance
+        run: leo build --network testnet
+      - name: Build subdao_reserve
+        working-directory: ./src/subdao_reserve
+        run: leo build --network testnet
+      - name: Build weekly_payroll_pool
+        working-directory: ./src/weekly_payroll_pool
+        run: leo build --network testnet
+      - name: Build pncw_payroll
+        working-directory: ./src/pncw_payroll
+        run: leo build --network testnet
+      - name: Build pniw_payroll
+        working-directory: ./src/pniw_payroll
+        run: leo build --network testnet
