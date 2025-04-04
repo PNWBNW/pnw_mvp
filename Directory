@@ -54,6 +54,7 @@ pnw_mvp/
 ├── integration_plan.md
 ├── program.json
 ├── README.md
-├── Directory/
+├── Directory
+├── directory/
 │   ├── .aleo/
 ├── LICENSE_PNW_MVP.txt
