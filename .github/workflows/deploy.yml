@@ -1,54 +1,32 @@
-name: 🚀 Deploy PNW-MVP to Testnet
-
+name: Deploy PNW MVP
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
-
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: 🔑 Set Aleo Private Key from Repository Secret
-        run: echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
-
-      - name: 🌍 Load Environment Variables from .env
+      - uses: actions/checkout@v4.2.2
+      - name: Install Leo
+        run: curl -sSL https://install.leo-lang.org | bash -s -- -y
+      - name: Build all contracts in order
         run: |
-          if [ -f "$GITHUB_WORKSPACE/.env" ]; then
-            export $(grep -v '^#' "$GITHUB_WORKSPACE/.env" | xargs)
-            echo "NETWORK=$NETWORK" >> $GITHUB_ENV
-            echo "ALEO_CLI_PATH=$GITHUB_WORKSPACE/directory/.aleo/leo" >> $GITHUB_ENV
-            echo "DEPLOYMENT_ROOT=$GITHUB_WORKSPACE/src" >> $GITHUB_ENV
-            echo "DEPLOYMENT_LOGS=$GITHUB_WORKSPACE/deploy_logs" >> $GITHUB_ENV
-            echo "✅ .env file loaded successfully."
-          else
-            echo "❌ .env file not found! Deployment aborted."
-            exit 1
-          fi
-
-      - name: 🔎 Validate .env Testnet Configuration
-        run: |
-          if [ "$NETWORK" != "testnet" ]; then
-            echo "❌ NETWORK is not set to 'testnet'. Deployment aborted!"
-            exit 1
-          else
-            echo "✅ NETWORK is correctly set to 'testnet'."
-          fi
-
-      - name: 🔽 Download and Install Leo CLI
-        run: |
-          echo "⬇️ Downloading and Installing Leo CLI..."
-          curl -L -o leo.zip https://github.com/ProvableHQ/leo/releases/download/v2.4.1/leo-mainnet-x86_64-unknown-linux-gnu.zip
-          unzip leo.zip -d leo_install
-          mv leo_install/leo $GITHUB_WORKSPACE/directory/.aleo/
-          chmod +x $GITHUB_WORKSPACE/directory/.aleo/leo
-          echo "✅ Leo CLI Installed Successfully!"
-
-      - name: 🛠 Run Deployment Script
-        run: |
-          chmod +x $GITHUB_WORKSPACE/deploy_pnw_mvp.sh
-          $GITHUB_WORKSPACE/deploy_pnw_mvp.sh
+          CONTRACTS=(
+            "credits"
+            "employer_agreement"
+            "oversightdao_reserve"
+            "process_tax_compliance"
+            "subdao_reserve"
+            "weekly_payroll_pool"
+            "pncw_payroll"
+            "pniw_payroll"
+          )
+          for dir in "${CONTRACTS[@]}"; do
+            if [ -f "src/$dir/leo.toml" ]; then
+              echo "Building src/$dir"
+              cd "src/$dir" && leo build && cd ../..
+            else
+              echo "Warning: src/$dir/leo.toml not found, skipping"
+            fi
+          done
