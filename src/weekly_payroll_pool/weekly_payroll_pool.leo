@@ -1,3 +1,17 @@
+import aleo_std::context::*;        // For caller, block height, transaction context
+import aleo_std::mapping::*;        // For dynamic mappings and set/get logic
+import aleo_std::assert::*;         // For assert(...) checks
+import aleo_std::crypto::*;         // For hash_poseidon, hash_blake3, etc.
+import aleo_std::bytes::*;          // For byte conversions: to_bytes, from_bytes
+import aleo_std::field::*;          // Field-level math: pow, invert, modular ops
+import aleo_std::math::*;           // Min, max, abs, rounding functions
+import aleo_std::option::*;         // For handling Option<T> (e.g., Some/None logic)
+import aleo_std::result::*;         // For Result<T, E> handling, unwrap, etc.
+import aleo_std::env::*;            // For reading environment variables in context
+import aleo_std::string::*;         // If you're using string helpers (rare until strings are native)
+import aleo_std::record::*;         // If you're using custom record types or need field flattening
+
+
 async transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
 
