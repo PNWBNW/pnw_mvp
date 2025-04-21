@@ -8,7 +8,6 @@ license = "PNW-MVP Proprietary License"
 main = "main.leo"
 
 [dependencies]
-credits = { path = "../credits" }
 subdao_reserve = { path = "../subdao_reserve" }
 pncw_payroll = { path = "../pncw_payroll" }
 pniw_payroll = { path = "../pniw_payroll" }
