@@ -1,10 +1,15 @@
 [package]
 name = "pniw_payroll"
-version = "25.3.14"
+version = "25.03.25"
 edition = "2025.3"
+authors = "PNW dev team"
+description = "Handles payroll execution for independent (PNiW) workers with subDAO funding integration"
+license = "Proprietary"
+main = "main.leo"
 
 [dependencies]
-credits = { path = "../credits" }
 employer_agreement = { path = "../employer_agreement" }
-process_tax_compliance = { path = "../process_tax_compliance" }
-weekly_payroll_pool = { path = "../weekly_payroll_pool" }
+subdao_reserve = { path = "../subdao_reserve" }
+
+[leo]
+network = "testnet"
