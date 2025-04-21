@@ -2,63 +2,52 @@
 
 echo "🔥 Starting PNW-MVP Deployment Process..."
 
-# Load environment variables from .env
-if [ -f "$GITHUB_WORKSPACE/.env" ]; then
-    export $(grep -v '^#' "$GITHUB_WORKSPACE/.env" | xargs)
-    echo "🌍 Using network: ${NETWORK:-testnet}"
-else
-    echo "❌ Error: .env file not found!"
-    exit 1
+# Validate environment
+if [ -z "$DEPLOYMENT_ROOT" ] || [ -z "$DEPLOYMENT_LOGS" ]; then
+  echo "❌ Environment variables DEPLOYMENT_ROOT or DEPLOYMENT_LOGS not set!"
+  exit 1
 fi
 
-# Ensure Leo CLI is executable
-chmod +x "$GITHUB_WORKSPACE/directory/.aleo/leo"
+echo "🌍 Using network: ${NETWORK:-testnet}"
+mkdir -p "$DEPLOYMENT_LOGS"
 
-# Change to the workspace root
-cd "$GITHUB_WORKSPACE" || { echo "❌ Could not enter repository root."; exit 1; }
-
-# Define contract paths relative to workspace root (credits removed)
+# List of contract directories (in optimized order)
 CONTRACTS=(
-    "src/employer_agreement"
-    "src/process_tax_compliance"
-    "src/weekly_payroll_pool"
-    "src/subdao_reserve"
-    "src/oversightdao_reserve"
-    "src/pncw_payroll"
-    "src/pniw_payroll"
+  "employer_agreement"
+  "process_tax_compliance"
+  "weekly_payroll_pool"
+  "subdao_reserve"
+  "oversightdao_reserve"
+  "pncw_payroll"
+  "pniw_payroll"
 )
 
 echo "🚀 Deploying Contracts in Optimized Order..."
-for contract_dir in "${CONTRACTS[@]}"; do
-    echo "🚀 Deploying: $contract_dir"
 
-    # List contents for debugging
-    echo "🔍 Listing files in $contract_dir:"
-    ls -la "$contract_dir"
+for CONTRACT in "${CONTRACTS[@]}"; do
+  CONTRACT_PATH="$DEPLOYMENT_ROOT/$CONTRACT"
+  LOG_PATH="$DEPLOYMENT_LOGS/${CONTRACT}_deploy.log"
 
-    echo "📄 Content of $contract_dir/leo.toml:"
-    cat "$contract_dir/leo.toml"
+  echo "🚀 Deploying: $CONTRACT"
+  echo "🔍 Listing files in $CONTRACT_PATH:"
+  ls -la "$CONTRACT_PATH"
 
-    # Check required files
-    if [ ! -f "$contract_dir/leo.toml" ]; then
-        echo "❌ Error: Missing leo.toml in $contract_dir!"
-        exit 248
-    fi
+  if [ ! -f "$CONTRACT_PATH/leo.toml" ]; then
+    echo "❌ Error: Missing leo.toml in $CONTRACT_PATH!" | tee -a "$LOG_PATH"
+    continue
+  fi
 
-    if [ ! -f "$contract_dir/main.leo" ]; then
-        echo "❌ Error: Missing main.leo in $contract_dir!"
-        exit 248
-    fi
+  if [ ! -f "$CONTRACT_PATH/main.leo" ]; then
+    echo "❌ Error: Missing main.leo in $CONTRACT_PATH!" | tee -a "$LOG_PATH"
+    continue
+  fi
 
-    # Run deployment
-    if ! "$GITHUB_WORKSPACE/directory/.aleo/leo" deploy \
-        --network testnet \
-        --path "$contract_dir" \
-        --private-key "$ALEO_PRIVATE_KEY" \
-        2>&1 | tee -a deploy_log.txt; then
-        echo "🚨 Deployment failed for $contract_dir!"
-        exit 248
-    fi
+  # Deploy contract and log output
+  if ! leo deploy --path "$CONTRACT_PATH" --network "${NETWORK:-testnet}" --private-key "$ALEO_PRIVATE_KEY" 2>&1 | tee "$LOG_PATH"; then
+    echo "🚨 Deployment failed for $CONTRACT!"
+  else
+    echo "✅ Successfully deployed: $CONTRACT"
+  fi
 done
 
-echo "✅ PNW-MVP Deployment Complete!"
+echo "✅ All deployments completed."
