@@ -3,7 +3,7 @@ program employer_agreement.aleo {
     mapping employer_records: address => [u8; 64];
     mapping worker_profiles: address => [u8; 64];
 
-    import credits::*;
+    import credits.aleo;
     import worker_profiles::*;
     import subdao_reserve::*;
 
