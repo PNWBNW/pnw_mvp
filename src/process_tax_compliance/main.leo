@@ -10,8 +10,6 @@ import aleo_std::result::*;
 import aleo_std::env::*;           
 import aleo_std::string::*;        
 import aleo_std::record::*;
-
-import credits.aleo;
 import pncw_payroll::*;
 import pniw_payroll::*;
 import subdao_reserve::*;
