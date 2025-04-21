@@ -9,8 +9,6 @@ import aleo_std::option::*;
 import aleo_std::result::*;
 import aleo_std::env::*;
 import aleo_std::record::*;
-
-import credits.aleo;
 import worker_profiles::*;
 import subdao_reserve::*;
 
