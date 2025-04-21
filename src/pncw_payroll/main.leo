@@ -1,6 +1,5 @@
-import employer_agreement.aleo;
-import subdao_reserve.aleo;
-
+import employer_agreement.aleo::*;
+import subdao_reserve.aleo::*;
 import aleo_std::context::*;
 import aleo_std::mapping::*;
 import aleo_std::assert::*;
