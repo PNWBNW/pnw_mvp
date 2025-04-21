@@ -1,11 +1,16 @@
 [package]
 name = "employer_agreement"
-version = "25.03.25"
+version = "25.04.09"
 edition = "2025.3"
-main = "main.leo"  # Relative path, not absolute
+description = "Employer registration and worker identity mapping contract for the PNW-MVP system."
+authors = "PNW Engineering Team"
+license = "Proprietary"
+main = "main.leo"
 
 [dependencies]
+credits = { path = "../credits" }
+worker_profiles = { path = "../worker_profiles" }
 subdao_reserve = { path = "../subdao_reserve" }
-weekly_payroll_pool = { path = "../weekly_payroll_pool" }
-oversightdao_reserve = { path = "../oversightdao_reserve" }
-process_tax_compliance = { path = "../process_tax_compliance" }
+
+[leo]
+network = "testnet"
