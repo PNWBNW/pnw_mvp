@@ -11,25 +11,19 @@
   "faucet_url": "https://discord.com/invite/aleo",
   "contracts": [
     {
-      "name": "credits",
-      "path": "src/credits",
-      "dependencies": []
-    },
-    {
       "name": "employer_agreement",
       "path": "src/employer_agreement",
-      "dependencies": ["credits"]
+      "dependencies": []
     },
     {
       "name": "process_tax_compliance",
       "path": "src/process_tax_compliance",
-      "dependencies": ["credits", "employer_agreement"]
+      "dependencies": ["employer_agreement"]
     },
     {
       "name": "weekly_payroll_pool",
       "path": "src/weekly_payroll_pool",
       "dependencies": [
-        "credits",
         "employer_agreement",
         "process_tax_compliance",
         "subdao_reserve",
@@ -41,7 +35,6 @@
       "name": "subdao_reserve",
       "path": "src/subdao_reserve",
       "dependencies": [
-        "credits",
         "employer_agreement",
         "process_tax_compliance",
         "weekly_payroll_pool"
@@ -50,13 +43,12 @@
     {
       "name": "oversightdao_reserve",
       "path": "src/oversightdao_reserve",
-      "dependencies": ["credits"]
+      "dependencies": []
     },
     {
       "name": "pncw_payroll",
       "path": "src/pncw_payroll",
       "dependencies": [
-        "credits",
         "employer_agreement",
         "process_tax_compliance",
         "weekly_payroll_pool"
@@ -66,7 +58,6 @@
       "name": "pniw_payroll",
       "path": "src/pniw_payroll",
       "dependencies": [
-        "credits",
         "employer_agreement",
         "process_tax_compliance",
         "weekly_payroll_pool"
