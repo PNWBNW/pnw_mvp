@@ -9,11 +9,9 @@ import aleo_std::option::*;         // For handling Option<T>
 import aleo_std::result::*;         // For Result<T, E> handling
 import aleo_std::env::*;            // For environment variables
 import aleo_std::record::*;         // For record flattening
-
-import credits.aleo;
-import subdao_reserve.aleo;
-import pncw_payroll.aleo;
-import pniw_payroll.aleo;
+import subdao_reserve.aleo::*;
+import pncw_payroll.aleo::*;
+import pniw_payroll.aleo::*;
 
 program weekly_payroll_pool {
 
