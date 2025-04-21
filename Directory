@@ -1,36 +1,25 @@
 pnw_mvp/
 ├── src/
-│   ├── credits/
-│   │   ├── main.leo
-│   │   ├── credits.leo
-│   │   ├── leo.toml
 │   ├── employer_agreement/
 │   │   ├── main.leo
-│   │   ├── employer_agreement.leo
 │   │   ├── leo.toml
 │   ├── process_tax_compliance/
 │   │   ├── main.leo
-│   │   ├── process_tax_compliance.leo
 │   │   ├── leo.toml
 │   ├── weekly_payroll_pool/
 │   │   ├── main.leo
-│   │   ├── weekly_payroll_pool.leo
 │   │   ├── leo.toml
 │   ├── subdao_reserve/
 │   │   ├── main.leo
-│   │   ├── subdao_reserve.leo
 │   │   ├── leo.toml
 │   ├── oversightdao_reserve/
 │   │   ├── main.leo
-│   │   ├── oversightdao_reserve.leo
 │   │   ├── leo.toml
 │   ├── pncw_payroll/
 │   │   ├── main.leo
-│   │   ├── pncw_payroll.leo
 │   │   ├── leo.toml
 │   ├── pniw_payroll/
 │   │   ├── main.leo
-│   │   ├── pniw_payroll.leo
 │   │   ├── leo.toml
 ├── worker_profiles/
 │   ├── Readme.md
