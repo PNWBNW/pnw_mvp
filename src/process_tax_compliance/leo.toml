@@ -8,7 +8,6 @@ description = "Handles employer tax compliance logic for the PNW MVP"
 main = "main.leo"
 
 [dependencies]
-credits = { path = "../credits" }
 pncw_payroll = { path = "../pncw_payroll" }
 pniw_payroll = { path = "../pniw_payroll" }
 subdao_reserve = { path = "../subdao_reserve" }
