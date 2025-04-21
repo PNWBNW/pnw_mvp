@@ -1,40 +1,33 @@
 #!/bin/bash
+set -e
 
 echo "🔥 Starting PNW-MVP Deployment Process..."
 echo "🌍 Using network: $NETWORK"
 
-for CONTRACT_DIR in "$DEPLOYMENT_ROOT"/*/; do
-  CONTRACT_NAME=$(basename "$CONTRACT_DIR")
-  echo "🚀 Deploying: $CONTRACT_NAME"
-  echo "🔍 Listing files in $CONTRACT_DIR:"
-  ls -l "$CONTRACT_DIR"
+PROJECTS=(
+    "employer_agreement"
+    "process_tax_compliance"
+    "weekly_payroll_pool"
+    "subdao_reserve"
+    "oversightdao_reserve"
+    "pncw_payroll"
+    "pniw_payroll"
+)
 
-  # Print leo.toml contents if available
-  if [ -f "$CONTRACT_DIR/leo.toml" ]; then
-    echo "📄 Content of $CONTRACT_NAME/leo.toml:"
-    cat "$CONTRACT_DIR/leo.toml"
-  else
-    echo "⚠️  Missing leo.toml in $CONTRACT_NAME — skipping"
-    continue
-  fi
+for project in "${PROJECTS[@]}"; do
+    DIR="$DEPLOYMENT_ROOT/$project"
+    echo "🚀 Deploying: $project"
+    echo "🔍 Listing files in $DIR:"
+    ls -l "$DIR"
 
-  cd "$CONTRACT_DIR"
+    echo "⚙️ Building $project..."
+    cd "$DIR" && leo build --network "$NETWORK"
 
-  # Build and deploy
-  {
-    leo build --network "$NETWORK" && leo deploy --network "$NETWORK"
-  } > "$DEPLOYMENT_LOGS/$CONTRACT_NAME.log" 2>&1
+    echo "📦 Deploying $project..."
+    leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK"
 
-  # Result
-  if [ $? -eq 0 ]; then
-    echo "✅ Successfully deployed: $CONTRACT_NAME"
-  else
-    echo "❌ Failed to deploy: $CONTRACT_NAME"
-    echo "📜 Deployment log for $CONTRACT_NAME:"
-    cat "$DEPLOYMENT_LOGS/$CONTRACT_NAME.log"
-  fi
-
-  cd - > /dev/null
+    echo "✅ Successfully deployed: $project"
+    echo ""
 done
 
-echo "✅ All deployments completed."
+echo "✅ All deployments completed successfully."
