@@ -1,4 +1,4 @@
-import credits::*;
+import credits.aleo;
 import pncw_payroll::*;
 import pniw_payroll::*;
 import subdao_reserve::*;
