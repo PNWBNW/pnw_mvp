@@ -10,10 +10,8 @@ import aleo_std::result::*;         // For Result<T, E> handling
 import aleo_std::env::*;            // For environment context
 import aleo_std::string::*;
 import aleo_std::record::*;
-
-import credits.aleo;
-import weekly_payroll_pool.aleo;
-import process_tax_compliance.aleo;
+import weekly_payroll_pool.aleo::*;
+import process_tax_compliance.aleo::*;
 
 program subdao_reserve {
     mapping reserve_balance: [u8; 32] => u64;
