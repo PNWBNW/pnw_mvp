@@ -1,7 +1,11 @@
 [package]
 name = "oversightdao_reserve"
-version = "25.3.14"
+version = "25.04.09"
 edition = "2025.3"
+description = "Manages the reserve funds for OversightDAO for payroll compliance and withdrawals"
+license = "Proprietary"
+authors = "PNW Dev Team"
+main = "main.leo"
 
-[dependencies]
-credits = { path = "../credits" }
+[leo]
+network = "testnet"
