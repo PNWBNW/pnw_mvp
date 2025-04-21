@@ -1,19 +1,32 @@
-# 🔥 Ignore all generated files and system metadata
+# 🔥 Build and output directories
 target/
 build/
+imports/
+outputs/
+
+# 🔒 Ignore secrets and credentials
+.env
+.env.local
+.env.*.local
+.secret
+credentials.json
+
+# 🛠️ Editor and IDE files
 .idea/
-.DS_Store
-*.log
+.vscode/
+*.iml
+*.swp
+*.swo
+*.swn
+*.sublime-project
+*.sublime-workspace
 
-# 🛠️ Ignore all TOML files EXCEPT `leo.toml` in `src/`
-*.toml
-!pnw_mvp/src/**/leo.toml
-
-# ✅ Ensure `.leo` program files are included
+# ✅ Keep Leo program files only in src/*
 !pnw_mvp/src/**/main.leo
+!pnw_mvp/src/**/leo.toml
 !pnw_mvp/src/**/contracts/*.leo
 
-# 🚀 Ignore compiled binary output and cache
+# 🧪 Ignore compiled Leo outputs
 *.aleo
 *.avm
 *.r1cs
@@ -24,29 +37,22 @@ build/
 *.bak
 *.lock
 
-# 🛠️ Ignore editor-specific files (e.g., VS Code, JetBrains)
-.vscode/
-*.iml
-*.swp
-*.swo
-*.swn
-*.sublime-project
-*.sublime-workspace
-
-# 🔑 Ignore local environment & secrets
-.env
-.env.local
-.env.*.local
-.secret
-credentials.json
-
-# 🛠️ Ignore log/debug files
+# 🪵 Ignore logs
 logs/
 debug.log
+*.log
 npm-debug.log
 yarn-debug.log
 yarn-error.log
 
-# 🔥 Ignore GitHub Actions workflow temp files
+# 🧹 Ignore cached package outputs
+node_modules/
+dist/
+
+# ⚙️ Ignore GitHub Actions workflow temp files
 .github/workflows/*.log
 .github/workflows/*.tmp
+
+# 📦 Ignore general toml files except src
+*.toml
+!pnw_mvp/src/**/leo.toml
