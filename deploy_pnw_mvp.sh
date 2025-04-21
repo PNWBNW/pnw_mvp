@@ -17,11 +17,16 @@ PROJECTS=(
 for project in "${PROJECTS[@]}"; do
     DIR="$DEPLOYMENT_ROOT/$project"
     echo "🚀 Deploying: $project"
-    echo "🔍 Listing files in $DIR:"
+    echo "🔍 Directory contents of $DIR:"
     ls -l "$DIR"
 
+    echo "📁 Ensuring build/ and imports/ folders exist..."
+    mkdir -p "$DIR/build"
+    mkdir -p "$DIR/imports"
+
     echo "⚙️ Building $project..."
-    cd "$DIR" && leo build --network "$NETWORK"
+    cd "$DIR"
+    leo build --network "$NETWORK"
 
     echo "📦 Deploying $project..."
     leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK"
