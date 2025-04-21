@@ -1,5 +1,3 @@
-import credits.aleo;
-
 import aleo_std::context::*;        // For caller, block height, transaction context
 import aleo_std::mapping::*;        // For dynamic mappings and set/get logic
 import aleo_std::assert::*;         // For assert(...) checks
