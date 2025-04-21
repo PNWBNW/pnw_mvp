@@ -17,9 +17,8 @@ chmod +x "$GITHUB_WORKSPACE/directory/.aleo/leo"
 # Change to the workspace root
 cd "$GITHUB_WORKSPACE" || { echo "❌ Could not enter repository root."; exit 1; }
 
-# Define contract paths relative to workspace root
+# Define contract paths relative to workspace root (credits removed)
 CONTRACTS=(
-    "src/credits"
     "src/employer_agreement"
     "src/process_tax_compliance"
     "src/weekly_payroll_pool"
