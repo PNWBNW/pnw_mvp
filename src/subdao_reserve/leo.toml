@@ -1,10 +1,14 @@
 [package]
 name = "subdao_reserve"
-version = "25.3.14"
+version = "25.04.09"
 edition = "2025.3"
+license = "Proprietary"
+description = "Handles reserve logic for each subDAO, including funding payroll and managing tax obligations"
+authors = "PNWBNW Dev Team"
 
 [dependencies]
-credits = { path = "../credits" }
-employer_agreement = { path = "../employer_agreement" }
-process_tax_compliance = { path = "../process_tax_compliance" }
 weekly_payroll_pool = { path = "../weekly_payroll_pool" }
+process_tax_compliance = { path = "../process_tax_compliance" }
+
+[leo]
+network = "testnet"
