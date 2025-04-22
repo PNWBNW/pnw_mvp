@@ -1,0 +1,13 @@
+[package]
+name = "worker_profiles"
+version = "25.04.22"
+edition = "2025.3"
+license = "Proprietary"
+description = "Defines mappings and constants for worker categories and verification status used in the PNW MVP."
+authors = "PNWBNW Dev Team"
+main = "worker_registry"
+
+[dependencies]
+
+[leo]
+network = "testnet"
