@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-
-# Exit immediately on error
 set -e
 
 echo "🔥 Starting PNW-MVP Deployment Process..."
 
-# Ensure environment variables are set
 if [[ -z "$DEPLOYMENT_ROOT" || -z "$DEPLOYMENT_LOGS" || -z "$NETWORK" || -z "$ALEO_PRIVATE_KEY" ]]; then
   echo "❌ Missing required environment variables. Make sure DEPLOYMENT_ROOT, DEPLOYMENT_LOGS, NETWORK, and ALEO_PRIVATE_KEY are set."
   exit 1
@@ -14,7 +11,6 @@ fi
 echo "🌍 Using network: $NETWORK"
 mkdir -p "$DEPLOYMENT_LOGS"
 
-# Define contract list (in build order if dependencies exist)
 CONTRACTS=(
   employer_agreement
   oversightdao_reserve
@@ -28,6 +24,7 @@ CONTRACTS=(
 for CONTRACT in "${CONTRACTS[@]}"; do
   DIR="$DEPLOYMENT_ROOT/$CONTRACT"
   LOG="$DEPLOYMENT_LOGS/${CONTRACT}.log"
+  IMPORT_DIR="$DIR/imports"
 
   echo ""
   echo "🚀 Deploying: $CONTRACT"
@@ -41,7 +38,15 @@ for CONTRACT in "${CONTRACTS[@]}"; do
   cd "$DIR" || { echo "❌ Failed to cd into $DIR"; continue; }
 
   echo "📁 Ensuring build/ and imports/ folders exist..."
-  mkdir -p build imports
+  mkdir -p build "$IMPORT_DIR"
+
+  echo "🔗 Linking imports for $CONTRACT..."
+  for DEP in "${CONTRACTS[@]}"; do
+    if [[ "$DEP" != "$CONTRACT" ]]; then
+      DEP_SOURCE_REL="../../$DEP"
+      ln -sf "$DEP_SOURCE_REL" "$IMPORT_DIR/$DEP"
+    fi
+  done
 
   echo "⚙️ Building $CONTRACT..."
   if leo build --network "$NETWORK" > "$LOG" 2>&1; then
