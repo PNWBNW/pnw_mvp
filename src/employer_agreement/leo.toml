@@ -8,7 +8,6 @@ license = "Proprietary"
 main = "main.leo"
 
 [dependencies]
-worker_profiles = { path = "../worker_profiles" }
 subdao_reserve = { path = "../subdao_reserve" }
 
 [leo]
