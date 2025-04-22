@@ -1,4 +1,4 @@
-name: Deploy PNW-MVP to Aleo Testnet
+name: Deploy to Aleo Testnet
 
 on:
   push:
@@ -17,40 +17,43 @@ jobs:
       DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up .env variables
-        run: |
-          echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_PRIVATE_KEY }}" >> $GITHUB_ENV
-          echo "NETWORK=testnet" >> $GITHUB_ENV
+    - name: Set Aleo Private Key
+      run: |
+        echo "ALEO_PRIVATE_KEY=${{ secrets.ALEO_TEST_KEY }}" >> $GITHUB_ENV
+        echo "NETWORK=testnet" >> $GITHUB_ENV
 
-      - name: Download and install Leo CLI
-        run: |
-          curl -L https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip -o leo.zip
-          unzip leo.zip -d /tmp
-          sudo mv /tmp/leo /usr/local/bin/leo
-          sudo chmod +x /usr/local/bin/leo
-          leo --version
+    - name: Install Leo CLI v2.5.0
+      run: |
+        curl -L https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip -o leo.zip
+        unzip leo.zip -d /tmp
+        sudo mv /tmp/leo /usr/local/bin/leo
+        sudo chmod +x /usr/local/bin/leo
+        leo --version
 
-      - name: List contracts directory contents
-        run: ls -R $DEPLOYMENT_ROOT
+    - name: Display Deployment Structure
+      run: ls -R $DEPLOYMENT_ROOT
 
-      - name: Deploy PNW-MVP contracts
-        run: |
-          mkdir -p "$DEPLOYMENT_LOGS"
-          chmod +x $GITHUB_WORKSPACE/deploy_pnw_mvp.sh
-          $GITHUB_WORKSPACE/deploy_pnw_mvp.sh
-        env:
-          ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
-          NETWORK: testnet
-          ALEO_CLI_PATH: /usr/local/bin/leo
-          DEPLOYMENT_ROOT: ${{ github.workspace }}/src
-          DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
+    - name: Run Repackage Script
+      run: |
+        chmod +x ./repackage.sh
+        ./repackage.sh
 
-      - name: Upload Deployment Logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: deploy_logs
-          path: deploy_logs
-          include-hidden-files: true
+    - name: Create Log Directory
+      run: |
+        mkdir -p "$DEPLOYMENT_LOGS"
+
+    - name: Execute Deployment
+      run: |
+        chmod +x ./deploy_pnw_mvp.sh
+        ./deploy_pnw_mvp.sh
+
+    - name: Upload Deployment Logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: deploy_logs
+        path: deploy_logs
+        include-hidden-files: true
+        if-no-files-found: warn
