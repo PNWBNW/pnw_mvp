@@ -1,61 +1,35 @@
 #!/usr/bin/env bash
-set -e
 
 echo "🔥 Starting PNW-MVP Deployment Process..."
+echo "🌍 Using network: ${NETWORK}"
 
-if [[ -z "$DEPLOYMENT_ROOT" || -z "$DEPLOYMENT_LOGS" || -z "$NETWORK" || -z "$ALEO_PRIVATE_KEY" ]]; then
-  echo "❌ Missing required environment variables. Make sure DEPLOYMENT_ROOT, DEPLOYMENT_LOGS, NETWORK, and ALEO_PRIVATE_KEY are set."
-  exit 1
-fi
+for CONTRACT_DIR in "${DEPLOYMENT_ROOT}"/*; do
+  if [ -d "$CONTRACT_DIR" ]; then
+    CONTRACT_NAME=$(basename "$CONTRACT_DIR")
+    echo ""
+    echo "🚀 Deploying: $CONTRACT_NAME"
+    echo "🔍 Directory: $CONTRACT_DIR"
 
-echo "🌍 Using network: $NETWORK"
-mkdir -p "$DEPLOYMENT_LOGS"
+    cd "$CONTRACT_DIR"
 
-CONTRACTS=(
-  employer_agreement
-  oversightdao_reserve
-  pncw_payroll
-  pniw_payroll
-  process_tax_compliance
-  subdao_reserve
-  weekly_payroll_pool
-)
+    echo "📁 Ensuring build/ and imports/ folders exist..."
+    mkdir -p build import
 
-for CONTRACT in "${CONTRACTS[@]}"; do
-  DIR="$DEPLOYMENT_ROOT/$CONTRACT"
-  LOG="$DEPLOYMENT_LOGS/${CONTRACT}.log"
-  IMPORT_DIR="$DIR/imports"
+    echo "🔗 Linking imports for $CONTRACT_NAME..."
+    find "$CONTRACT_DIR/import" -mindepth 1 -maxdepth 1 -type d | while read -r DEP; do
+      ln -sfn "$DEP" "$CONTRACT_DIR/import/"
+    done
 
-  echo ""
-  echo "🚀 Deploying: $CONTRACT"
-  echo "🔍 Directory: $DIR"
-
-  if [ ! -f "$DIR/leo.toml" ] || [ ! -f "$DIR/main.leo" ]; then
-    echo "❌ Missing leo.toml or main.leo in $DIR"
-    continue
-  fi
-
-  cd "$DIR" || { echo "❌ Failed to cd into $DIR"; continue; }
-
-  echo "📁 Ensuring build/ and imports/ folders exist..."
-  mkdir -p build "$IMPORT_DIR"
-
-  echo "🔗 Linking imports for $CONTRACT..."
-  for DEP in "${CONTRACTS[@]}"; do
-    if [[ "$DEP" != "$CONTRACT" ]]; then
-      DEP_SOURCE_REL="../../$DEP"
-      ln -sf "$DEP_SOURCE_REL" "$IMPORT_DIR/$DEP"
+    echo "⚙️ Building $CONTRACT_NAME..."
+    if leo build --network "${NETWORK}" 2>&1 | tee "${DEPLOYMENT_LOGS}/${CONTRACT_NAME}.log"; then
+      echo "✅ Build succeeded for $CONTRACT_NAME"
+    else
+      echo "❌ Failed to build $CONTRACT_NAME (see log above or in ${DEPLOYMENT_LOGS}/${CONTRACT_NAME}.log)"
     fi
-  done
 
-  echo "⚙️ Building $CONTRACT..."
-  if leo build --network "$NETWORK" > "$LOG" 2>&1; then
-    echo "✅ Successfully built $CONTRACT"
-  else
-    echo "❌ Failed to build $CONTRACT (check $LOG)"
-    continue
+    cd - > /dev/null
   fi
 done
 
 echo ""
-echo "✅ All build attempts finished. Check individual logs in $DEPLOYMENT_LOGS"
+echo "✅ All build attempts finished. Check logs above or in $DEPLOYMENT_LOGS"
