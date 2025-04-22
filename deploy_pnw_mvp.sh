@@ -1,55 +1,42 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set -e
 
 echo "🔥 Starting PNW-MVP Deployment Process..."
 echo "🌍 Using network: $NETWORK"
 echo ""
 
-# Validate environment
-if [[ -z "$DEPLOYMENT_ROOT" || -z "$DEPLOYMENT_LOGS" || -z "$NETWORK" ]]; then
-  echo "❌ Missing environment variables. Aborting."
-  exit 1
-fi
+echo "🔎 Validating and Deploying contracts in: $DEPLOYMENT_ROOT"
+echo ""
 
-# Loop through each contract directory
-for project_path in "$DEPLOYMENT_ROOT"/*; do
-  if [[ -d "$project_path" ]]; then
-    project_name=$(basename "$project_path")
-    echo "🚀 Deploying: $project_name"
-    echo "🔍 Directory: $project_path"
+for project_dir in "$DEPLOYMENT_ROOT"/*; do
+    if [ -d "$project_dir" ]; then
+        contract_name=$(basename "$project_dir")
+        echo "🚀 Building: $contract_name"
+        echo "📁 Directory: $project_dir"
 
-    cd "$project_path" || {
-      echo "❌ Could not enter directory: $project_path"
-      continue
-    }
+        # Write .env for Leo if not already present
+        echo "NETWORK=$NETWORK" > "$project_dir/.env"
 
-    LOG_FILE="$DEPLOYMENT_LOGS/${project_name}_log.txt"
+        # Ensure imports and build directories exist
+        mkdir -p "$project_dir/import"
+        mkdir -p "$project_dir/build"
 
-    echo "📁 Ensuring import/ and build/ folders exist..."
-    mkdir -p import build
+        # Build with --network explicitly
+        log_file="$DEPLOYMENT_LOGS/${contract_name}_log.txt"
+        (
+            cd "$project_dir"
+            leo build --network "$NETWORK"
+        ) > "$log_file" 2>&1
 
-    echo "📝 Writing .env file for Leo"
-    echo "NETWORK=$NETWORK" > .env
+        if grep -q "Build succeeded" "$log_file"; then
+            echo "✅ Build succeeded for $contract_name"
+        else
+            echo "❌ Build failed for $contract_name"
+            echo "📄 See log: $log_file"
+        fi
 
-    echo "🔗 Linking imports for $project_name..."
-    ln -sf import/* . 2>/dev/null || true
-
-    echo "⚙️ Building $project_name..."
-    leo build --network "$NETWORK" >> "$LOG_FILE" 2>&1 || {
-      echo "❌ Build failed for $project_name. See log: $LOG_FILE"
-      continue
-    }
-
-    echo "✅ Build succeeded for $project_name"
-
-    echo "🚢 Deploying $project_name to $NETWORK..."
-    leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" >> "$LOG_FILE" 2>&1 || {
-      echo "❌ Deploy failed for $project_name. See log: $LOG_FILE"
-      continue
-    }
-
-    echo "✅ Deployed $project_name successfully"
-    echo ""
-  fi
+        echo ""
+    fi
 done
 
-echo "✅ Deployment process complete."
+echo "✅ Deployment process finished."
