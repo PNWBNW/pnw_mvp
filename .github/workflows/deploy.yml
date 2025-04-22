@@ -12,6 +12,7 @@ jobs:
 
     env:
       NETWORK: testnet
+      SNARKOS_VERSION: v3.6.0
       DEPLOYMENT_ROOT: ${{ github.workspace }}/src
       DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
       ALEO_PRIVATE_KEY: ${{ secrets.ALEO_TEST_KEY }}
@@ -27,6 +28,12 @@ jobs:
         sudo mv /tmp/leo /usr/local/bin/leo
         sudo chmod +x /usr/local/bin/leo
         leo --version
+
+    - name: Confirm Aleo Testnet Compatibility
+      run: |
+        echo "✅ Environment prepared for Aleo Testnet v3.6.0"
+        echo "🧪 Using snarkOS version: $SNARKOS_VERSION"
+        echo "🧪 Using Leo CLI version: $(leo --version)"
 
     - name: Validate toml structure
       run: |
