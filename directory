@@ -1,0 +1,44 @@
+pnw_mvp/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml                     # GitHub Actions workflow file
+├── .gitignore                             # Updated to include .gitkeep and ignore build outputs
+├── deploy_pnw_mvp.sh                      # Main deploy script
+├── repackage.sh                           # Script to create symlinks for dynamic import resolution
+├── README.md                              # Optional: project documentation
+└── src/
+    ├── employer_agreement/
+    │   ├── leo.toml
+    │   ├── main.leo
+    │   └── import/
+    │       └── .gitkeep
+    ├── oversightdao_reserve/
+    │   ├── leo.toml
+    │   ├── main.leo
+    │   └── import/
+    │       └── .gitkeep
+    ├── pncw_payroll/
+    │   ├── leo.toml
+    │   ├── main.leo
+    │   └── import/
+    │       └── .gitkeep
+    ├── pniw_payroll/
+    │   ├── leo.toml
+    │   ├── main.leo
+    │   └── import/
+    │       └── .gitkeep
+    ├── process_tax_compliance/
+    │   ├── leo.toml
+    │   ├── main.leo
+    │   └── import/
+    │       └── .gitkeep
+    ├── subdao_reserve/
+    │   ├── leo.toml
+    │   ├── main.leo
+    │   └── import/
+    │       └── .gitkeep
+    └── weekly_payroll_pool/
+        ├── leo.toml
+        ├── main.leo
+        └── import/
+            └── .gitkeep
