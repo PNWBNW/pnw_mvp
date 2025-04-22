@@ -1,8 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set -e
 
 echo "🔥 Starting PNW-MVP Deployment Process..."
 echo "🌍 Using network: ${NETWORK}"
 
+# Loop through each contract in the deployment root
 for CONTRACT_DIR in "${DEPLOYMENT_ROOT}"/*; do
   if [ -d "$CONTRACT_DIR" ]; then
     CONTRACT_NAME=$(basename "$CONTRACT_DIR")
@@ -10,21 +12,22 @@ for CONTRACT_DIR in "${DEPLOYMENT_ROOT}"/*; do
     echo "🚀 Deploying: $CONTRACT_NAME"
     echo "🔍 Directory: $CONTRACT_DIR"
 
-    cd "$CONTRACT_DIR"
+    cd "$CONTRACT_DIR" || {
+      echo "❌ Failed to access $CONTRACT_DIR"
+      continue
+    }
 
-    echo "📁 Ensuring build/ and imports/ folders exist..."
+    echo "📁 Ensuring build/ and import/ folders exist..."
     mkdir -p build import
 
     echo "🔗 Linking imports for $CONTRACT_NAME..."
-    find "$CONTRACT_DIR/import" -mindepth 1 -maxdepth 1 -type d | while read -r DEP; do
-      ln -sfn "$DEP" "$CONTRACT_DIR/import/"
-    done
+    # Link dynamic imports if needed (already handled by repackage.sh)
 
     echo "⚙️ Building $CONTRACT_NAME..."
     if leo build --network "${NETWORK}" 2>&1 | tee "${DEPLOYMENT_LOGS}/${CONTRACT_NAME}.log"; then
       echo "✅ Build succeeded for $CONTRACT_NAME"
     else
-      echo "❌ Failed to build $CONTRACT_NAME (see log above or in ${DEPLOYMENT_LOGS}/${CONTRACT_NAME}.log)"
+      echo "❌ Build failed for $CONTRACT_NAME (check ${DEPLOYMENT_LOGS}/${CONTRACT_NAME}.log)"
     fi
 
     cd - > /dev/null
@@ -32,4 +35,4 @@ for CONTRACT_DIR in "${DEPLOYMENT_ROOT}"/*; do
 done
 
 echo ""
-echo "✅ All build attempts finished. Check logs above or in $DEPLOYMENT_LOGS"
+echo "✅ All build attempts finished. Check individual logs in ${DEPLOYMENT_LOGS}"
