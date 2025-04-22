@@ -1,8 +1,11 @@
 # 🔥 Build and output directories
 target/
 build/
-imports/
 outputs/
+
+# Allow empty import folders using .gitkeep
+imports/
+!pnw_mvp/src/**/import/.gitkeep
 
 # 🔒 Ignore secrets and credentials
 .env
