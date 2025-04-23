@@ -14,7 +14,7 @@ for contract_dir in "$DEPLOYMENT_ROOT"/*; do
         
         cd "$contract_dir"
 
-        if ! leo build --network "$NETWORK"; then
+        if ! leo build --network "$NETWORK" .; then
             echo "❌ Build failed for $contract at $contract_dir"
             exit 13
         fi
