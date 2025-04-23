@@ -9,6 +9,3 @@ main = "main.leo"
 
 [dependencies]
 subdao_reserve = { path = "../subdao_reserve" }
-
-[leo]
-network = "testnet"
