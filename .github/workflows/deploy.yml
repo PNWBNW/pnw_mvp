@@ -40,11 +40,6 @@ jobs:
         chmod +x ./validate_toml_structure.sh
         ./validate_toml_structure.sh
 
-    - name: Prepare imports
-      run: |
-        chmod +x ./repackage.sh
-        ./repackage.sh
-
     - name: Create deploy logs folder
       run: mkdir -p "$DEPLOYMENT_LOGS"
 
