@@ -49,8 +49,9 @@ jobs:
 
     - name: Deploy contracts
       run: |
-        chmod -R +r ./src/* # Add read permissions recursively
+        chmod -R +r ./src/*
         chmod +x ./deploy_pnw_mvp.sh
+        export LEO_PATH="$GITHUB_WORKSPACE/src"
         ./deploy_pnw_mvp.sh
 
     - name: Upload deploy logs
