@@ -24,7 +24,8 @@ jobs:
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable
+        toolchain: 1.77
+        override: true # Ensure we get the specified version
 
     - name: Install Leo CLI
       run: |
@@ -35,7 +36,8 @@ jobs:
         leo --version
 
     - name: Confirm Leo Installation
-      run: echo "🧪 Using Leo CLI version: $(leo --version)"
+      run: |
+        echo "🧪 Using Leo CLI version: $(leo --version)"
 
     - name: Validate toml structure
       run: |
