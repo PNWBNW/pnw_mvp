@@ -37,7 +37,7 @@ get_local_dependencies() {
         fi
 
         echo "🛠️ Building $contract..."
-        if ! leo build --network "$NETWORK" .; then
+        if ! leo build --network "$NETWORK"; then
             echo "❌ Build failed for $contract"
             exit 13
         fi
