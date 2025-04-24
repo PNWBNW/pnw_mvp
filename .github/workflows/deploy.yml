@@ -49,6 +49,7 @@ jobs:
 
     - name: Deploy contracts
       run: |
+        chmod -R +r ./src/* # Add read permissions recursively
         chmod +x ./deploy_pnw_mvp.sh
         ./deploy_pnw_mvp.sh
 
