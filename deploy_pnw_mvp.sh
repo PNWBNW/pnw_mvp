@@ -11,8 +11,9 @@ get_local_dependencies() {
   awk '/\[dependencies\]/,/\[/{if(/path *=/){split($0, a, "="); gsub(/[[:space:]'\''\{\}]/, "", a[2]); print a[2]}}' "$toml_file"
 }
 
-for contract_dir in "$DEPLOYMENT_ROOT"/*
-do
+# for contract_dir in "$DEPLOYMENT_ROOT"/*
+# do
+    contract_dir="$DEPLOYMENT_ROOT/employer_agreement"
     if [ -d "$contract_dir" ] && [ -f "$contract_dir/leo.toml" ]; then
         contract=$(basename "$contract_dir")
         echo ""
@@ -36,7 +37,7 @@ do
         fi
 
         echo "🛠️ Building $contract..."
-        if ! leo build --network "$NETWORK"; then
+        if ! leo build --network "$NETWORK" .; then
             echo "❌ Build failed for $contract"
             exit 13
         fi
@@ -44,6 +45,6 @@ do
         echo "✅ Build succeeded for $contract"
         cd .. # Go back to the root of src
     fi
-done
+# done
 
 echo "🎉 Deployment process completed!"
