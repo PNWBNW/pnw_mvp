@@ -12,7 +12,7 @@ jobs:
 
     env:
       NETWORK: testnet
-      SNARKOS_VERSION: v3.6.0
+      SNARKOS_VERSION: v3.6.0 # This is for informational purposes, Leo handles network
       DEPLOYMENT_ROOT: ${{ github.workspace }}/src
       DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
       ALEO_PRIVATE_KEY: ${{ secrets.ALEO_TEST_KEY }}
@@ -21,19 +21,21 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
     - name: Install Leo CLI
       run: |
-        curl -L https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip -o leo.zip
+        curl -L "https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo.zip" -o leo.zip
         unzip leo.zip -d /tmp
-        sudo mv /tmp/leo /usr/local/bin/leo
+        sudo mv /tmp/leo /usr/local/bin/
         sudo chmod +x /usr/local/bin/leo
         leo --version
 
-    - name: Confirm Aleo Testnet Compatibility
-      run: |
-        echo "✅ Environment prepared for Aleo Testnet v3.6.0"
-        echo "🧪 Using snarkOS version: $SNARKOS_VERSION"
-        echo "🧪 Using Leo CLI version: $(leo --version)"
+    - name: Confirm Leo Installation
+      run: echo "🧪 Using Leo CLI version: $(leo --version)"
 
     - name: Validate toml structure
       run: |
