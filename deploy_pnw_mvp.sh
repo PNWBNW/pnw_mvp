@@ -5,10 +5,10 @@ set -x
 echo "🔥 Starting PNW-MVP Deployment Process (using leo add for dependencies)..."
 echo "🌍 Using network: $NETWORK"
 
-# Function to extract dependencies from leo.toml
-get_dependencies() {
+# Function to extract local dependencies with their paths from leo.toml
+get_local_dependencies() {
   local toml_file="$1"
-  awk '/\[dependencies\]/,/\[/{if(/=/){split($0, a, "="); gsub(/[[:space:]"]/, "", a[1]); print a[1]}}' "$toml_file"
+  awk '/\[dependencies\]/,/\[/{if(/path *=/){split($0, a, "="); gsub(/[[:space:]"'{}]/, "", a[2]); print a[2]}}' "$toml_file"
 }
 
 for contract_dir in "$DEPLOYMENT_ROOT"/*
@@ -22,17 +22,17 @@ do
         cd "$contract_dir"
 
         echo "🔗 Adding local dependencies for $contract..."
-        dependencies=$(get_dependencies "leo.toml")
-        if [[ -n "$dependencies" ]]; then
-            while IFS= read -r dependency; do
-                echo "   ➕ Adding local dependency: $dependency"
-                if ! leo add --local "../$dependency"; then
-                    echo "❌ Failed to add local dependency '$dependency' for $contract"
+        local_dependencies=$(get_local_dependencies "leo.toml")
+        if [[ -n "$local_dependencies" ]]; then
+            while IFS= read -r dependency_path; do
+                echo "   ➕ Adding local dependency: $dependency_path"
+                if ! leo add --path "$dependency_path"; then
+                    echo "❌ Failed to add local dependency '$dependency_path' for $contract"
                     exit 1
                 fi
-            done <<< "$dependencies"
+            done <<< "$local_dependencies"
         else
-            echo "   No dependencies found in leo.toml"
+            echo "   No local dependencies found in leo.toml"
         fi
 
         echo "🛠️ Building $contract..."
