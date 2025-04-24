@@ -6,6 +6,3 @@ description = "Employer registration and worker identity mapping contract for th
 authors = "PNW Engineering Team"
 license = "Proprietary"
 main = "main.leo"
-
-[dependencies]
-subdao_reserve = { path = "../subdao_reserve" }
