@@ -8,7 +8,7 @@ echo "🌍 Using network: $NETWORK"
 # Function to extract local dependencies with their paths from leo.toml
 get_local_dependencies() {
   local toml_file="$1"
-  awk "/\\[dependencies\\]/,/\\[/{if(/path *=/){split(\$0, a, \"=\"); gsub(/[[:space:]\\\"'\\{\\}]/, \"\", a[2]); print a[2]}}/" "$toml_file"
+  awk '/\[dependencies\]/,/\[/{if(/path *=/){split($0, a, "="); gsub(/[[:space:]'\''\{\}]/, "", a[2]); print a[2]}}' "$toml_file"
 }
 
 for contract_dir in "$DEPLOYMENT_ROOT"/*
