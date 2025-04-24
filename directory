@@ -1,11 +1,12 @@
 pnw_mvp/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml                     # GitHub Actions workflow file
-├── .gitignore                             # Updated to include .gitkeep and ignore build outputs
-├── deploy_pnw_mvp.sh                      # Main deploy script
-├── repackage.sh                           # Script to create symlinks for dynamic import resolution
-├── README.md                              # Optional: project documentation
+│       └── deploy.yml                     
+├── .gitignore                          
+├── deploy_pnw_mvp.sh                      
+├── validate_leo_projects.sh
+├── validate_toml_structure.sh
+├── README.md                             
 └── src/
     ├── employer_agreement/
     │   ├── leo.toml
