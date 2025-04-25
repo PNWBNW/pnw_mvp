@@ -6,7 +6,7 @@
 
 ## What Is PNW-MVP?
 
-The **PNW-MVP** project is a digital system built to help **farmers, small businesses, and noncitizen workers** manage payroll and taxes securely — without paperwork, middlemen, or exposure of private data.
+The **PNW-MVP** project is a digital system built to help **farmers, small businesses, citizen and noncitizen workers** manage payroll and taxes securely — without paperwork, middlemen, or exposure of private data.
 
 This system runs on the Aleo blockchain network, where information is **private by default** but **verifiable by regulators**.
 
