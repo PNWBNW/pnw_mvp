@@ -77,7 +77,6 @@ PNW-MVP uses **zero-knowledge cryptography**, which lets the system:
 
 - [aleo.org](https://aleo.org): Learn about the private internet
 - [github.com/PNWBNW](https://github.com/PNWBNW): See our open code
-- [Contact the Dev Team](mailto:josh@pnwbnw.com)
 
 ---
 
