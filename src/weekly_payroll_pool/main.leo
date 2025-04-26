@@ -1,19 +1,19 @@
 program weekly_payroll_pool;
 
-import aleo_std::context::*;
-import aleo_std::mapping::*;
-import aleo_std::assert::*;
-import aleo_std::crypto::*;
-import aleo_std::bytes::*;
-import aleo_std::field::*;
-import aleo_std::math::*;
-import aleo_std::option::*;
-import aleo_std::result::*;
-import aleo_std::env::*;
-import aleo_std::record::*;
-import subdao_reserve.aleo::*;
-import pncw_payroll.aleo::*;
-import pniw_payroll.aleo::*;
+import context.leo;
+import mapping.leo;
+import assert.leo;
+import crypto.leo;
+import bytes.leo;
+import field.leo;
+import math.leo;
+import option.leo;
+import result.leo;
+import env.leo;
+import record.leo;
+import subdao_reserve.aleo;
+import pncw_payroll.aleo;
+import pniw_payroll.aleo;
 
 mapping weekly_balance: [u8; 32] => u64;
 mapping worker_types: [u8; 32] => u8;
@@ -23,7 +23,8 @@ function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
     return worker_ans;
 }
 
-async transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
+// NEW - Regular transition for funding pool (safe for .set)
+transition fund_weekly_pool_sync(subdao_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
     let current_balance: u64 = weekly_balance.get_or_use(subdao_ans, 0u64);
     let new_balance: u64 = current_balance.checked_add(amount);
@@ -31,7 +32,14 @@ async transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
     return true;
 }
 
-async transition execute_weekly_payroll(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 64]) -> bool {
+// Async wrapper that calls the sync transition
+async transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
+    fund_weekly_pool_sync(subdao_ans, amount);
+    return true;
+}
+
+// NEW - Regular transition for executing payroll (safe for .set)
+transition execute_weekly_payroll_sync(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 64]) -> bool {
     assert(amount > 0u64);
 
     let weekly_funds: u64 = weekly_balance.get_or_use(subdao_ans, 0u64);
@@ -39,6 +47,13 @@ async transition execute_weekly_payroll(worker_ans: [u8; 32], subdao_ans: [u8; 3
 
     let new_balance: u64 = weekly_funds.checked_sub(amount);
     weekly_balance.set(subdao_ans, new_balance);
+
+    return true;
+}
+
+// Async wrapper that handles the public transfer and worker payroll logic
+async transition execute_weekly_payroll(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 64]) -> bool {
+    execute_weekly_payroll_sync(worker_ans, subdao_ans, amount, zpass_hash);
 
     let worker_address: [u8; 32] = lookup_worker_by_ans(worker_ans);
     credits::transfer_public(worker_address, amount);
@@ -55,6 +70,7 @@ async transition execute_weekly_payroll(worker_ans: [u8; 32], subdao_ans: [u8; 3
     return true;
 }
 
+// Regular transition for finalize (no writes, so async is fine)
 async transition finalize_weekly_payroll(subdao_ans: [u8; 32]) -> bool {
     assert(weekly_balance.contains(subdao_ans));
     return true;
