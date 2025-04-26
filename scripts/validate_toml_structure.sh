@@ -1,41 +1,51 @@
 #!/usr/bin/env bash
-# Abort on any error & echo every command (handy in CI logs)
-set -euo pipefail
+# ---------------------------------------------------------------------------
+# Validate that each contract:
+#   • contains leo.toml
+#   • leo.toml has a [package].main entry
+#   • that file actually exists (handles nested src/ layouts)
+# ---------------------------------------------------------------------------
 
+set -euo pipefail
 ROOT_DIR="${1:-./src}"
 
 echo "🔎  Validating leo.toml structure and main.leo presence in ‘$ROOT_DIR’ …"
-echo
+ISSUES=0
 
-failures=0
+while IFS= read -r -d '' CONTRACT_DIR; do
+  CONTRACT_NAME=$(basename "$CONTRACT_DIR")
+  echo "🧪  $CONTRACT_NAME"
 
-# Iterate over every leo.toml we can find under src/
-while IFS= read -r -d '' toml; do
-  dir="$(dirname "$toml")"
-  name="$(basename "$dir")"
-  main_file="$dir/main.leo"
-
-  echo "🧪  $name"
-
-  # 1.  main = "main.leo" must exist in the toml
-  if ! grep -Eq '^\s*main\s*=\s*"main\.leo"\s*$' "$toml"; then
-    echo "   ❌  $toml → missing or incorrect main entry"
-    ((failures++))
+  TOML="$CONTRACT_DIR/leo.toml"
+  if [[ ! -f $TOML ]]; then
+    echo "   ❌  leo.toml not found"
+    ((ISSUES++))
+    continue
   fi
 
-  # 2.  main.leo must actually be there
-  if [[ ! -f "$main_file" ]]; then
-    echo "   ❌  $main_file → file not found"
-    ((failures++))
+  # Pull the path after main = "…"
+  MAIN_PATH=$(grep -E '^[[:space:]]*main[[:space:]]*=' "$TOML" \
+              | head -1 \
+              | sed -E 's/.*=["'\'']([^"'\'']+)["'\''].*/\1/')
+
+  if [[ -z $MAIN_PATH ]]; then
+    echo "   ❌  Missing ‘main = …’ entry in leo.toml"
+    ((ISSUES++))
+    continue
   fi
 
-done < <(find "$ROOT_DIR" -maxdepth 2 -type f -name 'leo.toml' -print0)
+  FULL_PATH="$CONTRACT_DIR/$MAIN_PATH"
+  if [[ ! -f $FULL_PATH ]]; then
+    echo "   ❌  $MAIN_PATH → file not found"
+    ((ISSUES++))
+  else
+    echo "   ✅  $MAIN_PATH found"
+  fi
+done < <(find "$ROOT_DIR" -mindepth 1 -maxdepth 1 -type d -print0)
 
-if ((failures)); then
-  echo
-  echo "🚨  Validation finished with $failures problem(s)."
+if [[ $ISSUES -eq 0 ]]; then
+  echo "✅  All contracts passed structural validation."
+else
+  echo "⚠️  Validation finished with $ISSUES issue(s)."
   exit 1
 fi
-
-echo
-echo "✅  Every leo.toml points to an existing main.leo – good to go!"
