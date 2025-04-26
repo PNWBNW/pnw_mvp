@@ -1,17 +1,17 @@
 program oversightdao_reserve.aleo;
 
-import aleo_std::context::*;
-import aleo_std::mapping::*;
-import aleo_std::assert::*;
-import aleo_std::crypto::*;
-import aleo_std::bytes::*;
-import aleo_std::field::*;
-import aleo_std::math::*;
-import aleo_std::option::*;
-import aleo_std::result::*;
-import aleo_std::env::*;
-import aleo_std::string::*;
-import aleo_std::record::*;
+
+import context.leo;
+import mapping.leo;
+import assert.leo;
+import crypto.leo;
+import bytes.leo;
+import field.leo;
+import math.leo;
+import option.leo;
+import result.leo;
+import env.leo;
+import record.leo;
 
 mapping reserve_balance: [u8; 32] => u64;
 
