@@ -1,38 +1,41 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Abort on any error & echo every command (handy in CI logs)
+set -euo pipefail
 
-echo "🔎 Validating leo.toml structure and main.leo presence..."
+ROOT_DIR="${1:-./src}"
 
-ROOT_DIR="./src"
-FAILED=0
+echo "🔎  Validating leo.toml structure and main.leo presence in ‘$ROOT_DIR’ …"
+echo
 
-for contract in "$ROOT_DIR"/*; do
-  if [ -d "$contract" ]; then
-    echo "🧪 Checking: $contract"
-    
-    TOML_FILE="$contract/leo.toml"
-    MAIN_FILE="$contract/main.leo"
+failures=0
 
-    if [ ! -f "$TOML_FILE" ]; then
-      echo "❌ Missing leo.toml in $contract"
-      FAILED=$((FAILED + 1))
-      continue
-    fi
+# Iterate over every leo.toml we can find under src/
+while IFS= read -r -d '' toml; do
+  dir="$(dirname "$toml")"
+  name="$(basename "$dir")"
+  main_file="$dir/main.leo"
 
-    if ! grep -q 'main *= *"main\.leo"' "$TOML_FILE"; then
-      echo "❌ Incorrect or missing main = \"main.leo\" in $TOML_FILE"
-      FAILED=$((FAILED + 1))
-    fi
+  echo "🧪  $name"
 
-    if [ ! -f "$MAIN_FILE" ]; then
-      echo "❌ Missing main.leo file in $contract"
-      FAILED=$((FAILED + 1))
-    fi
+  # 1.  main = "main.leo" must exist in the toml
+  if ! grep -Eq '^\s*main\s*=\s*"main\.leo"\s*$' "$toml"; then
+    echo "   ❌  $toml → missing or incorrect main entry"
+    ((failures++))
   fi
-done
 
-if [ "$FAILED" -eq 0 ]; then
-  echo "✅ All leo.toml files correctly reference main.leo and files are present."
-else
-  echo "⚠️ Validation completed with $FAILED issue(s)."
+  # 2.  main.leo must actually be there
+  if [[ ! -f "$main_file" ]]; then
+    echo "   ❌  $main_file → file not found"
+    ((failures++))
+  fi
+
+done < <(find "$ROOT_DIR" -maxdepth 2 -type f -name 'leo.toml' -print0)
+
+if ((failures)); then
+  echo
+  echo "🚨  Validation finished with $failures problem(s)."
   exit 1
 fi
+
+echo
+echo "✅  Every leo.toml points to an existing main.leo – good to go!"
