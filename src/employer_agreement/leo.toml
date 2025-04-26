@@ -1,6 +1,6 @@
 [package]
 name = "employer_agreement"
-version = "25.04.09"
+version = "25.04.26"
 edition = "2025.3"
 description = "Employer registration and worker identity mapping contract for the PNW-MVP system."
 authors = "PNW Engineering Team"
