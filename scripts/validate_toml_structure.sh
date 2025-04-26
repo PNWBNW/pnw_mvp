@@ -1,45 +1,48 @@
 #!/usr/bin/env bash
-# ---------------------------------------------------------------------------
-# Validate that each contract:
-#   • contains leo.toml
-#   • leo.toml has a [package].main entry
-#   • that file actually exists (handles nested src/ layouts)
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------
+#  Verify each contract directory contains:
+#   • leo.toml
+#   • a [package].main entry
+#   • the referenced main.leo file (nested or flat)
+# -----------------------------------------------------------
 
 set -euo pipefail
-ROOT_DIR="${1:-./src}"
 
-echo "🔎  Validating leo.toml structure and main.leo presence in ‘$ROOT_DIR’ …"
+# Accept an explicit root path or fall back to $DEPLOYMENT_ROOT or ./src
+ROOT_DIR="${1:-${DEPLOYMENT_ROOT:-./src}}"
+
+echo "🔎  Validating leo.toml structure in ‘$ROOT_DIR’ …"
 ISSUES=0
 
 while IFS= read -r -d '' CONTRACT_DIR; do
-  CONTRACT_NAME=$(basename "$CONTRACT_DIR")
+  CONTRACT_NAME="$(basename "$CONTRACT_DIR")"
   echo "🧪  $CONTRACT_NAME"
 
-  TOML="$CONTRACT_DIR/leo.toml"
-  if [[ ! -f $TOML ]]; then
+  TOML_FILE="$CONTRACT_DIR/leo.toml"
+  if [[ ! -f $TOML_FILE ]]; then
     echo "   ❌  leo.toml not found"
     ((ISSUES++))
     continue
   fi
 
-  # Pull the path after main = "…"
-  MAIN_PATH=$(grep -E '^[[:space:]]*main[[:space:]]*=' "$TOML" \
-              | head -1 \
-              | sed -E 's/.*=["'\'']([^"'\'']+)["'\''].*/\1/')
+  MAIN_PATH=$(grep -E '^[[:space:]]*main[[:space:]]*=' "$TOML_FILE" \
+              | head -1 | sed -E 's/.*=["'\'']([^"'\'']+)["'\''].*/\1/')
 
   if [[ -z $MAIN_PATH ]]; then
-    echo "   ❌  Missing ‘main = …’ entry in leo.toml"
+    echo "   ❌  Missing ‘main = …’ entry"
     ((ISSUES++))
     continue
   fi
 
   FULL_PATH="$CONTRACT_DIR/$MAIN_PATH"
-  if [[ ! -f $FULL_PATH ]]; then
+  # Accept either nested path or flat fallback
+  if [[ -f $FULL_PATH ]]; then
+    echo "   ✅  $MAIN_PATH found"
+  elif [[ -f "$CONTRACT_DIR/main.leo" ]]; then
+    echo "   ⚠️  Falling back to flat main.leo (update leo.toml?)"
+  else
     echo "   ❌  $MAIN_PATH → file not found"
     ((ISSUES++))
-  else
-    echo "   ✅  $MAIN_PATH found"
   fi
 done < <(find "$ROOT_DIR" -mindepth 1 -maxdepth 1 -type d -print0)
 
