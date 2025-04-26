@@ -1,22 +1,21 @@
 program process_tax_compliance;
 
-import aleo_std::context::*;
-import aleo_std::mapping::*;
-import aleo_std::assert::*;
-import aleo_std::crypto::*;
-import aleo_std::bytes::*;
-import aleo_std::field::*;
-import aleo_std::math::*;
-import aleo_std::option::*;
-import aleo_std::result::*;
-import aleo_std::env::*;
-import aleo_std::string::*;
-import aleo_std::record::*;
-import pncw_payroll::*;
-import pniw_payroll::*;
-import subdao_reserve::*;
-import worker_profiles::*;
-import employer_agreement::*;
+import context.leo;
+import mapping.leo;
+import assert.leo;
+import crypto.leo;
+import bytes.leo;
+import field.leo;
+import math.leo;
+import option.leo;
+import result.leo;
+import env.leo;
+import record.leo;
+import pncw_payroll.aleo;
+import pniw_payroll.aleo;
+import subdao_reserve.aleo;
+import worker_profiles.aleo;
+import employer_agreement.aleo;
 
 mapping employer_tax: [u8; 32] => EmployerTaxRecord;
 mapping employer_zpass_verified: [u8; 32] => bool;
@@ -33,20 +32,20 @@ struct EmployerTaxRecord {
 }
 
 function encode_ans(ans_name: bytes) -> [u8; 32] {
-    return hash_arc721(ans_name);
+    hash_arc721(ans_name)
 }
 
 function calculate_tax_due(employer_ans: [u8; 32], payroll_type: u8) -> u64 {
     if payroll_type == 0u8 {
-        return 1000u64;
+        1000u64
     } else if payroll_type == 1u8 {
-        return 500u64;
+        500u64
     } else {
-        return 0u64;
+        0u64
     }
 }
 
-async transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> bool {
+transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> bool {
     assert(employer_zpass_verified.get_or_use(employer_ans, false));
     assert(employer_agreement::employer_registry.get_or_use(employer_ans, false));
 
@@ -68,14 +67,14 @@ async transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8
         is_compliant
     });
 
-    if (!is_compliant) {
+    if !is_compliant {
         credits::transfer_public(TAX_SINK, tax_due);
     }
 
-    return is_compliant;
+    is_compliant
 }
 
-async transition finalize_tax_compliance(employer_ans: [u8; 32]) -> bool {
+transition finalize_tax_compliance(employer_ans: [u8; 32]) -> bool {
     assert(employer_tax.contains(employer_ans));
-    return true;
+    true
 }
