@@ -5,7 +5,7 @@ edition = "2025.3"
 license = "Proprietary"
 authors = "PNW Dev Team"
 description = "Handles employer tax compliance logic for the PNW MVP"
-main = "src/main.leo"
+main = "main.leo"
 
 [dependencies]
 pncw_payroll = { path = "../pncw_payroll" }
