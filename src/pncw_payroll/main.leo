@@ -1,4 +1,4 @@
-program pncw_payroll.aleo;
+program pncw_payroll;
 
 import context.leo;
 import mapping.leo;
@@ -18,10 +18,10 @@ mapping employer_funding: [u8; 32] => u64;
 mapping worker_balances: [u8; 32] => u64;
 
 function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
-    return worker_ans;
+    worker_ans
 }
 
-async transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
+transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
     assert(employer_agreement::employer_registry.get_or_use(employer_ans, false));
     assert(employer_agreement::employer_tax_compliance.get_or_use(employer_ans, false));
@@ -33,12 +33,12 @@ async transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
     let subdao_ans: [u8; 32] = subdao_reserve::SUBDAO_RESERVE_ANS;
     subdao_reserve::deposit(subdao_ans, amount);
 
-    return true;
+    true
 }
 
-async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> bool {
+transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
-    assert(worker_type.get_or_use(worker_ans, 0u8) != 0u8);
+    assert(employer_agreement::worker_type.get_or_use(worker_ans, 0u8) != 0u8);
 
     let current_funding: u64 = employer_funding.get_or_use(employer_ans, 0u64);
     assert(current_funding >= amount);
@@ -50,17 +50,16 @@ async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], a
     worker_balances.set(worker_ans, worker_balance);
 
     let worker_address: [u8; 32] = lookup_worker_by_ans(worker_ans);
-    // Token transfer assumed native
-    // aleo_std transfer abstracted, or assumed implicit
+    credits::transfer_public(worker_address, amount);
 
-    return true;
+    true
 }
 
-async transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
+transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
     assert(worker_balances.contains(worker_ans));
-    return true;
+    true
 }
 
 function verify_worker_balance(worker_ans: [u8; 32]) -> u64 {
-    return worker_balances.get_or_use(worker_ans, 0u64);
+    worker_balances.get_or_use(worker_ans, 0u64)
 }
