@@ -1,23 +1,22 @@
 #!/usr/bin/env bash
-# Build-only validation for every contract.
-
 set -euo pipefail
-ROOT="${1:-${DEPLOYMENT_ROOT:-./src}}"
-echo "🔍 Validating Leo projects in: $ROOT"
-echo
 
-FAIL=0
+ROOT_DIR="${1:-src}"
 
-find "$ROOT" -mindepth 1 -maxdepth 1 -type d | while read -r DIR; do
-  [[ -f "$DIR/leo.toml" ]] || continue
-  echo "🛠️  leo build → $(basename "$DIR")"
-  if leo build --network "$NETWORK" --path "$DIR" ; then
-    echo "   ✅  build ok"; echo
-  else
-    echo "   ❌  build failed"; echo
-    ((FAIL++))
-  fi
+echo "🛠️  Validating all Leo projects under '$ROOT_DIR'..."
+
+for contract_dir in "$ROOT_DIR"/*; do
+    if [ -d "$contract_dir" ] && [ -f "$contract_dir/leo.toml" ]; then
+        contract_name=$(basename "$contract_dir")
+        echo "🧪  Building: $contract_name"
+        
+        cd "$contract_dir"
+        leo build --network testnet || {
+            echo "❌  Build failed for $contract_name"
+            exit 1
+        }
+        cd - > /dev/null
+    fi
 done
 
-[[ $FAIL -eq 0 ]] || { echo "🚨  $FAIL project(s) failed."; exit 1; }
-echo "✅  All builds succeeded."
+echo "✅  All Leo projects built successfully."
