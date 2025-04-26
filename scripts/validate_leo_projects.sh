@@ -1,32 +1,23 @@
 #!/usr/bin/env bash
+# Build-only validation for every contract.
+
 set -euo pipefail
-
-ROOT="${1:-./src}"
-NETWORK="${NETWORK:-testnet}"
-
-echo "🔍  Building all Leo projects under ‘$ROOT’ on network=$NETWORK"
+ROOT="${1:-${DEPLOYMENT_ROOT:-./src}}"
+echo "🔍 Validating Leo projects in: $ROOT"
 echo
 
-fails=0
+FAIL=0
 
-while IFS= read -r -d '' toml; do
-  project_dir="$(dirname "$toml")"
-  project="$(basename "$project_dir")"
-
-  echo "🛠️  leo build — $project"
-  if leo build --network "$NETWORK" --path "$project_dir" \
-        >"$DEPLOYMENT_LOGS/${project}_build.log" 2>&1; then
-    echo "✅  Build succeeded"
+find "$ROOT" -mindepth 1 -maxdepth 1 -type d | while read -r DIR; do
+  [[ -f "$DIR/leo.toml" ]] || continue
+  echo "🛠️  leo build → $(basename "$DIR")"
+  if leo build --network "$NETWORK" --path "$DIR" ; then
+    echo "   ✅  build ok"; echo
   else
-    echo "❌  Build FAILED – see ${DEPLOYMENT_LOGS}/${project}_build.log"
-    ((fails++))
+    echo "   ❌  build failed"; echo
+    ((FAIL++))
   fi
-  echo
-done < <(find "$ROOT" -maxdepth 2 -type f -name 'leo.toml' -print0)
+done
 
-if ((fails)); then
-  echo "🚨  $fails project(s) failed to build."
-  exit 1
-fi
-
-echo "🎉  All projects compiled successfully."
+[[ $FAIL -eq 0 ]] || { echo "🚨  $FAIL project(s) failed."; exit 1; }
+echo "✅  All builds succeeded."
