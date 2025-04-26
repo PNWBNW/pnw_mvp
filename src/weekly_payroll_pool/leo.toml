@@ -1,16 +1,13 @@
 [package]
 name = "weekly_payroll_pool"
-version = "25.04.09"
+version = "25.04.26"
 edition = "2025.3"
-authors = ["PNW MVP Team"]
+authors = "PNW MVP Team"
 description = "Handles weekly payroll disbursements from SubDAO reserves to workers via PNCW and PNIW channels."
 license = "PNW-MVP Proprietary License"
-main = "main.leo"
+main = "src/main.leo"
 
 [dependencies]
 subdao_reserve = { path = "../subdao_reserve" }
 pncw_payroll = { path = "../pncw_payroll" }
 pniw_payroll = { path = "../pniw_payroll" }
-
-[leo]
-network = "testnet"
