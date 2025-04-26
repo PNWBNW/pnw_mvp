@@ -1,5 +1,4 @@
-program oversightdao_reserve.aleo;
-
+program oversightdao_reserve;
 
 import context.leo;
 import mapping.leo;
@@ -18,10 +17,10 @@ mapping reserve_balance: [u8; 32] => u64;
 const OVERSIGHT_DAO_ANS: [u8; 32] = encode_ans(b"oversightdao.pnw.ans");
 
 function encode_ans(ans_name: bytes) -> [u8; 32] {
-    return hash_arc721(ans_name);
+    hash_arc721(ans_name)
 }
 
-async transition deposit(oversightdao_ans: [u8; 32], amount: u64) -> bool {
+transition deposit(oversightdao_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
     assert(oversightdao_ans == OVERSIGHT_DAO_ANS);
 
@@ -29,23 +28,22 @@ async transition deposit(oversightdao_ans: [u8; 32], amount: u64) -> bool {
     let new_balance: u64 = current_balance.checked_add(amount);
 
     reserve_balance.set(oversightdao_ans, new_balance);
-    return true;
+    true
 }
 
-async transition withdraw(subdao_ans: [u8; 32], amount: u64) -> bool {
+transition withdraw(subdao_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
 
     let current_balance: u64 = reserve_balance.get_or_use(OVERSIGHT_DAO_ANS, 0u64);
-    assert(current_balance >= amount, "Insufficient reserve balance.");
+    assert(current_balance >= amount);
 
     let new_balance: u64 = current_balance.checked_sub(amount);
     reserve_balance.set(OVERSIGHT_DAO_ANS, new_balance);
 
-    // Token transfer logic intentionally omitted (handled externally or elsewhere)
-    return true;
+    true
 }
 
-async transition finalize_withdraw(subdao_ans: [u8; 32], amount: u64) -> bool {
+transition finalize_withdraw(subdao_ans: [u8; 32], amount: u64) -> bool {
     assert(reserve_balance.contains(OVERSIGHT_DAO_ANS));
-    return true;
+    true
 }
