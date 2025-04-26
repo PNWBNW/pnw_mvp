@@ -12,45 +12,46 @@ jobs:
 
     env:
       NETWORK: testnet
-      SNARKOS_VERSION: v3.6.0      # informational
+      SNARKOS_VERSION: v3.6.0
       DEPLOYMENT_ROOT: ${{ github.workspace }}/src
       DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
       ALEO_PRIVATE_KEY: ${{ secrets.ALEO_TEST_KEY }}
 
     steps:
-    - name: ⬇️  Checkout repo
-      uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
-    - name: 🛠️  Install Leo CLI
-      run: |
-        curl -L "https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip" -o leo.zip
-        unzip leo.zip -d /tmp
-        sudo mv /tmp/leo /usr/local/bin/leo
-        sudo chmod +x /usr/local/bin/leo
-        leo --version
+      - name: 🛠️  Install Rust (Leo ≥ 2.5 needs it)
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
 
-    # --- quick static checks ----------------------------------------
-    - name: 🔍 Validate leo.toml structure
-      run: |
-        chmod +x validate_toml_structure.sh
-        ./validate_toml_structure.sh
+      - name: 🦁 Install Leo CLI 2.5.0
+        run: |
+          curl -L "https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip" -o leo.zip
+          unzip leo.zip -d /tmp
+          sudo mv /tmp/leo /usr/local/bin/leo
+          sudo chmod +x /usr/local/bin/leo
+          leo --version
 
-    # --- full ‘leo build’ compile pass ------------------------------
-    - name: 🧪 Compile-check every project
-      run: |
-        mkdir -p "$DEPLOYMENT_LOGS"
-        chmod +x validate_leo_projects.sh
-        ./validate_leo_projects.sh
+      - name: 🔎 Validate leo.toml → main.leo links
+        run: |
+          chmod +x scripts/validate_toml_structure.sh
+          scripts/validate_toml_structure.sh
 
-    # --- build & deploy --------------------------------------------
-    - name: 🚀 Build & deploy contracts
-      run: |
-        chmod +x deploy_pnw_mvp.sh
-        ./deploy_pnw_mvp.sh
+      - name: 📂 Create deploy-logs folder
+        run: mkdir -p "$DEPLOYMENT_LOGS"
 
-    # --- archive logs ----------------------------------------------
-    - name: 📦 Upload deploy logs
-      uses: actions/upload-artifact@v4
-      with:
-        name: deploy_logs
-        path: ${{ env.DEPLOYMENT_LOGS }}
+      - name: 🚀 Build & (later) deploy
+        run: |
+          chmod +x scripts/deploy_pnw_mvp.sh
+          export LEO_PATH="$DEPLOYMENT_ROOT"
+          scripts/deploy_pnw_mvp.sh
+
+      - name: 📦 Upload deploy logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy_logs
+          path: ${{ env.DEPLOYMENT_LOGS }}
