@@ -1,39 +1,36 @@
 #!/usr/bin/env bash
-# ---------------------------------------------------------------------------
-# Build (and later deploy) every Leo contract under $DEPLOYMENT_ROOT
-# Adds local path dependencies automatically before building.
-# ---------------------------------------------------------------------------
+# Deploy every contract that passes build, adding local deps first.
 
 set -euo pipefail
 
-echo "🔥 Starting PNW-MVP Deployment Process"
-echo "🌍 Network: $NETWORK"
-echo "📂 Contracts root: $DEPLOYMENT_ROOT"
+echo "🔥  Starting PNW-MVP deployment"
+echo "🌍  Network: $NETWORK"
+echo
 
-# Helper: extract dependency paths from [dependencies] section
-deps() {
-  awk '/dependencies/,//{if(/path *=/){gsub(/[[:space:]|"\047|\{|}]/,"");print $3}}' "$1"
+get_local_deps() {      # extract “path = …” entries
+  awk '/dependencies/,//{if($0 ~ /path *=/){gsub(/.*path *= *"|"/,"");print}}' "$1"
 }
 
-for CONTRACT_DIR in "$DEPLOYMENT_ROOT"/*; do
-  [[ -f "$CONTRACT_DIR/leo.toml" ]] || continue
+for DIR in "$DEPLOYMENT_ROOT"/*; do
+  [[ -d $DIR && -f $DIR/leo.toml ]] || continue
+  NAME=$(basename "$DIR")
+  echo "🚀  Building: $NAME"
 
-  CONTRACT=$(basename "$CONTRACT_DIR")
-  echo -e "\n🚀 Building: $CONTRACT"
-  echo "📁 Directory: $CONTRACT_DIR"
+  pushd "$DIR" >/dev/null
 
-  pushd "$CONTRACT_DIR" >/dev/null
-
-  echo "🔗 Adding local dependencies…"
-  for DEP_PATH in $(deps leo.toml); do
-    echo "   ➕  $DEP_PATH"
-    leo add --path "$DEP_PATH" >/dev/null
+  # Add local dependencies (if any)
+  for DEP in $(get_local_deps leo.toml); do
+    echo "   ➕  leo add --path $DEP"
+    leo add --path "$DEP"
   done
 
-  echo "🛠️  leo build --network $NETWORK"
-  leo build --network "$NETWORK"
+  leo build --network "$NETWORK" --path .         # stop on failure
+
+  echo "✅  Build ok – deploying $NAME"
+  leo deploy --network "$NETWORK" --private-key "$ALEO_PRIVATE_KEY"
 
   popd >/dev/null
+  echo
 done
 
-echo -e "\n🎉 All contracts built successfully."
+echo "🎉  Deployment script finished."
