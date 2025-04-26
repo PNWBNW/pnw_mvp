@@ -1,28 +1,27 @@
 program pniw_payroll;
 
-import employer_agreement.aleo::*;
-import subdao_reserve.aleo::*;
-import aleo_std::context::*;
-import aleo_std::mapping::*;
-import aleo_std::assert::*;
-import aleo_std::crypto::*;
-import aleo_std::bytes::*;
-import aleo_std::field::*;
-import aleo_std::math::*;
-import aleo_std::option::*;
-import aleo_std::result::*;
-import aleo_std::env::*;
-import aleo_std::string::*;
-import aleo_std::record::*;
+import context.leo;
+import mapping.leo;
+import assert.leo;
+import crypto.leo;
+import bytes.leo;
+import field.leo;
+import math.leo;
+import option.leo;
+import result.leo;
+import env.leo;
+import record.leo;
+import employer_agreement.aleo;
+import subdao_reserve.aleo;
 
 mapping employer_funding: [u8; 32] => u64;
 mapping worker_balances: [u8; 32] => u64;
 
 function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
-    return worker_ans;
+    worker_ans
 }
 
-async transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
+transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
     assert(employer_agreement::employer_registry.get_or_use(employer_ans, false));
     assert(employer_agreement::employer_tax_compliance.get_or_use(employer_ans, false));
@@ -35,10 +34,10 @@ async transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
     credits::transfer_public(subdao_ans, amount);
     subdao_reserve::deposit(subdao_ans, amount);
 
-    return true;
+    true
 }
 
-async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> bool {
+transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> bool {
     assert(employer_agreement::worker_type.get_or_use(worker_ans, 0u8) != 0u8);
 
     let current_funding: u64 = employer_funding.get_or_use(employer_ans, 0u64);
@@ -53,14 +52,14 @@ async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], a
     let worker_address: [u8; 32] = lookup_worker_by_ans(worker_ans);
     credits::transfer_public(worker_address, amount);
 
-    return true;
+    true
 }
 
-async transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
+transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
     assert(worker_balances.contains(worker_ans));
-    return true;
+    true
 }
 
 function verify_worker_balance(worker_ans: [u8; 32]) -> u64 {
-    return worker_balances.get_or_use(worker_ans, 0u64);
+    worker_balances.get_or_use(worker_ans, 0u64)
 }
