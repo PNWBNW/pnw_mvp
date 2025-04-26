@@ -1,29 +1,32 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-ROOT="${1:-src}"
-echo "🔍 Validating Leo projects in: $ROOT"
-echo ""
+ROOT="${1:-./src}"
+NETWORK="${NETWORK:-testnet}"
 
-FAILURES=0
+echo "🔍  Building all Leo projects under ‘$ROOT’ on network=$NETWORK"
+echo
 
-for dir in "$ROOT"/*; do
-    if [ -d "$dir" ] && [ -f "$dir/leo.toml" ] && [ -f "$dir/main.leo" ]; then
-        echo "🧪 Validating: $dir"
-        pushd "$dir" > /dev/null
-        if ! leo build --network "$NETWORK"; then
-            echo "❌ Validation failed in $dir"
-            ((FAILURES++))
-        else
-            echo "✅ Validation succeeded in $dir"
-        fi
-        echo ""
-        popd > /dev/null
-    fi
-done
+fails=0
 
-if [ "$FAILURES" -gt 0 ]; then
-    echo "❗ $FAILURES project(s) failed validation."
-    exit 1
-else
-    echo "✅ All projects validated successfully."
+while IFS= read -r -d '' toml; do
+  project_dir="$(dirname "$toml")"
+  project="$(basename "$project_dir")"
+
+  echo "🛠️  leo build — $project"
+  if leo build --network "$NETWORK" --path "$project_dir" \
+        >"$DEPLOYMENT_LOGS/${project}_build.log" 2>&1; then
+    echo "✅  Build succeeded"
+  else
+    echo "❌  Build FAILED – see ${DEPLOYMENT_LOGS}/${project}_build.log"
+    ((fails++))
+  fi
+  echo
+done < <(find "$ROOT" -maxdepth 2 -type f -name 'leo.toml' -print0)
+
+if ((fails)); then
+  echo "🚨  $fails project(s) failed to build."
+  exit 1
 fi
+
+echo "🎉  All projects compiled successfully."
