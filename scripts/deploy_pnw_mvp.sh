@@ -1,36 +1,30 @@
 #!/usr/bin/env bash
-# Deploy every contract that passes build, adding local deps first.
-
 set -euo pipefail
 
-echo "🔥  Starting PNW-MVP deployment"
-echo "🌍  Network: $NETWORK"
-echo
+DEPLOYMENT_ROOT="${DEPLOYMENT_ROOT:-src}"
+DEPLOYMENT_LOGS="${DEPLOYMENT_LOGS:-deploy_logs}"
 
-get_local_deps() {      # extract “path = …” entries
-  awk '/dependencies/,//{if($0 ~ /path *=/){gsub(/.*path *= *"|"/,"");print}}' "$1"
-}
+echo "🔥 Starting deployment script..."
+mkdir -p "$DEPLOYMENT_LOGS"
 
-for DIR in "$DEPLOYMENT_ROOT"/*; do
-  [[ -d $DIR && -f $DIR/leo.toml ]] || continue
-  NAME=$(basename "$DIR")
-  echo "🚀  Building: $NAME"
-
-  pushd "$DIR" >/dev/null
-
-  # Add local dependencies (if any)
-  for DEP in $(get_local_deps leo.toml); do
-    echo "   ➕  leo add --path $DEP"
-    leo add --path "$DEP"
-  done
-
-  leo build --network "$NETWORK" --path .         # stop on failure
-
-  echo "✅  Build ok – deploying $NAME"
-  leo deploy --network "$NETWORK" --private-key "$ALEO_PRIVATE_KEY"
-
-  popd >/dev/null
-  echo
+for contract_dir in "$DEPLOYMENT_ROOT"/*; do
+    if [ -d "$contract_dir" ] && [ -f "$contract_dir/leo.toml" ]; then
+        contract_name=$(basename "$contract_dir")
+        
+        echo "🚀 Deploying: $contract_name"
+        cd "$contract_dir"
+        
+        # Build again before deploy to be safe
+        leo build --network testnet
+        
+        # Deploy
+        leo deploy --private-key "$ALEO_PRIVATE_KEY" --network testnet
+        
+        # Save logs
+        cp deploy.log "$GITHUB_WORKSPACE/$DEPLOYMENT_LOGS/${contract_name}_deploy.log" || echo "⚠️  No deploy.log for $contract_name"
+        
+        cd - > /dev/null
+    fi
 done
 
-echo "🎉  Deployment script finished."
+echo "✅ Deployment complete!"
