@@ -1,45 +1,61 @@
 pnw_mvp/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml                     
-├── .gitignore                          
-├── deploy_pnw_mvp.sh                      
-├── validate_leo_projects.sh
-├── validate_toml_structure.sh
-├── README.md                             
-└── src/
+│       └── deploy.yml
+├── .gitignore
+├── README.md
+│
+├── scripts/                       ← keep helper scripts together
+│   ├── deploy_pnw_mvp.sh
+│   ├── validate_leo_projects.sh
+│   └── validate_toml_structure.sh
+│
+└── src/                           ← “collection” folder for every Leo project
     ├── employer_agreement/
     │   ├── leo.toml
-    │   ├── main.leo
-    │   └── import/
-    │       └── .gitkeep
+    │   ├── imports/               ← Leo looks for dep-program bytecode here (keep .gitkeep)
+    │   │   └── .gitkeep
+    │   └── src/              ← NEW (mandatory for 2.4+ layout)
+    │       └── main.leo
+    │
     ├── oversightdao_reserve/
     │   ├── leo.toml
-    │   ├── main.leo
-    │   └── import/
-    │       └── .gitkeep
+    │   ├── imports/
+    │   │   └── .gitkeep
+    │   └── src/
+    │       └── main.leo
+    │
     ├── pncw_payroll/
     │   ├── leo.toml
-    │   ├── main.leo
-    │   └── import/
-    │       └── .gitkeep
+    │   ├── imports/
+    │   │   └── .gitkeep
+    │   └── src/
+    │       └── main.leo
+    │
     ├── pniw_payroll/
     │   ├── leo.toml
-    │   ├── main.leo
-    │   └── import/
-    │       └── .gitkeep
+    │   ├── imports/
+    │   │   └── .gitkeep
+    │   └── src/
+    │       └── main.leo
+    │
     ├── process_tax_compliance/
     │   ├── leo.toml
-    │   ├── main.leo
-    │   └── import/
-    │       └── .gitkeep
+    │   ├── imports/
+    │   │   └── .gitkeep
+    │   └── src/
+    │       └── main.leo
+    │
     ├── subdao_reserve/
     │   ├── leo.toml
-    │   ├── main.leo
-    │   └── import/
-    │       └── .gitkeep
+    │   ├── imports/
+    │   │   └── .gitkeep
+    │   └── src/
+    │       └── main.leo
+    │
     └── weekly_payroll_pool/
         ├── leo.toml
-        ├── main.leo
-        └── import/
-            └── .gitkeep
+        ├── imports/
+        │   └── .gitkeep
+        └── src/
+            └── main.leo
