@@ -5,57 +5,50 @@ pnw_mvp/
 ├── .gitignore
 ├── README.md
 │
-├── scripts/                       ← keep helper scripts together
+├── scripts/
 │   ├── deploy_pnw_mvp.sh
 │   ├── validate_leo_projects.sh
 │   └── validate_toml_structure.sh
 │
-└── src/                           ← “collection” folder for every Leo project
+└── src/
     ├── employer_agreement/
     │   ├── leo.toml
-    │   ├── imports/               ← Leo looks for dep-program bytecode here (keep .gitkeep)
+    │   ├── imports/
     │   │   └── .gitkeep
-    │   └── src/              ← NEW (mandatory for 2.4+ layout)
-    │       └── main.leo
+    │   ├── main.leo
     │
     ├── oversightdao_reserve/
     │   ├── leo.toml
     │   ├── imports/
     │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
+    │   ├── main.leo
     │
     ├── pncw_payroll/
     │   ├── leo.toml
     │   ├── imports/
     │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
+    │   ├── main.leo
     │
     ├── pniw_payroll/
     │   ├── leo.toml
     │   ├── imports/
     │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
+    │   ├── main.leo
     │
     ├── process_tax_compliance/
     │   ├── leo.toml
     │   ├── imports/
     │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
+    │   ├── main.leo
     │
     ├── subdao_reserve/
     │   ├── leo.toml
     │   ├── imports/
     │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
+    │   ├── main.leo
     │
     └── weekly_payroll_pool/
         ├── leo.toml
         ├── imports/
         │   └── .gitkeep
-        └── src/
-            └── main.leo
+        ├── main.leo
