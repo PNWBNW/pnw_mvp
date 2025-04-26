@@ -1,11 +1,11 @@
 [package]
 name = "process_tax_compliance"
-version = "25.04.09"
+version = "25.04.26"
 edition = "2025.3"
 license = "Proprietary"
 authors = "PNW Dev Team"
 description = "Handles employer tax compliance logic for the PNW MVP"
-main = "main.leo"
+main = "src/main.leo"
 
 [dependencies]
 pncw_payroll = { path = "../pncw_payroll" }
@@ -13,6 +13,3 @@ pniw_payroll = { path = "../pniw_payroll" }
 subdao_reserve = { path = "../subdao_reserve" }
 worker_profiles = { path = "../worker_profiles" }
 employer_agreement = { path = "../employer_agreement" }
-
-[leo]
-network = "testnet"
