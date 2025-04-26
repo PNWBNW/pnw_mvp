@@ -1,15 +1,12 @@
 [package]
 name = "pncw_payroll"
-version = "25.04.09"
+version = "25.04.26"
 edition = "2025.3"
-main = "main.leo"
 authors = "PNW dev team"
 description = "Handles full-time worker payroll and credit transfers using Aleo native credits"
 license = "Proprietary"
+main = "src/main.leo"
 
 [dependencies]
 employer_agreement = { path = "../employer_agreement" }
 subdao_reserve = { path = "../subdao_reserve" }
-
-[leo]
-network = "testnet"
