@@ -9,45 +9,43 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     env:
-      NETWORK: testnet
-      SNARKOS_VERSION: v3.6.0   # informational
-      DEPLOYMENT_ROOT: ${{ github.workspace }}/src
-      DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
+      NETWORK:          testnet
+      SNARKOS_VERSION:  v3.6.0        # informational
+      DEPLOYMENT_ROOT:  ${{ github.workspace }}/src
+      DEPLOYMENT_LOGS:  ${{ github.workspace }}/deploy_logs
       ALEO_PRIVATE_KEY: ${{ secrets.ALEO_TEST_KEY }}
 
     steps:
-      - name: Checkout repo
+      - name: ⬇️  Checkout repo
         uses: actions/checkout@v4
 
-      # Optional – Leo uses Rust internally, but building contracts doesn’t
-      # require system-wide toolchains; keep if you need custom helpers
-      - name: Install Rust (optional helper tools)
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.77
-          override: true
-
-      - name: Install Leo CLI
+      - name: 🛠️  Install Leo CLI
         run: |
           curl -L "https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip" -o leo.zip
           unzip leo.zip -d /tmp
-          sudo mv /tmp/leo /usr/local/bin/leo
-          sudo chmod +x /usr/local/bin/leo
+          sudo mv /tmp/leo /usr/local/bin/leo && sudo chmod +x /usr/local/bin/leo
           leo --version
 
-      - name: Validate leo.toml structure
+      - name: 🔍 Validate leo.toml & main.leo paths
         run: |
           chmod +x scripts/validate_toml_structure.sh
-          scripts/validate_toml_structure.sh
+          scripts/validate_toml_structure.sh "$DEPLOYMENT_ROOT"
 
-      - name: Build & deploy contracts
+      - name: 🧪 Optional full build test
+        run: |
+          chmod +x scripts/validate_leo_projects.sh
+          scripts/validate_leo_projects.sh "$DEPLOYMENT_ROOT"
+
+      - name: 📁 Create log folder
+        run: mkdir -p "$DEPLOYMENT_LOGS"
+
+      - name: 🚀 Build & Deploy
         run: |
           chmod +x scripts/deploy_pnw_mvp.sh
           scripts/deploy_pnw_mvp.sh
 
-      - name: Upload deploy logs
+      - name: 📤 Upload deploy logs
         uses: actions/upload-artifact@v4
         with:
           name: deploy_logs
