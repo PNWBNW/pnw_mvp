@@ -1,50 +1,65 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Fail fast, show commands & propagate failures through pipes
 set -euo pipefail
-set -x
+IFS=$'\n\t'
 
-echo "🔥 Starting PNW-MVP Deployment Process (using leo add for dependencies)..."
-echo "🌍 Using network: $NETWORK"
+echo "🔥  Starting PNW-MVP deployment"
+echo "🌍  NETWORK=$NETWORK"
+echo
 
-# Function to extract local dependencies with their paths from leo.toml
-get_local_dependencies() {
-  local toml_file="$1"
-  awk '/\[dependencies\]/,/\[/{if(/path *=/){split($0, a, "="); gsub(/[[:space:]'\''\{\}]/, "", a[2]); print a[2]}}' "$toml_file"
+PROJECT_ROOT="${DEPLOYMENT_ROOT:-./src}"
+LOG_DIR="${DEPLOYMENT_LOGS:-./deploy_logs}"
+mkdir -p "$LOG_DIR"
+
+# --- helper : fetch local dependencies (relative paths) --------------
+deps_from_toml() {
+  awk '/dependencies/,//{ if ($0 ~ /path *=/) { gsub(/.*path *= *"|"/,"",$0); print $0 } }' "$1"
 }
 
-# for contract_dir in "$DEPLOYMENT_ROOT"/*
-# do
-    contract_dir="$DEPLOYMENT_ROOT/employer_agreement"
-    if [ -d "$contract_dir" ] && [ -f "$contract_dir/leo.toml" ]; then
-        contract=$(basename "$contract_dir")
-        echo ""
-        echo "🚀 Building: $contract"
-        echo "📁 Directory: $contract_dir"
+# --- build order (leaves last two payroll contracts that depend on everything else)
+ORDER=(
+  employer_agreement
+  oversightdao_reserve
+  subdao_reserve
+  process_tax_compliance
+  weekly_payroll_pool
+  pncw_payroll
+  pniw_payroll
+)
 
-        cd "$contract_dir"
+for proj in "${ORDER[@]}"; do
+  dir="$PROJECT_ROOT/$proj"
+  [[ -d "$dir" ]] || { echo "⚠️  $proj directory not found – skipping"; continue; }
 
-        echo "🔗 Adding local dependencies for $contract..."
-        local_dependencies=$(get_local_dependencies "leo.toml")
-        if [[ -n "$local_dependencies" ]]; then
-            while IFS= read -r dependency_path; do
-                echo "   ➕ Adding local dependency: $dependency_path"
-                if ! leo add --path "$dependency_path"; then
-                    echo "❌ Failed to add local dependency '$dependency_path' for $contract"
-                    exit 1
-                fi
-            done <<< "$local_dependencies"
-        else
-            echo "   No local dependencies found in leo.toml"
-        fi
+  echo "🚀  Building & deploying $proj"
+  pushd "$dir" >/dev/null
 
-        echo "🛠️ Building $contract..."
-        if ! leo build --network "$NETWORK" --path .; then
-            echo "❌ Build failed for $contract"
-            exit 13
-        fi
+  # ---- add local deps once (leo will ignore duplicates) -------------
+  for dep_path in $(deps_from_toml leo.toml); do
+    full_path="$PROJECT_ROOT/$dep_path"
+    echo "   ➕  leo add --path $dep_path"
+    leo add --path "$full_path" >/dev/null || true
+  done
 
-        echo "✅ Build succeeded for $contract"
-        cd .. # Go back to the root of src
-    fi
-# done
+  # ---- build --------------------------------------------------------
+  if leo build --network "$NETWORK" >>"$LOG_DIR/${proj}_build.log" 2>&1; then
+    echo "   ✅  Build OK"
+  else
+    echo "   ❌  Build failed – check ${LOG_DIR}/${proj}_build.log"
+    exit 1
+  fi
 
-echo "🎉 Deployment process completed!"
+  # ---- deploy -------------------------------------------------------
+  if leo deploy --network "$NETWORK" --private-key "$ALEO_PRIVATE_KEY" \
+        >>"$LOG_DIR/${proj}_deploy.log" 2>&1; then
+    echo "   🚀  Deployed!"
+  else
+    echo "   ❌  Deploy failed – check ${LOG_DIR}/${proj}_deploy.log"
+    exit 1
+  fi
+
+  popd >/dev/null
+  echo
+done
+
+echo "🎉  All contracts built & deployed successfully!"
