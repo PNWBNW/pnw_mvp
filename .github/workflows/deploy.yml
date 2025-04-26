@@ -12,49 +12,44 @@ jobs:
 
     env:
       NETWORK: testnet
-      SNARKOS_VERSION: v3.6.0 # This is for informational purposes, Leo handles network
+      SNARKOS_VERSION: v3.6.0      # informational
       DEPLOYMENT_ROOT: ${{ github.workspace }}/src
       DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
       ALEO_PRIVATE_KEY: ${{ secrets.ALEO_TEST_KEY }}
 
     steps:
-    - name: Checkout repo
+    - name: ⬇️  Checkout repo
       uses: actions/checkout@v4
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: 1.77
-        override: true # Ensure we get the specified version
-
-    - name: Install Leo CLI
+    - name: 🛠️  Install Leo CLI
       run: |
         curl -L "https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip" -o leo.zip
         unzip leo.zip -d /tmp
-        sudo mv /tmp/leo /usr/local/bin/
+        sudo mv /tmp/leo /usr/local/bin/leo
         sudo chmod +x /usr/local/bin/leo
         leo --version
 
-    - name: Confirm Leo Installation
+    # --- quick static checks ----------------------------------------
+    - name: 🔍 Validate leo.toml structure
       run: |
-        echo "🧪 Using Leo CLI version: $(leo --version)"
-
-    - name: Validate toml structure
-      run: |
-        chmod +x ./validate_toml_structure.sh
+        chmod +x validate_toml_structure.sh
         ./validate_toml_structure.sh
 
-    - name: Create deploy logs folder
-      run: mkdir -p "$DEPLOYMENT_LOGS"
-
-    - name: Deploy contracts
+    # --- full ‘leo build’ compile pass ------------------------------
+    - name: 🧪 Compile-check every project
       run: |
-        chmod -R +r ./src/*
-        chmod +x ./deploy_pnw_mvp.sh
-        export LEO_PATH="$GITHUB_WORKSPACE/src"
+        mkdir -p "$DEPLOYMENT_LOGS"
+        chmod +x validate_leo_projects.sh
+        ./validate_leo_projects.sh
+
+    # --- build & deploy --------------------------------------------
+    - name: 🚀 Build & deploy contracts
+      run: |
+        chmod +x deploy_pnw_mvp.sh
         ./deploy_pnw_mvp.sh
 
-    - name: Upload deploy logs
+    # --- archive logs ----------------------------------------------
+    - name: 📦 Upload deploy logs
       uses: actions/upload-artifact@v4
       with:
         name: deploy_logs
