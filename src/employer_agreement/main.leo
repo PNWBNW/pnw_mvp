@@ -1,18 +1,18 @@
 program employer_agreement.aleo {
 
-import aleo_std::context::*;
-import aleo_std::mapping::*;
-import aleo_std::assert::*;
-import aleo_std::crypto::*;
-import aleo_std::bytes::*;
-import aleo_std::field::*;
-import aleo_std::math::*;
-import aleo_std::option::*;
-import aleo_std::result::*;
-import aleo_std::env::*;
-import aleo_std::record::*;
-import worker_profiles::*;
-import subdao_reserve::*;
+import context.leo;
+import mapping.leo;
+import assert.leo;
+import crypto.leo;
+import bytes.leo;
+import field.leo;
+import math.leo;
+import option.leo;
+import result.leo;
+import env.leo;
+import record.leo;
+import worker_profiles.leo;
+import subdao_reserve.leo;
 
 mapping employer_records: address => [u8; 64];
 mapping worker_profiles: address => [u8; 64];
