@@ -1,16 +1,5 @@
-program subdao_reserve;
+program subdao_reserve {
 
-import context.leo;
-import mapping.leo;
-import assert.leo;
-import crypto.leo;
-import bytes.leo;
-import field.leo;
-import math.leo;
-import option.leo;
-import result.leo;
-import env.leo;
-import record.leo;
 import weekly_payroll_pool.aleo;
 import process_tax_compliance.aleo;
 
