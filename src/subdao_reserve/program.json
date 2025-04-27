@@ -1,6 +1,6 @@
 {
   "program": "subdao_reserve.aleo",
   "version": "25.04.26",
-  "description": "Employer registration and worker identity mapping contract for the PNW-MVP system.",
+  "description": "liquidity pools for subdaos to manage for payroll, taxes, and other funding.",
   "license": "Proprietary"
 }
