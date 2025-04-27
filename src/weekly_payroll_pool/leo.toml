@@ -4,7 +4,7 @@ version = "25.04.26"
 edition = "2025.3"
 authors = "PNW MVP Team"
 description = "Handles weekly payroll disbursements from SubDAO reserves to workers via PNCW and PNIW channels."
-license = "PNW-MVP Proprietary License"
+license = "Proprietary License"
 main = "main.leo"
 
 [dependencies]
