@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Verify every contract directory contains:
-# - leo.toml file
-# - main = ... entry in leo.toml
-# - main.leo file present as referenced
+# Strict validation for each Leo contract directory:
+# - leo.toml must exist
+# - leo.toml must have correct 'main = "src/main.leo"'
+# - src/main.leo file must physically exist
 
 set -euo pipefail
 
 ROOT_DIR="${DEPLOYMENT_ROOT:-./src}"
 
-echo "🔎 Validating leo.toml structure in: $ROOT_DIR"
+echo "🔎 Strictly validating leo.toml structure in: $ROOT_DIR"
 echo
 
 ISSUES=0
@@ -33,13 +33,16 @@ find "$ROOT_DIR" -mindepth 1 -maxdepth 1 -type d | while read -r CONTRACT_DIR; d
     continue
   fi
 
-  # Accept either nested path or flat fallback
-  if [[ -f "$CONTRACT_DIR/$MAIN_PATH" ]]; then
-    echo "   ✅ Found $MAIN_PATH"
-  elif [[ -f "$CONTRACT_DIR/main.leo" ]]; then
-    echo "   ⚠️ Fallback to flat main.leo (recommend fixing leo.toml)"
+  if [[ "$MAIN_PATH" != "src/main.leo" ]]; then
+    echo "   ❌ main must point to src/main.leo, found: $MAIN_PATH"
+    ((ISSUES++))
+    continue
+  fi
+
+  if [[ -f "$CONTRACT_DIR/src/main.leo" ]]; then
+    echo "   ✅ src/main.leo found"
   else
-    echo "   ❌ main.leo not found as referenced"
+    echo "   ❌ src/main.leo not found in $CONTRACT_NAME"
     ((ISSUES++))
   fi
 
@@ -47,7 +50,7 @@ find "$ROOT_DIR" -mindepth 1 -maxdepth 1 -type d | while read -r CONTRACT_DIR; d
 done
 
 if [[ $ISSUES -eq 0 ]]; then
-  echo "✅ All contracts structurally validated."
+  echo "✅ All contracts strictly validated."
 else
   echo "⚠️ Validation finished with $ISSUES issue(s)."
   exit 1
