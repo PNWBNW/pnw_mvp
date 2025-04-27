@@ -31,8 +31,8 @@ transition get_worker_data(employer: address, worker: address) -> [u8; 64] {
 transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> bool {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
 
-    let registry_entry = employer_registry.get(employer_ans);
-    let reverse_entry = ans_reverse_lookup.get(encoded_ans);
+    let registry_entry: bool = employer_registry.get(employer_ans);
+    let reverse_entry: [u8; 32] = ans_reverse_lookup.get(encoded_ans);
 
     assert(registry_entry == false);
     assert(reverse_entry == [0u8; 32]);
@@ -46,21 +46,24 @@ transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> boo
 }
 
 transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
-    let registry_entry = employer_registry.get(employer_ans);
+    let registry_entry: bool = employer_registry.get(employer_ans);
     assert(registry_entry == true);
+
     employer_tax_compliance.set(employer_ans, true);
     return true;
 }
 
 transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
-    let registry_entry = employer_registry.get(employer_ans);
+    let registry_entry: bool = employer_registry.get(employer_ans);
     assert(registry_entry == true);
+
     return true;
 }
 
 function lookup_employer_by_ans(ans_name: bytes) -> [u8; 32] {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
-    let lookup = ans_reverse_lookup.get(encoded_ans);
+    let lookup: [u8; 32] = ans_reverse_lookup.get(encoded_ans);
+
     assert(lookup != [0u8; 32]);
     return lookup;
 }
