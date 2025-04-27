@@ -9,13 +9,13 @@ mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
 transition register_employer(employer: address, employer_data: [u8; 64]) -> bool {
     employer_records.set(employer, employer_data);
-    true
+    true;
 }
 
 transition link_worker_to_employer(employer: address, worker: address, worker_data: [u8; 64]) -> bool {
     assert(employer == caller);
     worker_profiles.set(worker, worker_data);
-    true
+    true;
 }
 
 transition get_employer_data(employer: address) -> [u8; 64] {
@@ -42,20 +42,20 @@ transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> boo
     ans_registry.set(employer_ans, encoded_ans);
     ans_reverse_lookup.set(encoded_ans, employer_ans);
 
-    true
+    true;
 }
 
 transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     let registry_entry = employer_registry.get(employer_ans);
     assert(registry_entry == true);
     employer_tax_compliance.set(employer_ans, true);
-    true
+    true;
 }
 
 transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
     let registry_entry = employer_registry.get(employer_ans);
     assert(registry_entry == true);
-    true
+    true;
 }
 
 function lookup_employer_by_ans(ans_name: bytes) -> [u8; 32] {
