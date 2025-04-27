@@ -5,7 +5,7 @@ edition = "2025.3"
 license = "Proprietary"
 description = "Handles reserve logic for each subDAO, including funding payroll and managing tax obligations"
 authors = "PNW Dev Team"
-main = "src/main.leo"
+main = "main.leo"
 
 [dependencies]
 weekly_payroll_pool = { path = "../weekly_payroll_pool" }
