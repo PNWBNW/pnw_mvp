@@ -35,7 +35,7 @@ transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> boo
     let reverse_entry : ans_reverse_lookup=get(encoded_ans);
 
     assert(registry_entry == false);
-    assert(reverse_entry == [0u8; 32]);
+    assert(reverse_entry == [0u8] 32]);
 
     employer_registry.set(employer_ans, true);
     employer_tax_compliance.set(employer_ans, false);
