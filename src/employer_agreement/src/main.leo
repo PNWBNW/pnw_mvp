@@ -35,7 +35,9 @@ transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> boo
     let reverse_entry: [u8; 32] = ans_reverse_lookup.get(encoded_ans);
 
     assert(registry_entry == false);
-    assert(reverse_entry == [0u8; 32]);
+
+    let empty_entry: [u8; 32] = [0u8; 32];
+    assert(reverse_entry == empty_entry);
 
     employer_registry.set(employer_ans, true);
     employer_tax_compliance.set(employer_ans, false);
@@ -46,28 +48,25 @@ transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> boo
 }
 
 transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
-    let registry_entry: bool = employer_registry.get(employer_ans);
-    assert(registry_entry == true);
-
+    let registered: bool = employer_registry.get(employer_ans);
+    assert(registered == true);
     employer_tax_compliance.set(employer_ans, true);
     return true;
 }
 
 transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
-    let registry_entry: bool = employer_registry.get(employer_ans);
-    assert(registry_entry == true);
-
+    let registered: bool = employer_registry.get(employer_ans);
+    assert(registered == true);
     return true;
 }
 
 function lookup_employer_by_ans(ans_name: bytes) -> [u8; 32] {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
-    let lookup: [u8; 32] = ans_reverse_lookup.get(encoded_ans);
-
-    assert(lookup != [0u8; 32]);
-    return lookup;
+    let exists: [u8; 32] = ans_reverse_lookup.get(encoded_ans);
+    return exists;
 }
 
 function encode_ans(ans_name: bytes) -> [u8; 32] {
-    return hash_arc721(ans_name);
+    hash_arc721(ans_name)
+}
 }
