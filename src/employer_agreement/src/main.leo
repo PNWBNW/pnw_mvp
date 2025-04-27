@@ -20,12 +20,12 @@ transition link_worker_to_employer(employer: address, worker: address, worker_da
 
 transition get_employer_data(employer: address) -> [u8; 64] {
     assert(employer == caller);
-    employer_records.get(employer)
+    employer_records.get(employer);
 }
 
 transition get_worker_data(employer: address, worker: address) -> [u8; 64] {
     assert(employer == caller);
-    worker_profiles.get(worker)
+    worker_profiles.get(worker);
 }
 
 transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> bool {
