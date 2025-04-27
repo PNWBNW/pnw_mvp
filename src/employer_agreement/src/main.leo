@@ -36,7 +36,7 @@ transition register_employer_ans(employer_ans: [u8; 32], ans_name: bytes) -> boo
 
     assert(registry_entry == false);
 
-    let empty_entry: [u8; 32] = [0u8; 32];
+    let empty_entry: [u8; 32] = [0u8; 32u8];
     assert(reverse_entry == empty_entry);
 
     employer_registry.set(employer_ans, true);
