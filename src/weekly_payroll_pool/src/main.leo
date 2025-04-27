@@ -1,16 +1,5 @@
-program weekly_payroll_pool;
+program weekly_payroll_pool {
 
-import context.leo;
-import mapping.leo;
-import assert.leo;
-import crypto.leo;
-import bytes.leo;
-import field.leo;
-import math.leo;
-import option.leo;
-import result.leo;
-import env.leo;
-import record.leo;
 import subdao_reserve.aleo;
 import pncw_payroll.aleo;
 import pniw_payroll.aleo;
