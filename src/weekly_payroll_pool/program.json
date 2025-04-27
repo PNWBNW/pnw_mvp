@@ -1,0 +1,6 @@
+{
+  "program": "weekly_payroll_pool.aleo",
+  "version": "25.04.26",
+  "description": "liquidity pool to prefund payroll to approve continuation of work.",
+  "license": "Proprietary"
+}
