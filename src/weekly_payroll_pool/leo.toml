@@ -5,7 +5,10 @@ edition = "2025.3"
 authors = "PNW MVP Team"
 description = "Handles weekly payroll disbursements from SubDAO reserves to workers via PNCW and PNIW channels."
 license = "Proprietary License"
-main = "main.leo"
+main = "src/main.leo"
+
+[program]
+path = "src/main.leo"
 
 [dependencies]
 subdao_reserve = { path = "../subdao_reserve" }
