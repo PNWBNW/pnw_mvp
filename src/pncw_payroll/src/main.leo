@@ -1,16 +1,5 @@
-program pncw_payroll;
+program pncw_payroll {
 
-import context.leo;
-import mapping.leo;
-import assert.leo;
-import crypto.leo;
-import bytes.leo;
-import field.leo;
-import math.leo;
-import option.leo;
-import result.leo;
-import env.leo;
-import record.leo;
 import employer_agreement.aleo;
 import subdao_reserve.aleo;
 
