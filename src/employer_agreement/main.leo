@@ -1,16 +1,4 @@
-program employer_agreement;
-
-import context.leo;
-import mapping.leo;
-import assert.leo;
-import crypto.leo;
-import bytes.leo;
-import field.leo;
-import math.leo;
-import option.leo;
-import result.leo;
-import env.leo;
-import record.leo;
+program employer_agreement.aleo {
 
 mapping employer_records: address => [u8; 64];
 mapping worker_profiles: address => [u8; 64];
