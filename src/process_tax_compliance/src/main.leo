@@ -1,20 +1,8 @@
-program process_tax_compliance;
+program process_tax_compliance {
 
-import context.leo;
-import mapping.leo;
-import assert.leo;
-import crypto.leo;
-import bytes.leo;
-import field.leo;
-import math.leo;
-import option.leo;
-import result.leo;
-import env.leo;
-import record.leo;
 import pncw_payroll.aleo;
 import pniw_payroll.aleo;
 import subdao_reserve.aleo;
-import worker_profiles.aleo;
 import employer_agreement.aleo;
 
 mapping employer_tax: [u8; 32] => EmployerTaxRecord;
