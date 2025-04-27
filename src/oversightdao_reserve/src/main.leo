@@ -1,16 +1,5 @@
-program oversightdao_reserve;
+program oversightdao_reserve {
 
-import context.leo;
-import mapping.leo;
-import assert.leo;
-import crypto.leo;
-import bytes.leo;
-import field.leo;
-import math.leo;
-import option.leo;
-import result.leo;
-import env.leo;
-import record.leo;
 
 mapping reserve_balance: [u8; 32] => u64;
 
