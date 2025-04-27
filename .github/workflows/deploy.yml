@@ -18,10 +18,10 @@ jobs:
       ALEO_PRIVATE_KEY: ${{ secrets.ALEO_TEST_KEY }}
 
     steps:
-      - name: ⬇️  Checkout repository
+      - name: ⬇️ Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🛠️  Install Leo CLI
+      - name: 🛠️ Install Leo CLI
         run: |
           curl -L "https://github.com/ProvableHQ/leo/releases/download/v2.5.0/leo-mainnet-x86_64-unknown-linux-gnu.zip" -o leo.zip
           unzip leo.zip -d /tmp
@@ -29,20 +29,10 @@ jobs:
           sudo chmod +x /usr/local/bin/leo
           leo --version
 
-      - name: 🔍 Validate leo.toml and main.leo
-        run: |
-          chmod +x scripts/validate_toml_structure.sh
-          ./scripts/validate_toml_structure.sh "$DEPLOYMENT_ROOT"
-
-      - name: 🧪 Build all contracts (optional test build)
-        run: |
-          chmod +x scripts/validate_leo_projects.sh
-          ./scripts/validate_leo_projects.sh "$DEPLOYMENT_ROOT"
-
       - name: 📁 Create deployment logs folder
         run: mkdir -p "$DEPLOYMENT_LOGS"
 
-      - name: 🚀 Deploy contracts
+      - name: 🚀 Clean build and deploy contracts
         run: |
           chmod +x scripts/deploy_pnw_mvp.sh
           ./scripts/deploy_pnw_mvp.sh
