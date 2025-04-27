@@ -11,5 +11,4 @@ main = "main.leo"
 pncw_payroll = { path = "../pncw_payroll" }
 pniw_payroll = { path = "../pniw_payroll" }
 subdao_reserve = { path = "../subdao_reserve" }
-worker_profiles = { path = "../worker_profiles" }
 employer_agreement = { path = "../employer_agreement" }
