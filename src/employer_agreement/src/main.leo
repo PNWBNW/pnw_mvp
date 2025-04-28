@@ -30,7 +30,7 @@ program employer_agreement.aleo {
         // Note: This transition now only returns a Future indicating completion.
         // It doesn't return the actual data read due to async function limitations.
         // Reading data likely needs a different pattern (e.g., off-chain query or events).
-        let _employer_record: [u8; 32] = employer_records.get(employer);
+        let (employer_record: [u8; 32] = employer_records.get(employer);
         // Call dummy async function and return awaited future
         let dummy_future: Future = no_op();
         return await_futures(dummy_future);
@@ -40,7 +40,7 @@ program employer_agreement.aleo {
         assert(employer == self.caller);
         // Note: This transition now only returns a Future indicating completion.
         // It doesn't return the actual data read.
-        let _worker_record: [u8; 32] = worker_profiles.get(worker);
+        let (worker_record: [u8; 32] = worker_profiles.get(worker);
          // Call dummy async function and return awaited future
         let dummy_future: Future = no_op();
         return await_futures(dummy_future);
