@@ -51,10 +51,22 @@ program employer_agreement.aleo {
     async transition register_employer_ans(employer_ans: [u8; 32], ans_name: field) -> bool {
         let encoded_ans: [u8; 32] = encode_ans(ans_name);
         let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
-        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+        // Replaced [0u8; 32] with full array literal
+        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
+        ]);
 
         assert(registry_entry == false);
-        assert(reverse_entry == [0u8; 32]);
+         // Replaced [0u8; 32] with full array literal for comparison
+        assert(reverse_entry == [
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
+        ]);
 
         employer_registry.set(employer_ans, true);
         employer_tax_compliance.set(employer_ans, false);
@@ -79,11 +91,23 @@ program employer_agreement.aleo {
 
     async function lookup_employer_by_ans(ans_name: field) -> [u8; 32] {
         let encoded_ans: [u8; 32] = encode_ans(ans_name);
-        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+         // Replaced [0u8; 32] with full array literal
+        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
+        ]);
         return reverse_entry;
     }
 
     inline encode_ans(ans_name: field) -> [u8; 32] {
-        return [0u8; 32];
+         // Replaced [0u8; 32] with full array literal
+        return [
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
+        ];
     }
 }
