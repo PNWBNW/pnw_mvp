@@ -1,6 +1,4 @@
 program employer_agreement.aleo {
-    // Note: You might need to import hashing functions, e.g.:
-    // use aleo_program::prelude::{Poseidon, Environment};
 
     mapping employer_records: address => [u8; 32];
     mapping worker_profiles: address => [u8; 32];
@@ -9,47 +7,56 @@ program employer_agreement.aleo {
     mapping ans_registry: [u8; 32] => [u8; 32];
     mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
-    async transition register_employer(employer: address, employer_data: [u8; 32]) -> bool {
+    //  Helper functions to interact with mappings
+    async function set_employer_record(employer: address, employer_data: [u8; 32]) -> bool {
         employer_records.set(employer, employer_data);
         return true;
     }
 
-    async transition link_worker_to_employer(employer: address, worker: address, worker_data: [u8; 32]) -> bool {
-        assert(employer == self.caller);
+    async function set_worker_profile(worker: address, worker_data: [u8; 32]) -> bool {
         worker_profiles.set(worker, worker_data);
         return true;
     }
 
+    async function get_employer_record(employer: address) -> [u8; 32] {
+        return employer_records.get(employer);
+    }
+
+    async function get_worker_profile(worker: address) -> [u8; 32] {
+        return worker_profiles.get(worker);
+    }
+
+    async transition register_employer(employer: address, employer_data: [u8; 32]) -> bool {
+        let result: Future<bool> = set_employer_record(employer, employer_data);
+        return await_future(result);
+    }
+
+    async transition link_worker_to_employer(employer: address, worker: address, worker_data: [u8; 32]) -> bool {
+        assert(employer == self.caller);
+        let result: Future<bool> = set_worker_profile(worker, worker_data);
+        return await_future(result);
+    }
+
     async transition get_employer_data(employer: address) -> [u8; 32] {
         assert(employer == self.caller);
-        return employer_records.get(employer);
+        let result: Future<[u8; 32]> = get_employer_record(employer);
+        return await_future(result);
     }
 
     async transition get_worker_data(employer: address, worker: address) -> [u8; 32] {
         assert(employer == self.caller);
-        return worker_profiles.get(worker);
+        let result: Future<[u8; 32]> = get_worker_profile(worker);
+        return await_future(result);
     }
 
     async transition register_employer_ans(employer_ans: [u8; 32], ans_name: field) -> bool {
         let encoded_ans: [u8; 32] = encode_ans(ans_name);
 
         let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
-        // Reverted [0u8; 32] shorthand back to full array literal
-        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-        ]);
+        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
 
         assert(registry_entry == false);
-        // Reverted [0u8; 32] shorthand back to full array literal for comparison
-        assert(reverse_entry == [
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-        ]);
+        assert(reverse_entry == [0u8; 32]);
 
         employer_registry.set(employer_ans, true);
         employer_tax_compliance.set(employer_ans, false);
@@ -74,25 +81,11 @@ program employer_agreement.aleo {
 
     async function lookup_employer_by_ans(ans_name: field) -> [u8; 32] {
         let encoded_ans: [u8; 32] = encode_ans(ans_name);
-        // Reverted [0u8; 32] shorthand back to full array literal
-        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-        ]);
+        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
         return reverse_entry;
     }
 
     inline encode_ans(ans_name: field) -> [u8; 32] {
-        // Placeholder return: Replace with actual hash result using Poseidon or similar.
-        // return Poseidon::hash_to_bytes(ans_name); // Example
-        // Reverted [0u8; 32] shorthand back to full array literal
-        return [
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-        ];
+        return [0u8; 32];
     }
 }
