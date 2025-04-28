@@ -12,7 +12,6 @@ function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
     return worker_ans;
 }
 
-// NEW - Regular transition for funding pool (safe for .set)
 transition fund_weekly_pool_sync(subdao_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
     let current_balance: u64 = weekly_balance.get_or_use(subdao_ans, 0u64);
@@ -21,14 +20,12 @@ transition fund_weekly_pool_sync(subdao_ans: [u8; 32], amount: u64) -> bool {
     return true;
 }
 
-// Async wrapper that calls the sync transition
 async transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
     fund_weekly_pool_sync(subdao_ans, amount);
     return true;
 }
 
-// NEW - Regular transition for executing payroll (safe for .set)
-transition execute_weekly_payroll_sync(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 64]) -> bool {
+transition execute_weekly_payroll_sync(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 32]) -> bool {
     assert(amount > 0u64);
 
     let weekly_funds: u64 = weekly_balance.get_or_use(subdao_ans, 0u64);
@@ -40,14 +37,19 @@ transition execute_weekly_payroll_sync(worker_ans: [u8; 32], subdao_ans: [u8; 32
     return true;
 }
 
-// Async wrapper that handles the public transfer and worker payroll logic
-async transition execute_weekly_payroll(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 64]) -> bool {
+async transition execute_weekly_payroll(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 32]) -> bool {
     execute_weekly_payroll_sync(worker_ans, subdao_ans, amount, zpass_hash);
 
     let worker_address: [u8; 32] = lookup_worker_by_ans(worker_ans);
     credits::transfer_public(worker_address, amount);
 
-    let employer_ans: [u8; 32] = ans_reverse_lookup.get_or_use(self.caller, [0u8; 32]);
+    let employer_ans: [u8; 32] = ans_reverse_lookup.get_or_use(self.caller, [
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
+    ]);
+    
     let worker_type: u8 = worker_types.get_or_use(worker_ans, 0u8);
 
     if worker_type == 10u8 {
@@ -59,7 +61,6 @@ async transition execute_weekly_payroll(worker_ans: [u8; 32], subdao_ans: [u8; 3
     return true;
 }
 
-// Regular transition for finalize (no writes, so async is fine)
 async transition finalize_weekly_payroll(subdao_ans: [u8; 32]) -> bool {
     assert(weekly_balance.contains(subdao_ans));
     return true;
