@@ -7,51 +7,49 @@ program employer_agreement.aleo {
     mapping ans_registry: [u8; 32] => [u8; 32];
     mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
-    //  Helper functions to interact with mappings
-    async function set_employer_record(employer: address, employer_data: [u8; 32]) -> bool {
+    function set_employer_record(employer: address, employer_data: [u8; 32]) -> bool {
         employer_records.set(employer, employer_data);
         return true;
     }
 
-    async function set_worker_profile(worker: address, worker_data: [u8; 32]) -> bool {
+    function set_worker_profile(worker: address, worker_data: [u8; 32]) -> bool {
         worker_profiles.set(worker, worker_data);
         return true;
     }
 
-    async function get_employer_record(employer: address) -> [u8; 32] {
+    function get_employer_record(employer: address) -> [u8; 32] {
         return employer_records.get(employer);
     }
 
-    async function get_worker_profile(worker: address) -> [u8; 32] {
+    function get_worker_profile(worker: address) -> [u8; 32] {
         return worker_profiles.get(worker);
     }
 
     async transition register_employer(employer: address, employer_data: [u8; 32]) -> bool {
-        let result: Future<bool> = set_employer_record(employer, employer_data);
-        return await_future(result);
+        let success: bool = set_employer_record(employer, employer_data);
+        return success;
     }
 
     async transition link_worker_to_employer(employer: address, worker: address, worker_data: [u8; 32]) -> bool {
         assert(employer == self.caller);
-        let result: Future<bool> = set_worker_profile(worker, worker_data);
-        return await_future(result);
+        let success: bool = set_worker_profile(worker, worker_data);
+        return success;
     }
 
     async transition get_employer_data(employer: address) -> [u8; 32] {
         assert(employer == self.caller);
-        let result: Future<[u8; 32]> = get_employer_record(employer);
-        return await_future(result);
+        let employer_record: [u8; 32] = get_employer_record(employer);
+        return employer_record;
     }
 
     async transition get_worker_data(employer: address, worker: address) -> [u8; 32] {
         assert(employer == self.caller);
-        let result: Future<[u8; 32]> = get_worker_profile(worker);
-        return await_future(result);
+        let worker_record: [u8; 32] = get_worker_profile(worker);
+        return worker_record;
     }
 
     async transition register_employer_ans(employer_ans: [u8; 32], ans_name: field) -> bool {
         let encoded_ans: [u8; 32] = encode_ans(ans_name);
-
         let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
         let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
 
