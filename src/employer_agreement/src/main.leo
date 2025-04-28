@@ -18,11 +18,11 @@ async transition link_worker_to_employer(employer: address, worker: address, wor
 }
 
 async transition get_employer_data(employer: address) -> [u8; 32] {
-    employer_records.get(employer)
+    employer_records.get(employer);
 }
 
 async transition get_worker_data(employer: address, worker: address) -> [u8; 32] {
-    worker_profiles.get(worker)
+    worker_profiles.get(worker);
 }
 
 async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
@@ -77,5 +77,5 @@ async transition lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
 }
 
 function encode_ans(ans_name: [u8]) -> [u8; 32] {
-    hash_to_field(ans_name)
+    hash_to_field(ans_name);
 }
