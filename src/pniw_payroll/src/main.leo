@@ -2,12 +2,13 @@ program pniw_payroll {
 
 import employer_agreement.aleo;
 import subdao_reserve.aleo;
+import credits.aleo;
 
 mapping employer_funding: [u8; 32] => u64;
 mapping worker_balances: [u8; 32] => u64;
 
 function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
-    worker_ans
+    return worker_ans;
 }
 
 transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
@@ -23,7 +24,7 @@ transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
     credits::transfer_public(subdao_ans, amount);
     subdao_reserve::deposit(subdao_ans, amount);
 
-    true
+    return true;
 }
 
 transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> bool {
@@ -41,14 +42,14 @@ transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount:
     let worker_address: [u8; 32] = lookup_worker_by_ans(worker_ans);
     credits::transfer_public(worker_address, amount);
 
-    true
+    return true;
 }
 
 transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
     assert(worker_balances.contains(worker_ans));
-    true
+    return true;
 }
 
 function verify_worker_balance(worker_ans: [u8; 32]) -> u64 {
-    worker_balances.get_or_use(worker_ans, 0u64)
+    return worker_balances.get_or_use(worker_ans, 0u64);
 }
