@@ -14,35 +14,35 @@ const TAX_SINK: [u8; 32] = encode_ans(b"govtax.pnw.ans");
 
 struct EmployerTaxRecord {
     employer_ans: [u8; 32],
-    total_tax_paid: u64,
-    last_payment_timestamp: u64,
+    total_tax_paid: u32,
+    last_payment_timestamp: u32,
     is_compliant: bool
 }
 
-function encode_ans(ans_name: bytes) -> [u8; 32] {
+function encode_ans(ans_name: [u8]) -> [u8; 32] {
     hash_arc721(ans_name)
 }
 
-function calculate_tax_due(employer_ans: [u8; 32], payroll_type: u8) -> u64 {
+function calculate_tax_due(payroll_type: u8) -> u32 {
     if payroll_type == 0u8 {
-        1000u64
+        1000u32
     } else if payroll_type == 1u8 {
-        500u64
+        500u32
     } else {
-        0u64
+        0u32
     }
 }
 
-transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> bool {
+async transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> bool {
     assert(employer_zpass_verified.get_or_use(employer_ans, false));
     assert(employer_agreement::employer_registry.get_or_use(employer_ans, false));
 
-    let tax_due: u64 = calculate_tax_due(employer_ans, payroll_type);
+    let tax_due: u32 = calculate_tax_due(payroll_type);
 
     let employer_record: EmployerTaxRecord = employer_tax.get_or_use(employer_ans, EmployerTaxRecord {
         employer_ans,
-        total_tax_paid: 0u64,
-        last_payment_timestamp: 0u64,
+        total_tax_paid: 0u32,
+        last_payment_timestamp: 0u32,
         is_compliant: false
     });
 
@@ -59,10 +59,10 @@ transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> b
         credits::transfer_public(TAX_SINK, tax_due);
     }
 
-    is_compliant
+    return true;
 }
 
-transition finalize_tax_compliance(employer_ans: [u8; 32]) -> bool {
+async transition finalize_tax_compliance(employer_ans: [u8; 32]) -> bool {
     assert(employer_tax.contains(employer_ans));
-    true
+    return true;
 }
