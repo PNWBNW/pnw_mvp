@@ -1,4 +1,4 @@
-program employer_agreement.aleo;
+program employer_agreement.aleo {
 
 mapping employer_records: address => [u8; 32];
 mapping worker_profiles: address => [u8; 32];
@@ -9,12 +9,12 @@ mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
 async transition register_employer(employer: address, employer_data: [u8; 32]) -> bool {
     employer_records.set(employer, employer_data);
-    true
+    return true;
 }
 
 async transition link_worker_to_employer(employer: address, worker: address, worker_data: [u8; 32]) -> bool {
     worker_profiles.set(worker, worker_data);
-    true
+    return true;
 }
 
 async transition get_employer_data(employer: address) -> [u8; 32] {
@@ -49,7 +49,7 @@ async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -
     ans_registry.set(employer_ans, encoded_ans);
     ans_reverse_lookup.set(encoded_ans, employer_ans);
 
-    true
+    return true;
 }
 
 async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
@@ -57,13 +57,13 @@ async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     assert(registered);
 
     employer_tax_compliance.set(employer_ans, true);
-    true
+    return true;
 }
 
 async transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
     let registered: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registered);
-    true
+    return true;
 }
 
 async transition lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
