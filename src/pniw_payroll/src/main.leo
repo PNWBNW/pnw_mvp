@@ -11,7 +11,11 @@ function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
     return worker_ans;
 }
 
-transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
+async transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
+    return finalize_fund_payroll(employer_ans, amount);
+}
+
+async function finalize_fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
     assert(amount > 0u64);
     assert(employer_agreement::employer_registry.get_or_use(employer_ans, false));
     assert(employer_agreement::employer_tax_compliance.get_or_use(employer_ans, false));
@@ -27,7 +31,11 @@ transition fund_payroll(employer_ans: [u8; 32], amount: u64) -> bool {
     return true;
 }
 
-transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> bool {
+async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> bool {
+    return finalize_execute_payroll(worker_ans, employer_ans, amount);
+}
+
+async function finalize_execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u64) -> bool {
     assert(employer_agreement::worker_type.get_or_use(worker_ans, 0u8) != 0u8);
 
     let current_funding: u64 = employer_funding.get_or_use(employer_ans, 0u64);
@@ -45,11 +53,15 @@ transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount:
     return true;
 }
 
-transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
+async transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
+    return finalize_finalize_payroll(worker_ans);
+}
+
+async function finalize_finalize_payroll(worker_ans: [u8; 32]) -> bool {
     assert(worker_balances.contains(worker_ans));
     return true;
 }
 
-function verify_worker_balance(worker_ans: [u8; 32]) -> u64 {
+async function verify_worker_balance(worker_ans: [u8; 32]) -> u64 {
     return worker_balances.get_or_use(worker_ans, 0u64);
 }
