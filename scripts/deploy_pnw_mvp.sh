@@ -37,7 +37,7 @@ for PROJECT in "${PROJECTS[@]}"; do
         cd "$DEPLOYMENT_ROOT/../$PROJECT"
         leo clean
         leo build
-        leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --confirm
+        leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
     else
         echo "❎ Skipping $PROJECT (toggle is not enabled)"
     fi
@@ -55,7 +55,7 @@ RETRY_DELAY=15
 
 for ((i=1;i<=MAX_RETRIES;i++)); do
     echo "🚀 Attempt $i to deploy coordinator_program..."
-    if leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --confirm; then
+    if leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes; then
         echo "✅ coordinator_program deployed successfully!"
         break
     else
