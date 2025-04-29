@@ -12,6 +12,10 @@ function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
 }
 
 async transition fund_payroll(employer_ans: [u8; 32], amount: u32) -> bool {
+    return finalize_fund_payroll(employer_ans, amount);
+}
+
+async function finalize_fund_payroll(employer_ans: [u8; 32], amount: u32) -> bool {
     assert(amount > 0u32);
 
     let is_registered: bool = employer_agreement::employer_registry.get_or_use(employer_ans, false);
@@ -31,6 +35,10 @@ async transition fund_payroll(employer_ans: [u8; 32], amount: u32) -> bool {
 }
 
 async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u32) -> bool {
+    return finalize_execute_payroll(worker_ans, employer_ans, amount);
+}
+
+async function finalize_execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u32) -> bool {
     assert(amount > 0u32);
 
     let worker_type: u8 = employer_agreement::worker_type.get_or_use(worker_ans, 0u8);
@@ -53,6 +61,10 @@ async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], a
 }
 
 async transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
+    return finalize_finalize_payroll(worker_ans);
+}
+
+async function finalize_finalize_payroll(worker_ans: [u8; 32]) -> bool {
     let exists: bool = worker_balances.contains(worker_ans);
     assert(exists);
 
