@@ -1,11 +1,21 @@
-program pncw_payroll {
+program pncw_payroll.aleo {
 
 import employer_agreement.aleo;
 import subdao_reserve.aleo;
 import credits.aleo;
+import payroll_audit_log.aleo;
 
 mapping employer_funding: [u8; 32] => u32;
 mapping worker_balances: [u8; 32] => u32;
+
+struct DateTime {
+    year: u16,
+    month: u8,
+    day: u8,
+    hour: u8,
+    minute: u8,
+    second: u8
+}
 
 function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
     return worker_ans;
@@ -67,6 +77,20 @@ async transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
 async function finalize_finalize_payroll(worker_ans: [u8; 32]) -> bool {
     let exists: bool = worker_balances.contains(worker_ans);
     assert(exists);
+
+    let block_time: DateTime = DateTime {
+        year: block.timestamp.year,
+        month: block.timestamp.month,
+        day: block.timestamp.day,
+        hour: block.timestamp.hour,
+        minute: block.timestamp.minute,
+        second: block.timestamp.second
+    };
+
+    let payment_hash: [u8; 32] = hash_to_field(worker_ans, block.height);
+    payroll_audit_log::record_payment(payment_hash, block_time);
+
+    worker_balances.remove(worker_ans);
 
     return true;
 }
