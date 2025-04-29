@@ -1,0 +1,10 @@
+{
+  "name": "coordinator_program",
+  "description": "A control module for coordinating PNW smart contract dependencies with toggles.",
+  "version": "25.04.28",
+  "authors": [
+    "PNW Engineering Team"
+  ],
+  "main": "src/main.leo",
+  "license": "Proprietary"
+}
