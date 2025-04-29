@@ -1,0 +1,18 @@
+[package]
+name = "coordinator_program"
+version = "25.04.28"
+edition = "2025.3"
+description = "A control module for deploying and coordinating PNW smart contracts selectively."
+authors = "PNW Engineering Team"
+license = "Proprietary"
+main = "src/main.leo"
+
+[dependencies]
+employer_agreement = { path = "../employer_agreement" }
+pncw_payroll = { path = "../pncw_payroll" }
+pniw_payroll = { path = "../pniw_payroll" }
+weekly_payroll_pool = { path = "../weekly_payroll_pool" }
+process_tax_compliance = { path = "../process_tax_compliance" }
+subDAO_reserve = { path = "../subDAO_reserve" }
+payroll_audit_log = { path = "../payroll_audit_log" }
+oversight_dao = { path = "../oversight_dao" }
