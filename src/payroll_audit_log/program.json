@@ -1,0 +1,9 @@
+{
+  "name": "payroll_audit_log",
+  "description": "Audit log for recording payroll and tax proof hashes along with block heights and timestamps.",
+  "version": "0.1.0",
+  "authors": [
+    "PNW Engineering Team"
+  ],
+  "license": "Proprietary"
+}
