@@ -1,8 +1,18 @@
-program pniw_payroll {
+program pniw_payroll.aleo {
 
 import employer_agreement.aleo;
 import subdao_reserve.aleo;
-import credits.aleo;
+import time_oracle.aleo;
+import payroll_audit_log.aleo;
+
+struct DateTime {
+    year: u16,
+    month: u8,
+    day: u8,
+    hour: u8,
+    minute: u8,
+    second: u8
+}
 
 mapping employer_funding: [u8; 32] => u64;
 mapping worker_balances: [u8; 32] => u64;
@@ -40,7 +50,6 @@ async function finalize_execute_payroll(worker_ans: [u8; 32], employer_ans: [u8;
 
     let current_funding: u64 = employer_funding.get_or_use(employer_ans, 0u64);
     assert(current_funding >= amount);
-
     let updated_funding: u64 = current_funding.checked_sub(amount);
     employer_funding.set(employer_ans, updated_funding);
 
@@ -49,6 +58,14 @@ async function finalize_execute_payroll(worker_ans: [u8; 32], employer_ans: [u8;
 
     let worker_address: [u8; 32] = lookup_worker_by_ans(worker_ans);
     credits::transfer_public(worker_address, amount);
+
+    // Consume previous record (simulate lifecycle burn)
+    worker_balances.remove(worker_ans);
+
+    // Timestamping via Demox time_oracle
+    let height: u32 = time_oracle::block_height();
+    let payment_hash: [u8; 32] = hash_to_bytes(worker_ans, height);
+    payroll_audit_log::record(payment_hash, height);
 
     return true;
 }
@@ -64,4 +81,9 @@ async function finalize_finalize_payroll(worker_ans: [u8; 32]) -> bool {
 
 async function verify_worker_balance(worker_ans: [u8; 32]) -> u64 {
     return worker_balances.get_or_use(worker_ans, 0u64);
+}
+
+function hash_to_bytes(worker_ans: [u8; 32], height: u32) -> [u8; 32] {
+    let input: [u8; 36] = worker_ans + height.to_le_bytes();
+    return hash_to_bytes(input)
 }
