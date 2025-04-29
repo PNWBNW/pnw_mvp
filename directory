@@ -8,8 +8,6 @@ pnw_mvp/
 │
 ├── scripts/
 │   ├── deploy_pnw_mvp.sh
-│   ├── validate_leo_projects.sh
-│   └── validate_toml_structure.sh
 │
 └── src/
     ├── employer_agreement/
