@@ -1,0 +1,14 @@
+[package]
+name = "payroll_audit_log"
+version = "0.1.0"
+edition = "2024.1"
+description = "Audit log for payroll and tax proof hashes with timestamps."
+authors = "PNW Engineering Team"
+license = "Proprietary"
+main = "src/main.leo"
+
+[dependencies]
+time_oracle = { path = "../../time_oracle" }
+
+[tool.leo]
+network = "testnet"
