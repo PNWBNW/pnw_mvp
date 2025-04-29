@@ -1,4 +1,4 @@
-program parent_main.aleo {
+program coordinator_program.aleo {
 
 import pncw_payroll.aleo;
 import pniw_payroll.aleo;
