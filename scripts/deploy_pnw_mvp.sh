@@ -1,87 +1,72 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
 
-DEPLOYMENT_ROOT="${DEPLOYMENT_ROOT:-src/coordinator_program}"
-DEPLOYMENT_LOGS="${DEPLOYMENT_LOGS:-deploy_logs}"
+set -e
 
 echo "🔥 Starting coordinator program deployment with .env toggles..."
-mkdir -p "$DEPLOYMENT_LOGS"
 
-# Load the .env file from coordinator_program
-if [ -f "$DEPLOYMENT_ROOT/.env" ]; then
-    echo "📜 Loading environment variables from $DEPLOYMENT_ROOT/.env"
-    set -o allexport
-    source "$DEPLOYMENT_ROOT/.env"
-    set +o allexport
-else
-    echo "❌ .env file not found in coordinator_program."
+ENV_FILE="$DEPLOYMENT_ROOT/.env"
+
+if [ ! -f "$ENV_FILE" ]; then
+    echo "❌ .env file not found at $ENV_FILE"
     exit 1
 fi
 
-# List of all programs and their environment toggle names
-PROGRAMS=("employer_agreement" "oversight_dao" "subdao_reserve" "pncw_payroll" "pniw_payroll" "weekly_payroll_pool" "process_tax_compliance" "payroll_audit_log")
+# Load environment variables
+echo "📜 Loading environment variables from $ENV_FILE"
+set -a
+source "$ENV_FILE"
+set +a
 
-for program in "${PROGRAMS[@]}"; do
-    # Convert program name to env variable name, uppercase and underscores
-    toggle_var_name=$(echo "$program" | tr '[:lower:]' '[:upper:]' | tr '-' '_' )
+# List of dependency projects
+PROJECTS=(
+    "employer_agreement"
+    "oversight_dao"
+    "subdao_reserve"
+    "pncw_payroll"
+    "pniw_payroll"
+    "weekly_payroll_pool"
+    "process_tax_compliance"
+    "payroll_audit_log"
+)
 
-    # Check if the corresponding toggle is set to "true"
-    if [[ "${!toggle_var_name:-false}" == "true" ]]; then
-        PROGRAM_PATH="src/$program"
-
-        if [ -d "$PROGRAM_PATH" ] && [ -f "$PROGRAM_PATH/leo.toml" ]; then
-            echo "🚀 Building and deploying: $program"
-            cd "$PROGRAM_PATH"
-
-            # Clean previous builds
-            echo "🧹 Cleaning..."
-            leo clean || echo "⚠️ Nothing to clean, skipping."
-
-            # Build fresh
-            echo "🔨 Building fresh..."
-            leo build --network testnet
-
-            # Deploy
-            echo "🛫 Deploying..."
-            leo deploy --private-key "$ALEO_PRIVATE_KEY" --network testnet
-
-            # Save deploy logs if available
-            if [[ -f deploy.log ]]; then
-                cp deploy.log "$GITHUB_WORKSPACE/$DEPLOYMENT_LOGS/${program}_deploy.log"
-            else
-                echo "⚠️ No deploy.log found for $program"
-            fi
-
-            cd - > /dev/null
-        else
-            echo "⚠️ Program folder or leo.toml missing for $program. Skipping."
-        fi
+# Deploy each project if its toggle is enabled
+for PROJECT in "${PROJECTS[@]}"; do
+    TOGGLE_VAR="DEPLOY_${PROJECT^^}"
+    if [ "${!TOGGLE_VAR}" == "true" ]; then
+        echo "🚀 Building and deploying: $PROJECT"
+        cd "$DEPLOYMENT_ROOT/../$PROJECT"
+        leo clean
+        leo build
+        leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --confirm
     else
-        echo "❎ Skipping $program (toggle is not enabled)"
+        echo "❎ Skipping $PROJECT (toggle is not enabled)"
     fi
 done
 
-# Finally, deploy the coordinator_program itself
-if [ -d "$DEPLOYMENT_ROOT" ] && [ -f "$DEPLOYMENT_ROOT/leo.toml" ]; then
-    echo "🚀 Building and deploying: coordinator_program"
-    cd "$DEPLOYMENT_ROOT"
+# Deploy the coordinator_program
+echo "🚀 Building and deploying: coordinator_program"
+cd "$DEPLOYMENT_ROOT"
+leo clean
+leo build
 
-    # Clean previous builds
-    leo clean || echo "⚠️ Nothing to clean, skipping."
+# Retry logic for deployment
+MAX_RETRIES=3
+RETRY_DELAY=15
 
-    # Build fresh
-    leo build --network testnet
-
-    # Deploy
-    leo deploy --private-key "$ALEO_PRIVATE_KEY" --network testnet
-
-    if [[ -f deploy.log ]]; then
-        cp deploy.log "$GITHUB_WORKSPACE/$DEPLOYMENT_LOGS/coordinator_program_deploy.log"
+for ((i=1;i<=MAX_RETRIES;i++)); do
+    echo "🚀 Attempt $i to deploy coordinator_program..."
+    if leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --confirm; then
+        echo "✅ coordinator_program deployed successfully!"
+        break
     else
-        echo "⚠️ No deploy.log found for coordinator_program"
+        if [ $i -lt $MAX_RETRIES ]; then
+            echo "⚠️ Deployment failed. Retrying in ${RETRY_DELAY} seconds..."
+            sleep $RETRY_DELAY
+        else
+            echo "❌ Deployment failed after $MAX_RETRIES attempts."
+            exit 1
+        fi
     fi
-
-    cd - > /dev/null
-fi
+done
 
 echo "✅ Deployment completed!"
