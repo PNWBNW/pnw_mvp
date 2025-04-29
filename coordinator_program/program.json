@@ -1,10 +1,11 @@
 {
-  "name": "coordinator_program",
-  "description": "A control module for coordinating PNW smart contract dependencies with toggles.",
-  "version": "25.04.28",
-  "authors": [
-    "PNW Engineering Team"
-  ],
-  "main": "src/main.leo",
-  "license": "Proprietary"
+  "program": "coordinator_program.aleo",
+  "description": "Master control layer for modular PNW program deployment",
+  "developer": "PNW Engineering Team",
+  "version": "1.0.0",
+  "license": "Proprietary",
+  "repository": "https://github.com/PNWBNW/pnw_mvp",
+  "build": {
+    "main": "src/main.leo"
+  }
 }
