@@ -18,14 +18,26 @@ async transition link_worker_to_employer(employer: address, worker: address, wor
 }
 
 async transition get_employer_data(employer: address) -> [u8; 32] {
-    employer_records.get(employer);
+    return finalize_get_employer_data(employer);
+}
+
+async function finalize_get_employer_data(employer: address) -> [u8; 32] {
+    return employer_records.get(employer);
 }
 
 async transition get_worker_data(employer: address, worker: address) -> [u8; 32] {
-    worker_profiles.get(worker);
+    return finalize_get_worker_data(worker);
+}
+
+async function finalize_get_worker_data(worker: address) -> [u8; 32] {
+    return worker_profiles.get(worker);
 }
 
 async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
+    return finalize_register_employer_ans(employer_ans, ans_name);
+}
+
+async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
 
     let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
@@ -53,6 +65,10 @@ async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -
 }
 
 async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
+    return finalize_verify_employer_tax(employer_ans);
+}
+
+async function finalize_verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     let registered: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registered);
 
@@ -61,21 +77,29 @@ async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
 }
 
 async transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
+    return finalize_check_employer_registration(employer_ans);
+}
+
+async function finalize_check_employer_registration(employer_ans: [u8; 32]) -> bool {
     let registered: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registered);
     return true;
 }
 
 async transition lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
+    return finalize_lookup_employer_by_ans(ans_name);
+}
+
+async function finalize_lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
-    ans_reverse_lookup.get_or_use(encoded_ans, [
+    return ans_reverse_lookup.get_or_use(encoded_ans, [
         0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
         0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
         0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
         0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-    ])
+    ]);
 }
 
 function encode_ans(ans_name: [u8]) -> [u8; 32] {
-    hash_to_field(ans_name);
+    return hash_to_field(ans_name);
 }
