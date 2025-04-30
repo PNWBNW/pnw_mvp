@@ -6,67 +6,72 @@ mapping employer_registry: [u8; 32] => bool;
 mapping employer_tax_compliance: [u8; 32] => bool;
 mapping ans_registry: [u8; 32] => [u8; 32];
 mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
-mapping registration_heights: address => u32;
 
 struct Employer {
-    employer_commitment: field.public,
+    employer_data: field
+    salt: scalar.private,
+    block_height: u32.public,
     _nonce: group.public
 }
 
 struct Worker {
-    worker_commitment: field.public,
+    worker_data: field
+    salt: scalar.private,
+    block_height: u32.public,
     _nonce: group.public
 }
 
-async transition register_employer(employer: address, employer_hash: [u8; 32]) -> Employer {
+async transition register_employer(employer: address, raw_data: [u8; 32]) -> Employer {
     let salt: scalar = ChaCha::rand_scalar();
-    let commitment: field = BHP256::commit_to_field(employer_hash, salt);
+    let commitment: field = BHP256::commit_to_field(raw_data, salt);
     let height: u32 = block.height;
 
-    let record: Employer = Employer {
-        employer_commitment: commitment,
-        _nonce: random()
+    let record: Employer = record {
+        employer_data: commitment,
+        salt,
+        block_height: height,
+        _nonce: random().public
     };
 
     employer_records.set(employer, record);
-    registration_heights.set(employer, height);
     return record;
-};
+}
 
 async transition link_worker_to_employer(employer: address, worker: address, worker_hash: [u8; 32]) -> Worker {
     let salt: scalar = ChaCha::rand_scalar();
     let commitment: field = BHP256::commit_to_field(worker_hash, salt);
     let height: u32 = block.height;
 
-    let profile: Worker = Worker {
-        worker_commitment: commitment,
-        _nonce: random()
+    let profile: Worker = record {
+        worker_data: commitment,
+        salt,
+        block_height: height,
+        _nonce: random().public
     };
 
     worker_profiles.set(worker, profile);
-    registration_heights.set(worker, height);
     return profile;
-};
+}
 
 async transition get_employer_data(employer: address) -> Employer {
     return finalize_get_employer_data(employer);
-};
+}
 
 async function finalize_get_employer_data(employer: address) -> Employer {
     return employer_records.get(employer);
-};
+}
 
 async transition get_worker_data(employer: address, worker: address) -> Worker {
     return finalize_get_worker_data(worker);
-};
+}
 
 async function finalize_get_worker_data(worker: address) -> Worker {
     return worker_profiles.get(worker);
-};
+}
 
 async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
     return finalize_register_employer_ans(employer_ans, ans_name);
-};
+}
 
 async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
@@ -92,32 +97,32 @@ async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: 
     ans_registry.set(employer_ans, encoded_ans);
     ans_reverse_lookup.set(encoded_ans, employer_ans);
     return true;
-};
+}
 
 async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     return finalize_verify_employer_tax(employer_ans);
-};
+}
 
 async function finalize_verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     let registered: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registered);
     employer_tax_compliance.set(employer_ans, true);
     return true;
-};
+}
 
 async transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
     return finalize_check_employer_registration(employer_ans);
-};
+}
 
 async function finalize_check_employer_registration(employer_ans: [u8; 32]) -> bool {
     let registered: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registered);
     return true;
-};
+}
 
 async transition lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
     return finalize_lookup_employer_by_ans(ans_name);
-};
+}
 
 async function finalize_lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
@@ -127,8 +132,8 @@ async function finalize_lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
         0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
         0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
     ]);
-};
+}
 
 function encode_ans(ans_name: [u8]) -> [u8; 32] {
     return hash_to_field(ans_name);
-};
+}}
