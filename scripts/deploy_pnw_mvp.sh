@@ -17,9 +17,6 @@ set -a
 source "$ENV_FILE"
 set +a
 
-# Set project root absolute path
-ROOT_DIR="$(dirname "$DEPLOYMENT_ROOT")"
-
 # List of dependency projects
 PROJECTS=(
     "employer_agreement"
@@ -32,19 +29,22 @@ PROJECTS=(
     "payroll_audit_log"
 )
 
-# Deploy each dependency project
+# Root directory where all src folders live
+SRC_ROOT="/home/runner/work/pnw_mvp/pnw_mvp/src"
+
+# Deploy each dependency project using full src path
 for PROJECT in "${PROJECTS[@]}"; do
     TOGGLE_VAR="DEPLOY_${PROJECT^^}"
     if [ "${!TOGGLE_VAR}" == "true" ]; then
         echo "🚀 Building and deploying: $PROJECT"
-        PROJECT_PATH="$ROOT_DIR/$PROJECT"
-        if [ -d "$PROJECT_PATH" ]; then
+        PROJECT_PATH="$SRC_ROOT/$PROJECT"
+        if [ -f "$PROJECT_PATH/src/main.leo" ]; then
             cd "$PROJECT_PATH"
             leo clean
             leo build
             leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
         else
-            echo "❌ Directory not found for $PROJECT at $PROJECT_PATH"
+            echo "❌ main.leo not found at $PROJECT_PATH/src/main.leo"
             exit 1
         fi
     else
@@ -52,7 +52,7 @@ for PROJECT in "${PROJECTS[@]}"; do
     fi
 done
 
-# Deploy the coordinator_program
+# Deploy coordinator_program
 echo "🚀 Building and deploying: coordinator_program"
 cd "$DEPLOYMENT_ROOT"
 leo clean
