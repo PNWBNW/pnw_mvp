@@ -8,23 +8,24 @@ mapping ans_registry: [u8; 32] => [u8; 32];
 mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
 struct Employer {
-    employer_hash: field.private,
+    employer_commitment: field.public,
     block_height: u32.public,
     _nonce: group.public
 }
 
 struct Worker {
-    worker_hash: field.private,
+    worker_commitment: field.public,
     block_height: u32.public,
     _nonce: group.public
 }
 
-async transition register_employer(employer: address, employer_data: [u8; 32]) -> Employer {
-    let height: u32 = time_oracle.aleo/get_block_height();
-    let hash: field = hash_to_field(employer_data);
+async transition register_employer(employer: address, employer_hash: [u8; 32]) -> Employer {
+    let salt: scalar = ChaCha::rand_scalar();
+    let commitment: field = BHP256::commit_to_field(employer_hash, salt);
+    let height: u32 = block.height;
 
     let record: Employer = Employer {
-        employer_hash: hash,
+        employer_commitment: commitment,
         block_height: height,
         _nonce: random()
     };
@@ -33,18 +34,19 @@ async transition register_employer(employer: address, employer_data: [u8; 32]) -
     return record;
 };
 
-async transition link_worker_to_employer(employer: address, worker: address, worker_data: [u8; 32]) -> Worker {
-    let height: u32 = time_oracle.aleo/get_block_height();
-    let hash: field = hash_to_field(worker_data);
+async transition link_worker_to_employer(employer: address, worker: address, worker_hash: [u8; 32]) -> Worker {
+    let salt: scalar = ChaCha::rand_scalar();
+    let commitment: field = BHP256::commit_to_field(worker_hash, salt);
+    let height: u32 = block.height;
 
-    let record: Worker = Worker {
-        worker_hash: hash,
+    let profile: Worker = Worker {
+        worker_commitment: commitment,
         block_height: height,
         _nonce: random()
     };
 
-    worker_profiles.set(worker, record);
-    return record;
+    worker_profiles.set(worker, profile);
+    return profile;
 };
 
 async transition get_employer_data(employer: address) -> Employer {
@@ -90,7 +92,6 @@ async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: 
     employer_tax_compliance.set(employer_ans, false);
     ans_registry.set(employer_ans, encoded_ans);
     ans_reverse_lookup.set(encoded_ans, employer_ans);
-
     return true;
 };
 
@@ -98,10 +99,11 @@ async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     return finalize_verify_employer_tax(employer_ans);
 };
 
-async function finalize_verify_employer_tax(employer_ans: [u8; 32]) {
+async function finalize_verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     let registered: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registered);
     employer_tax_compliance.set(employer_ans, true);
+    return true;
 };
 
 async transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
@@ -128,6 +130,6 @@ async function finalize_lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
     ]);
 };
 
-inline function encode_ans(ans_name: [u8]) -> [u8; 32] {
+function encode_ans(ans_name: [u8]) -> [u8; 32] {
     return hash_to_field(ans_name);
-}
+};
