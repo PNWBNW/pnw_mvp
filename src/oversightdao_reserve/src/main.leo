@@ -45,13 +45,7 @@ async function finalize_validate_reserve(subdao_ans: [u8; 32]) {
 }
 
 function encode_ans(ans_name: [u8; 32]) -> [u8; 32] {
-    let mut hash: [u8; 32] = [0u8; 32];
-    let len: u8 = if ans_name.len > 32u8 { 32u8 } else { ans_name.len };
-    let i: u8 = 0u8;
-    while i < len {
-        hash[i] = ans_name[i];
-        i = i + 1u8;
-    };
-    return hash;
+    return ans_name;
 }
 }
+
