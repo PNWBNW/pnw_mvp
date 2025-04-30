@@ -13,20 +13,20 @@ async transition deposit(oversightdao_ans: [u8; 32], amount: u64) -> Future {
     assert(amount > 0u64);
     assert(oversightdao_ans == OVERSIGHT_DAO_ANS);
     let future: Future = finalize_deposit(oversightdao_ans, amount);
-    return future
+    return future;
 }
 
 async function finalize_deposit(oversightdao_ans: [u8; 32], amount: u64) -> bool {
     let current_balance: u64 = reserve_balance.get_or_use(oversightdao_ans, 0u64);
     let new_balance: u64 = current_balance + amount;
     reserve_balance.set(oversightdao_ans, new_balance);
-    return true
+    return true;
 }
 
 async transition withdraw(subdao_ans: [u8; 32], amount: u64) -> Future {
     assert(amount > 0u64);
     let future: Future = finalize_withdraw(subdao_ans, amount);
-    return future
+    return future;
 }
 
 async function finalize_withdraw(subdao_ans: [u8; 32], amount: u64) -> bool {
@@ -34,19 +34,19 @@ async function finalize_withdraw(subdao_ans: [u8; 32], amount: u64) -> bool {
     assert(current_balance >= amount);
     let new_balance: u64 = current_balance - amount;
     reserve_balance.set(OVERSIGHT_DAO_ANS, new_balance);
-    return true
+    return true;
 }
 
 async transition validate_reserve(subdao_ans: [u8; 32]) -> Future {
     let future: Future = finalize_validate_reserve(subdao_ans);
-    return future
+    return future;
 }
 
 async function finalize_validate_reserve(subdao_ans: [u8; 32]) -> bool {
     assert(reserve_balance.contains(OVERSIGHT_DAO_ANS));
-    return true
+    return true;
 }
 
 inline function encode_ans(ans_name: [u8]) -> [u8; 32] {
-    return hash_arc721(ans_name)
+    return hash_arc721(ans_name);
 }
