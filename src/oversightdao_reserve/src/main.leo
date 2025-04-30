@@ -47,6 +47,6 @@ async function finalize_validate_reserve(subdao_ans: [u8; 32]) -> bool {
     return true;
 }
 
-function encode_ans(ans_name: [u8]) -> [u8; 32] {
+function encode_ans(ans_name: [u8; 32]) -> [u8; 32] {
     return hash_arc721(ans_name);
 }
