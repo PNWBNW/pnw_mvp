@@ -8,17 +8,17 @@ mapping ans_registry: [u8; 32] => [u8; 32];
 mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
 struct Employer {
-    employer_data: field
-    salt: scalar.private,
-    block_height: u32.public,
-    _nonce: group.public
+    employer_data: field,
+    salt: scalar,
+    block_height: u32,
+    _nonce: group
 }
 
 struct Worker {
     worker_data: field
-    salt: scalar.private,
-    block_height: u32.public,
-    _nonce: group.public
+    salt: scalar,
+    block_height: u32,
+    _nonce: group
 }
 
 async transition register_employer(employer: address, raw_data: [u8; 32]) -> Employer {
@@ -27,11 +27,11 @@ async transition register_employer(employer: address, raw_data: [u8; 32]) -> Emp
     let height: u32 = block.height;
 
     let record: Employer = record {
-        employer_data: commitment,
-        salt,
-        block_height: height,
+        employer_data: employer_data.public,
+        salt: salt.private,
+        block_height: height.public,
         _nonce: random().public
-    };
+};
 
     employer_records.set(employer, record);
     return record;
@@ -42,12 +42,12 @@ async transition link_worker_to_employer(employer: address, worker: address, wor
     let commitment: field = BHP256::commit_to_field(worker_hash, salt);
     let height: u32 = block.height;
 
-    let profile: Worker = record {
-        worker_data: commitment,
-        salt,
-        block_height: height,
+    let record: Worker = record {
+        employer_data: worker_data.public,
+        salt: salt.private,
+        block_height: height.public,
         _nonce: random().public
-    };
+};
 
     worker_profiles.set(worker, profile);
     return profile;
