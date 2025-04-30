@@ -17,6 +17,9 @@ set -a
 source "$ENV_FILE"
 set +a
 
+# Set project root absolute path
+ROOT_DIR="$(dirname "$DEPLOYMENT_ROOT")"
+
 # List of dependency projects
 PROJECTS=(
     "employer_agreement"
@@ -29,15 +32,21 @@ PROJECTS=(
     "payroll_audit_log"
 )
 
-# Deploy each project if its toggle is enabled
+# Deploy each dependency project
 for PROJECT in "${PROJECTS[@]}"; do
     TOGGLE_VAR="DEPLOY_${PROJECT^^}"
     if [ "${!TOGGLE_VAR}" == "true" ]; then
         echo "🚀 Building and deploying: $PROJECT"
-        cd "$DEPLOYMENT_ROOT/../$PROJECT"
-        leo clean
-        leo build
-        leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
+        PROJECT_PATH="$ROOT_DIR/$PROJECT"
+        if [ -d "$PROJECT_PATH" ]; then
+            cd "$PROJECT_PATH"
+            leo clean
+            leo build
+            leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
+        else
+            echo "❌ Directory not found for $PROJECT at $PROJECT_PATH"
+            exit 1
+        fi
     else
         echo "❎ Skipping $PROJECT (toggle is not enabled)"
     fi
@@ -49,7 +58,6 @@ cd "$DEPLOYMENT_ROOT"
 leo clean
 leo build
 
-# Retry logic for deployment
 MAX_RETRIES=3
 RETRY_DELAY=15
 
