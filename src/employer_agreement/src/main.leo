@@ -1,15 +1,29 @@
 program employer_agreement.aleo {
 
-mapping employer_records: address => [u8; 32];
+mapping employer_records: address => Employer;
 mapping worker_profiles: address => [u8; 32];
 mapping employer_registry: [u8; 32] => bool;
 mapping employer_tax_compliance: [u8; 32] => bool;
 mapping ans_registry: [u8; 32] => [u8; 32];
 mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
-async transition register_employer(employer: address, employer_data: [u8; 32]) -> bool {
-    employer_records.set(employer, employer_data);
-    return true;
+struct Employer {
+    employer_data: [u8; 32].private,
+    block_height: u32.public,
+    _nonce: group.public
+}
+
+async transition register_employer(employer: address, employer_data: [u8; 32]) -> Employer {
+    let height: u32 = block.height;
+
+    let record: Employer = record {
+        employer_data: employer_data,
+        block_height: height,
+        _nonce: random()
+    };
+
+    employer_records.set(employer, record);
+    return record;
 }
 
 async transition link_worker_to_employer(employer: address, worker: address, worker_data: [u8; 32]) -> bool {
@@ -17,11 +31,11 @@ async transition link_worker_to_employer(employer: address, worker: address, wor
     return true;
 }
 
-async transition get_employer_data(employer: address) -> [u8; 32] {
+async transition get_employer_data(employer: address) -> Employer {
     return finalize_get_employer_data(employer);
 }
 
-async function finalize_get_employer_data(employer: address) -> [u8; 32] {
+async function finalize_get_employer_data(employer: address) -> Employer {
     return employer_records.get(employer);
 }
 
