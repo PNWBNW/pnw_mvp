@@ -20,11 +20,11 @@ program employer_agreement.aleo {
         let hash: field = hash_to_field(employer_data);
         let height: u32 = block.height;
 
-        let record: Employer = record {
+        let record: Employer = record(
             employer_hash: hash.private,
             block_height: height.public,
             _nonce: random()
-        };
+        );
 
         employer_records.set(employer, record);
         return record;
@@ -33,11 +33,11 @@ program employer_agreement.aleo {
     async transition link_worker_to_employer(employer: address, worker: address, worker_data: [u8; 32]) -> Worker {
         let height: u32 = block.height;
 
-        let record: Worker = record {
+        let record: Worker = record(
             worker_data: worker_data.private,
             block_height: height.public,
             _nonce: random()
-        };
+        );
 
         worker_profiles.set(worker, record);
         return record;
