@@ -6,16 +6,15 @@ mapping employer_registry: [u8; 32] => bool;
 mapping employer_tax_compliance: [u8; 32] => bool;
 mapping ans_registry: [u8; 32] => [u8; 32];
 mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
+mapping registration_heights: address => u32;
 
 struct Employer {
     employer_commitment: field.public,
-    block_height: u32.public,
     _nonce: group.public
 }
 
 struct Worker {
     worker_commitment: field.public,
-    block_height: u32.public,
     _nonce: group.public
 }
 
@@ -26,11 +25,11 @@ async transition register_employer(employer: address, employer_hash: [u8; 32]) -
 
     let record: Employer = Employer {
         employer_commitment: commitment,
-        block_height: height,
         _nonce: random()
     };
 
     employer_records.set(employer, record);
+    registration_heights.set(employer, height);
     return record;
 };
 
@@ -41,11 +40,11 @@ async transition link_worker_to_employer(employer: address, worker: address, wor
 
     let profile: Worker = Worker {
         worker_commitment: commitment,
-        block_height: height,
         _nonce: random()
     };
 
     worker_profiles.set(worker, profile);
+    registration_heights.set(worker, height);
     return profile;
 };
 
