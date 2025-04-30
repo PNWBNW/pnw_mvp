@@ -20,7 +20,7 @@ set +a
 # List of dependency projects
 PROJECTS=(
     "employer_agreement"
-    "oversight_dao"
+    "oversightdao_reserve"
     "subdao_reserve"
     "pncw_payroll"
     "pniw_payroll"
