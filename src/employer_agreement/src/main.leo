@@ -8,15 +8,15 @@ mapping ans_registry: [u8; 32] => [u8; 32];
 mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
 struct Employer {
-    employer_hash: private field,
-    block_height: public u32,
-    _nonce: public group
+    employer_hash: field.private,
+    block_height: u32.public,
+    _nonce: group.public
 }
 
 struct Worker {
-    worker_hash: private field,
-    block_height: public u32,
-    _nonce: public group
+    worker_hash: field.private,
+    block_height: u32.public,
+    _nonce: group.public
 }
 
 async transition register_employer(employer: address, employer_data: [u8; 32]) -> Employer {
