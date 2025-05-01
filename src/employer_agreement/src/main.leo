@@ -29,7 +29,7 @@ async transition register_employer(owner: address, raw_data: [u8; 32], height: u
         salt: commitsalt,
         block_height: height
 };  
-    return (regi, finalize_register_employer(raw_data: [u8; 32] ));
+    return (regi, finalize_register_employer(raw_data) [u8; 32] ));
 }
 async function finalize_register_employer(raw_data: [u8; 32]) {
     let commitsalt: scalar = ChaCha::rand_scalar();
