@@ -9,29 +9,21 @@ mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
 struct Employer {
     employer_data: field,
-    salt: scalar,
-    block_height: u32,
     nonce: group
 }
 
 struct Worker {
     owner: address,
     worker_data: field,
-    salt: scalar,
-    block_height: u32,
     nonce: group
 }
 
 async transition register_employer(raw_data: [u8; 32]) -> Employer {
-    let height: u32 = block.height;
-    let salt: scalar = ChaCha::rand_scalar();
-    let commitment: field = BHP256::commit_to_field(raw_data, salt);
+    let commitment: field = hash_to_field(raw_data);
 
-    record: Employer = Employer {
+    let record: Employer = Employer {
         employer_data: commitment,
-        salt: salt,
-        block_height: height,
-        _nonce: random()
+        nonce: random()
     };
 
     employer_records.set(self.signer, record);
@@ -39,16 +31,12 @@ async transition register_employer(raw_data: [u8; 32]) -> Employer {
 }
 
 async transition link_worker_to_employer(worker_hash: [u8; 32]) -> Worker {
-    let height: u32 = block.height;
-    let salt: scalar = ChaCha::rand_scalar();
-    let commitment: field = BHP256::commit_to_field(worker_hash, salt);
+    let commitment: field = hash_to_field(worker_hash);
 
     let profile: Worker = Worker {
         owner: self.signer,
         worker_data: commitment,
-        salt: salt,
-        block_height: height,
-        _nonce: random()
+        nonce: random()
     };
 
     worker_profiles.set(self.signer, profile);
