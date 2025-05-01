@@ -21,15 +21,15 @@ record Worker {
     block_height: u32
 }
 
-async transition register_employer(owner: address, raw_data: [u8; 32], height: u32) -> Employer {
- 
+async transition register_employer(employer: address, raw_data: [u8; 32]) -> (Employer, [u8; 32]) {
+
     let regi: Employer = Employer {
         owner: self.signer, 
         employer_data: raw_data,
         salt: commitsalt,
         block_height: height
 };  
-    return (regi, finalize_register_employer(raw_data) [u8; 32] ));
+    return (regi, finalize_register_employer(raw_data));
 }
 async function finalize_register_employer(raw_data: [u8; 32]) {
     let commitsalt: scalar = ChaCha::rand_scalar();
