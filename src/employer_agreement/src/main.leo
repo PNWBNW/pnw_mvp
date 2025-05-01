@@ -119,7 +119,7 @@ async function finalize_check_employer_regi(employer_ans: [u8; 32]) -> bool {
     return true;
 }
 
-async transition lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
+async transition lookup_employer_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
     return finalize_lookup_employer_by_ans(ans_name);
 }
 
