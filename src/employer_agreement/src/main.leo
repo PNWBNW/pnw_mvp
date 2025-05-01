@@ -1,4 +1,4 @@
-program employer_agreement.aleo;
+program employer_agreement.aleo {
 
 mapping employer_records: address => Employer;
 mapping worker_profiles: address => Worker;
