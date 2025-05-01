@@ -7,40 +7,39 @@ mapping employer_tax_compliance: [u8; 32] => bool;
 mapping ans_registry: [u8; 32] => [u8; 32];
 mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
-struct Employer {
+ record Employer {
+    owner:address,
     employer_data: field,
     salt: scalar,
-    block_height: u32,
-    nonce: group
+    block_height: u32
 }
 
-struct Worker {
-    worker_data: field
+record Worker {
+    owner:address,
+    worker_data: field,
     salt: scalar,
-    block_height: u32,
-    nonce: group
+    block_height: u32
 }
 
-async transition register_employer(employer: address, raw_data: [u8; 32]) -> Employer {
+async transition register_employer(owner: address, raw_data: [u8; 32], block_height: u32) -> Employer {
     let salt: scalar = ChaCha::rand_scalar();
     let commitment: field = BHP256::commit_to_field(raw_data, salt);
-    let height: u32 = block.height;
+    
 
-    let record: Employer = record {
+    let regi: Employer = record {
         employer_data: employer_data.public,
         salt: salt.private,
-        block_height: height.public,
-        _nonce: random().public
+        block_height: 0u32
 };
 
     employer_records.set(employer, record);
-    return record;
+    return regi;
 }
 
 async transition link_worker_to_employer(employer: address, worker: address, worker_hash: [u8; 32]) -> Worker {
     let salt: scalar = ChaCha::rand_scalar();
     let commitment: field = BHP256::commit_to_field(worker_hash, salt);
-    let height: u32 = block.height;
+    
 
     let record: Worker = record {
         employer_data: worker_data.public,
