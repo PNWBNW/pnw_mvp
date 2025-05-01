@@ -21,8 +21,8 @@ async transition register_employer(raw_data: [u8; 32]) -> Employer {
     let commitment: field = hash_to_field(raw_data);
 
     let regi: Employer = Employer {
-        employer_data: commitment.public,
-        nonce: random().public
+        employer_data: commitment,
+        nonce: random()
     };
 
     employer_records.set(self.signer, regi);
@@ -33,8 +33,8 @@ async transition link_worker_to_employer(worker: address, raw_data: [u8; 32]) ->
     let commitment: field = hash_to_field(raw_data);
 
     let profile: Worker = Worker {
-        worker_data: commitment.public,
-        nonce: random().public
+        worker_data: commitment,
+        nonce: random()
     };
 
     worker_profiles.set(worker, profile);
