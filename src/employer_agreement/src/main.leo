@@ -21,21 +21,22 @@ record Worker {
     block_height: u32
 }
 
-async transition register_employer(owner: address, raw_data: [u8; 32], block_height: u32) -> Employer {
-    let salt: scalar = ChaCha::rand_scalar();
-    let commitment: field = BHP256::commit_to_field(raw_data, salt);
-    
-
-    let regi: Employer = record {
-        employer_data: employer_data.public,
-        salt: salt.private,
-        block_height: 0u32
-};
-
-    employer_records.set(employer, record);
-    return regi;
+async transition register_employer(owner: address, raw_data: [u8; 32], height: u32) -> Employer {
+ 
+    let regi: Employer = Employer {
+        owner: self.signer, 
+        employer_data: raw_data,
+        salt: commitsalt,
+        block_height: height
+};  
+    return (regi, finalize_register_employer(raw_data );
 }
-
+async function finalize_register_employer(raw_data)  {
+    let commitsalt: scalar = ChaCha::rand_scalar();
+    let commit: field = BHP256::commit_to_field(raw_data, salt);
+    employer_records.set(employer, regi);
+    return;
+}
 async transition link_worker_to_employer(employer: address, worker: address, worker_hash: [u8; 32]) -> Worker {
     let salt: scalar = ChaCha::rand_scalar();
     let commitment: field = BHP256::commit_to_field(worker_hash, salt);
