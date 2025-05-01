@@ -27,7 +27,7 @@ async transition register_employer(raw_data: [u8; 32]) -> Employer {
     let salt: scalar = ChaCha::rand_scalar();
     let commitment: field = BHP256::commit_to_field(raw_data, salt);
 
-    let record: Employer = Employer {
+    record: Employer = Employer {
         employer_data: commitment,
         salt: salt,
         block_height: height,
