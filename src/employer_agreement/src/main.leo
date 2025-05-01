@@ -57,11 +57,11 @@ async function finalize_get_worker_data(worker: address) -> Worker {
     return worker_profiles.get(worker);
 }
 
-async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
+async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32]) -> bool {
     return finalize_register_employer_ans(employer_ans, ans_name);
 }
 
-async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
+async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32]) -> bool {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
 
     let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
