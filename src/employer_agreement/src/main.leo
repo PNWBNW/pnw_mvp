@@ -1,4 +1,4 @@
-program employer_agreement.aleo {
+program employer_agreement.aleo;
 
 mapping employer_records: address => Employer;
 mapping worker_profiles: address => Worker;
@@ -13,7 +13,6 @@ struct Employer {
 }
 
 struct Worker {
-    owner: address,
     worker_data: field,
     nonce: group
 }
@@ -21,25 +20,24 @@ struct Worker {
 async transition register_employer(raw_data: [u8; 32]) -> Employer {
     let commitment: field = hash_to_field(raw_data);
 
-    let record: Employer = Employer {
-        employer_data: commitment,
-        nonce: random()
+    let regi: Employer = Employer {
+        employer_data: commitment.public,
+        nonce: random().public
     };
 
-    employer_records.set(self.signer, record);
-    return record;
+    employer_records.set(self.signer, regi);
+    return regi;
 }
 
-async transition link_worker_to_employer(worker_hash: [u8; 32]) -> Worker {
-    let commitment: field = hash_to_field(worker_hash);
+async transition link_worker_to_employer(worker: address, raw_data: [u8; 32]) -> Worker {
+    let commitment: field = hash_to_field(raw_data);
 
     let profile: Worker = Worker {
-        owner: self.signer,
-        worker_data: commitment,
-        nonce: random()
+        worker_data: commitment.public,
+        nonce: random().public
     };
 
-    worker_profiles.set(self.signer, profile);
+    worker_profiles.set(worker, profile);
     return profile;
 }
 
@@ -65,11 +63,22 @@ async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -
 
 async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
+
     let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
     assert(!registry_entry);
 
-    let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
-    assert(reverse_entry == [0u8; 32]);
+    let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
+    ]);
+    assert(reverse_entry == [
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
+    ]);
 
     employer_registry.set(employer_ans, true);
     employer_tax_compliance.set(employer_ans, false);
@@ -105,7 +114,12 @@ async transition lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
 
 async function finalize_lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
-    return ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+    return ans_reverse_lookup.get_or_use(encoded_ans, [
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
+    ]);
 }
 
 function encode_ans(ans_name: [u8]) -> [u8; 32] {
