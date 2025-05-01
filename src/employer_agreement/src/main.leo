@@ -11,7 +11,7 @@ struct Employer {
     employer_data: field,
     salt: scalar,
     block_height: u32,
-    _nonce: group
+    nonce: group
 }
 
 struct Worker {
@@ -19,7 +19,7 @@ struct Worker {
     worker_data: field,
     salt: scalar,
     block_height: u32,
-    _nonce: group
+    nonce: group
 }
 
 async transition register_employer(raw_data: [u8; 32]) -> Employer {
