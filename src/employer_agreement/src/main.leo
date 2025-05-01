@@ -43,10 +43,9 @@ async transition link_worker_to_employer(employer: address, worker: address, wor
     
 
     let member: Worker = worker {
-        employer_data: worker_data.public,
-        salt: salt.private,
-        block_height: height.public,
-        _nonce: random().public
+        employer_data: worker_data,
+        salt: salt,
+        block_height: height
 };
 
     worker_profiles.set(worker, profile);
