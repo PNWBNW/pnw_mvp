@@ -42,7 +42,7 @@ async transition link_worker_to_employer(employer: address, worker: address, wor
     let commitment: field = BHP256::commit_to_field(worker_hash, salt);
     
 
-    let record: Worker = record {
+    let member: Worker = worker {
         employer_data: worker_data.public,
         salt: salt.private,
         block_height: height.public,
