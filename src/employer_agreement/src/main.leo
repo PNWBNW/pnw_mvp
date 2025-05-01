@@ -109,11 +109,11 @@ async function finalize_verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     return true;
 }
 
-async transition finalize_employer_registration(employer_ans: [u8; 32]) -> bool {
-    return finalize_check_employer_registration(employer_ans);
+async transition finalize_employer_regi(employer_ans: [u8; 32]) -> bool {
+    return finalize_check_employer_regi(employer_ans);
 }
 
-async function finalize_check_employer_registration(employer_ans: [u8; 32]) -> bool {
+async function finalize_check_employer_regi(employer_ans: [u8; 32]) -> bool {
     let registered: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registered);
     return true;
