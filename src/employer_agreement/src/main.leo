@@ -123,7 +123,7 @@ async transition lookup_employer_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
     return finalize_lookup_employer_by_ans(ans_name);
 }
 
-async function finalize_lookup_employer_by_ans(ans_name: [u8]) -> [u8; 32] {
+async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
     return ans_reverse_lookup.get_or_use(encoded_ans, [
         0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
