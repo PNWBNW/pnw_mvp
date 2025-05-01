@@ -31,7 +31,7 @@ async transition register_employer(owner: address, raw_data: [u8; 32], height: u
 };  
     return (regi, finalize_register_employer(raw_data: [u8; 32] ));
 }
-async function finalize_register_employer(raw_data)  {
+async function finalize_register_employer(raw_data: [u8; 32]) {
     let commitsalt: scalar = ChaCha::rand_scalar();
     let commit: field = BHP256::commit_to_field(raw_data, salt);
     employer_records.set(employer, regi);
