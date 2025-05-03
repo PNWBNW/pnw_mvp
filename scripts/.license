@@ -4,7 +4,7 @@ This script is part of the **Proven National Workers (PNW) MVP** deployment arch
 
 ## Purpose
 
-The `deploy_pnw_mvp.sh` and "deploy_crosschain.sh" scripts were created to:
+The "deploy_pnw_mvp.sh" and "deploy_crosschain.sh" scripts were created to:
 - Automate controlled deployments of Aleo and potentially other ZK-compatible smart contracts
 - Respect per-project `.env` toggles to prevent accidental builds
 - Support reproducible, modular zero-knowledge flows within GitHub Actions or CI pipelines
