@@ -1,0 +1,59 @@
+{
+  "name": "employer_registry",
+  "version": "0.1.0",
+  "description": "Program to register employers, verify tax compliance, and manage ANS mappings.",
+  "authors": ["Proven National Workers"],
+  "program": {
+    "id": "employer_registry.aleo",
+    "functions": [
+      {
+        "name": "register_employer",
+        "type": "async transition",
+        "inputs": ["employer: address", "employer_hash: field"],
+        "output": "Employer"
+      },
+      {
+        "name": "verify_employer_tax",
+        "type": "async transition",
+        "inputs": ["employer_ans: [u8; 32]"],
+        "output": "bool"
+      },
+      {
+        "name": "register_employer_ans",
+        "type": "async transition",
+        "inputs": ["employer_ans: [u8; 32]", "ans_name: [u8]"],
+        "output": "bool"
+      },
+      {
+        "name": "lookup_employer_by_ans",
+        "type": "async transition",
+        "inputs": ["ans_name: [u8]"],
+        "output": "[u8; 32]"
+      },
+      {
+        "name": "finalize_verify_employer_tax",
+        "type": "async function",
+        "inputs": ["employer_ans: [u8; 32]"],
+        "output": "none"
+      },
+      {
+        "name": "finalize_register_employer_ans",
+        "type": "async function",
+        "inputs": ["employer_ans: [u8; 32]", "ans_name: [u8]"],
+        "output": "none"
+      },
+      {
+        "name": "finalize_lookup_employer_by_ans",
+        "type": "async function",
+        "inputs": ["ans_name: [u8]"],
+        "output": "[u8; 32]"
+      },
+      {
+        "name": "encode_ans",
+        "type": "function",
+        "inputs": ["ans_name: [u8]"],
+        "output": "[u8; 32]"
+      }
+    ]
+  }
+}
