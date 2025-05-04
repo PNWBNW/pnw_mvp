@@ -60,10 +60,55 @@ ZKSHARK is divided into **four layers**—each optimized using a best-in-class z
 
 ---
 
-## Usage Example
+Snail Layer: Modular Integrity in ZKShark
 
-- **Payroll Snail** → Validates payment with Virgo
-- **Ghostnet** → Compresses proof using Scarab
-- **Final Layer** → Spartan folds proof into ZKSHARK ledger state
+In the ZKShark architecture, the Snail Layer forms the foundation of secure, auditable computation. Each Snail is a lightweight, function-specific prover that continuously verifies a focused category of logic (e.g., payroll hash validation, worker credential compliance, employer registration timestamps).
+
 
 ---
+
+Core Benefits
+
+1. Isolated Error Detection
+Each snail executes a narrow verification logic across relevant blockheight ranges.
+This modularity enables:
+
+Easier bug tracking
+
+Lower error propagation risk
+
+Easier validation of logic rollback or replay
+
+
+2. Anti-Spoofing Defense
+Because each snail computes proofs independently, attempts to spoof or inject tampered data (e.g. fake worker hashes or retroactive tax edits) can be caught by mismatches between Snail proofs and state expectations.
+
+3. ZK Efficiency Through Specialization
+Each Snail is compiled to prove just one thing well. This allows circuits to be compiled smaller and faster than generalized ZK-SNARKs, optimizing for gas and proving time.
+
+
+---
+
+How Snails Interact with Ghostnet
+
+Snail microproofs are committed into the Ghostnet, a GKR-based aggregation layer that:
+
+Verifies consistency across Snails
+
+Merkle-compresses state updates
+
+Escalates errors or mismatches back to governance or trusted agents
+
+
+
+---
+
+Analogy
+
+Think of Snails as independent auditors, each assigned to a department.
+Ghostnet acts like the auditor general, combining all results into a verified, immutable checkpoint.
+
+
+---
+
+This structure dramatically improves trust and traceability in zero-knowledge systems, especially across decentralized or compliance-sensitive applications like payroll, public registries, or DAOs.
