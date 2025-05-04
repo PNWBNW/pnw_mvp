@@ -5,14 +5,19 @@ build/
 .DS_Store
 *.log
 
-# 🛠️ Ignore all TOML files EXCEPT `leo.toml` in `src/`
-*.toml
-!src/**/leo.toml
+# ✅ Allow project-specific TOML files inside src folders (e.g. src/employer_registry/employer_registry.toml)
+!src/**/*.toml
 
-# ✅ Ensure `.leo` program files are included
+# ✅ Allow the top-level coordinator program TOML
+!coordinator_program.toml
+
+# 🛠️ Ignore all other TOML files not explicitly allowed
+*.toml
+
+# ✅ Ensure .leo source files are included
 !src/**/main.leo
 
-# 🚀 Ignore compiled binary output and cache
+# 🚀 Ignore compiled binary output and cache during development
 *.aleo
 *.avm
 *.r1cs
@@ -22,8 +27,9 @@ build/
 *.gz
 *.bak
 *.lock
+*.json
 
-# 🛠️ Ignore editor-specific files (e.g., VS Code, JetBrains)
+# 🛠️ Ignore editor-specific files
 .vscode/
 *.iml
 *.swp
@@ -46,10 +52,15 @@ npm-debug.log
 yarn-debug.log
 yarn-error.log
 
-# 🔥 Ignore GitHub Actions workflow temp files
+# 🔥 GitHub Actions temp/cache files
 .github/workflows/*.log
 .github/workflows/*.tmp
 
-# ✅ Keep empty import folders via .gitkeep
+# ✅ Preserve empty import folders
 src/**/import/*
 !.gitkeep
+
+# 📌 POST-BROADCAST NOTE:
+# After programs are deployed to Testnet/Mainnet,
+# remove *.avm and *.json from this ignore list to track final broadcast outputs,
+# and optionally remove `leo clean` from deploy scripts.
