@@ -1,4 +1,4 @@
-program employer_agreement.aleo;
+program employer_agreement.aleo{
 
 import ans_registry.aleo;
 
@@ -34,4 +34,5 @@ async transition register_employer_ans(employer: address, ans_hash: [u8; 32]) ->
 
     employer_registry.set(ans_hash, true);
     return true;
+}
 }
