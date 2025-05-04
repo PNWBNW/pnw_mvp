@@ -1,44 +1,38 @@
 program worker_profiles.aleo;
 
-mapping zpass_registry: address => field;
-mapping ans_registry: address => [u8; 32];
+import zpass_verifier.aleo;
+import ans_registry.aleo;
 
-struct WorkerProfile {
-    zpass_hash: field,
-    ans_hash: [u8; 32]
+mapping worker_data: address => Worker;
+
+struct Worker {
+    zpass_verified: bool,
+    ans_name: [u8; 32],
+    _nonce: group
 }
 
-async transition register_worker_profile(worker: address, zpass_id: [u8], ans_name: [u8]) -> WorkerProfile {
-    let zpass_hash: field = hash_arc721(zpass_id);
-    let ans_hash: [u8; 32] = hash_arc721(ans_name);
+async transition register_worker(worker: address, zpass_id: field, ans_hash: [u8; 32]) -> bool {
+    let future_zpass: Future = zpass_verifier.aleo/verify_zpass(zpass_id);
+    let future_ans: Future = ans_registry.aleo/verify_ans(ans_hash);
 
-    zpass_registry.set(worker, zpass_hash);
-    ans_registry.set(worker, ans_hash);
+    let verified: bool = await finalize_verification(future_zpass, future_ans, ans_hash);
 
-    let profile: WorkerProfile = WorkerProfile {
-        zpass_hash,
-        ans_hash
+    let profile: Worker = Worker {
+        zpass_verified: verified,
+        ans_name: ans_hash,
+        _nonce: random()
     };
 
-    return profile;
+    worker_data.set(worker, profile);
+    return true;
 }
 
-async transition get_worker_profile(worker: address) -> WorkerProfile {
-    return finalize_get_worker_profile(worker);
-}
+async function finalize_verification(fz: Future, fa: Future, ans_hash: [u8; 32]) -> bool {
+    let zpass_ok: bool = await fz;
+    let ans_ok: bool = await fa;
 
-async function finalize_get_worker_profile(worker: address) -> WorkerProfile {
-    let zpass_hash: field = zpass_registry.get(worker);
-    let ans_hash: [u8; 32] = ans_registry.get(worker);
+    assert(zpass_ok);
+    assert(ans_ok);
 
-    let profile: WorkerProfile = WorkerProfile {
-        zpass_hash,
-        ans_hash
-    };
-
-    return profile;
-}
-
-function hash_arc721(input: [u8]) -> [u8; 32] {
-    return hash_to_field(input).to_bytes();
+    return true;
 }
