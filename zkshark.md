@@ -1,117 +1,69 @@
+# ZKSHARK: Modular zkStack for Ghostnet-Aggregated Zero-Knowledge Systems
 
-
----
-
-zkSHARK: Phantom-Proof Layer for Sovereign Agricultural Data
-
-Overview
-
-zkSHARK (Zero-Knowledge Scalable Hybrid Argument of Recursive Knowledge) is a modular, quantum-resilient, Merkle-driven proof system. It enables farm-operated data to be compiled off-chain and published as zk-proven commitments via a phantom audit trail called the GhostNet.
-
-GhostNet is zkSHARK. It’s not a separate chain—it’s the zk-layer embedded in zkSHARK that logs proof-of-activity at each block height, without exposing raw data.
-
+**ZKSHARK** (Zero-Knowledge Scalable Hybrid Argument of Recursive Knowledge) is a next-gen zk system built for decentralized and auditable applications with high throughput, low proof cost, and long-term modular verifiability.
 
 ---
 
-Core Design
+## Architectural Overview
 
-1. Sovereign Snail Nodes
+ZKSHARK is divided into **four layers**—each optimized using a best-in-class zk-proof system:
 
-Each farm runs a snail: a background agent collecting and organizing:
-
-Payroll logs
-
-Crop cycles
-
-Compliance records
-
-
-Snails produce Merkle roots of their data without broadcasting content.
-
-2. zkSHARK Aggregators
-
-A zkSHARK instance consumes Merkle roots from one or more snails and produces:
-
-A compressed zk commitment
-
-Anchored to the current block height
-
-
-Example Leo logic:
-
-let root: field = Merkle::commit(data_array);
-let proof: field = BHP256::commit_to_field(root, salt);
-ghost_commits.set(block.height, proof);
-
+### 1. **Worker Data Commitments → Poseidon / Rescue Prime**
+- Hash-based commitment of raw input data (ZPass ID, ANS address, payroll record, etc.).
+- Provides ZK-friendly encoding with low gas costs.
+- Uses either:
+  - **Poseidon** (default Aleo-native ZK hash)
+  - **Rescue Prime** (higher security margin, ZKSHARK preferred)
+- Embedded directly into record creation (e.g. `BHP256::commit_to_field(...)` style).
 
 ---
 
-3. Embedded GhostNet Layer
-
-GhostNet is the invisible zk layer:
-
-Exists entirely within zkSHARK mappings
-
-Stores compressed zk records (ghost_commits) per block height
-
-Cannot be reversed into data, only zk-verified
-
-
-GhostNet is not an L2—it is a phantom zk scaffold inside the Aleo chain.
-
+### 2. **Snail Circuit Proofs → Virgo**
+- Each *snail* handles an isolated function: payroll, taxes, employer onboarding, etc.
+- **Virgo** provides ultra-fast proving for each snail via FFT-free polynomial commitment and streaming GKR logic.
+- Enables real-time circuit verification with polylogarithmic verifier time.
 
 ---
 
-4. Modular Snail Model
-
-Each snail handles a single function:
-
-Snail A: weekly_payroll
-
-Snail B: crop_rotation
-
-Snail C: fertilizer_tracking
-
-
-Snails produce localized Merkle roots. zkSHARK compresses and commits.
-
+### 3. **Ghostnet Aggregation Layer → Scarab GKR**
+- Scarab powers a "Ghostnet" of zk aggregation daemons.
+- Each snail circuit submits its Virgo-proofed result upward.
+- Scarab then recursively combines proof outputs using **Goldreich-Kahan-Rothblum (GKR)**–style reduction.
+- Great for scaling to millions of records with sublinear proof size.
 
 ---
 
-5. zkSHARK vs SNARK/STARK
-
-Feature	zkSHARK	SNARK/STARK
-
-Aggregation Model	Phantom block height commit	Transaction-based proofs
-Proof Origin	Merkle from individual functions	Monolithic circuits
-Quantum Security	512-bit + lattice support ready	Limited (SNARKs especially)
-Data Sovereignty	Farm/local node controlled	Usually prover-controlled
-Auditability	zk-openable via root + witness	Often opaque unless designed
-
-
+### 4. **Final State Root → Recursive Spartan Fold**
+- Final zkLedger state is compressed using Spartan-style folding.
+- Transparent (no trusted setup) and recursively composable.
+- Ideal for proof-carrying data, off-chain light clients, and long-term audit trails.
 
 ---
 
-Future Extensions
+## zkStack Summary
 
-Lattice-based extension for quantum resilience
-
-Toggleable snail modules (e.g. RETIREMENT_FUNDS=true) via .env
-
-Optional zk-opening for local councils, certifiers, exporters
-
-
+| Layer                    | ZK System Used     | Purpose                                     |
+|--------------------------|--------------------|---------------------------------------------|
+| Worker Commitments       | Poseidon / Rescue  | Efficient, secure field commitments         |
+| Snail Circuit Execution  | Virgo              | Fast, streaming ZK verification             |
+| Ghostnet Aggregation     | Scarab GKR         | Recursive zk-middleware for coordination    |
+| Final State Compression  | Spartan            | Folding all outputs into one zkProof        |
 
 ---
 
-Why zkSHARK Is Unique
+## Benefits
 
-GhostNet isn't a chain—it's the invisible heartbeat of zkSHARK.
+- **Modular ZK**: Each zk-snail is independently upgradable.
+- **Quantum-Resilient (512-bit hash roots)**: Resistant to Grover’s algorithm via Rescue.
+- **Recursive + Transparent**: No trusted setup, fully on-chain verifiable.
+- **Optimized for Aleo**: Compatible with Leo 2.5+ programs and composable smart contract outputs.
 
-Every proof is modular, aggregated, and time-stamped.
+---
 
-No raw data lives on-chain—only provable commitment anchors.
+## Usage Example
 
-
+- **Payroll Snail** → Validates payment with Virgo
+- **Ghostnet** → Compresses proof using Scarab
+- **Final Layer** → Spartan folds proof into ZKSHARK ledger state
 
 ---
