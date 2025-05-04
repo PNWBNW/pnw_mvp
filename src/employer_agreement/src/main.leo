@@ -1,128 +1,37 @@
-program employer_agreement.aleo {
+program employer_agreement.aleo;
+
+import ans_registry.aleo;
 
 mapping employer_records: address => Employer;
-mapping worker_profiles: address => Worker;
 mapping employer_registry: [u8; 32] => bool;
-mapping employer_tax_compliance: [u8; 32] => bool;
-mapping ans_registry: [u8; 32] => [u8; 32];
-mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
 struct Employer {
-    employer_data: field,
-    nonce: group
+    employer_hash: field,
+    _nonce: group
 }
 
-struct Worker {
-    worker_data: field,
-    nonce: group
-}
-
-async transition register_employer(raw_data: [u8; 32]) -> Employer {
-    let commitment: field = hash_to_field(raw_data);
-
-    let regi: Employer = Employer {
-        employer_data: commitment,
-        nonce: random()
+async transition register_employer(employer: address, employer_hash: field) -> bool {
+    let record: Employer = Employer {
+        employer_hash,
+        _nonce: random()
     };
 
-    employer_records.set(self.signer, regi);
-    return regi;
-}
-
-async transition link_worker_to_employer(worker: address, raw_data: [u8; 32]) -> Worker {
-    let commitment: field = hash_to_field(raw_data);
-
-    let profile: Worker = Worker {
-        worker_data: commitment,
-        nonce: random()
-    };
-
-    worker_profiles.set(worker, profile);
-    return profile;
-}
-
-async transition get_employer_data(employer: address) -> Employer {
-    return finalize_get_employer_data(employer);
-}
-
-async function finalize_get_employer_data(employer: address) -> Employer {
-    return employer_records.get(employer);
-}
-
-async transition get_worker_data(worker: address) -> Worker {
-    return finalize_get_worker_data(worker);
-}
-
-async function finalize_get_worker_data(worker: address) -> Worker {
-    return worker_profiles.get(worker);
-}
-
-async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32]) -> bool {
-    return finalize_register_employer_ans(employer_ans, ans_name);
-}
-
-async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32]) -> bool {
-    let encoded_ans: [u8; 32] = encode_ans(ans_name);
-
-    let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
-    assert(!registry_entry);
-
-    let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-    ]);
-    assert(reverse_entry == [
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-    ]);
-
-    employer_registry.set(employer_ans, true);
-    employer_tax_compliance.set(employer_ans, false);
-    ans_registry.set(employer_ans, encoded_ans);
-    ans_reverse_lookup.set(encoded_ans, employer_ans);
+    employer_records.set(employer, record);
     return true;
 }
 
-async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
-    return finalize_verify_employer_tax(employer_ans);
-}
+async transition register_employer_ans(employer: address, ans_hash: [u8; 32]) -> bool {
+    let is_registered: bool = employer_registry.get_or_use(ans_hash, false);
+    assert(!is_registered);
 
-async function finalize_verify_employer_tax(employer_ans: [u8; 32]) -> bool {
-    let registered: bool = employer_registry.get_or_use(employer_ans, false);
-    assert(registered);
-    employer_tax_compliance.set(employer_ans, true);
+    let record: Employer = employer_records.get(employer);
+    assert(record.employer_hash != 0field);
+
+    let future: Future = ans_registry.aleo/register_ans(ans_hash);
+    let verified: bool = await future;
+
+    assert(verified);
+
+    employer_registry.set(ans_hash, true);
     return true;
-}
-
-async transition finalize_employer_regi(employer_ans: [u8; 32]) -> bool {
-    return finalize_check_employer_regi(employer_ans);
-}
-
-async function finalize_check_employer_regi(employer_ans: [u8; 32]) -> bool {
-    let registered: bool = employer_registry.get_or_use(employer_ans, false);
-    assert(registered);
-    return true;
-}
-
-async transition lookup_employer_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
-    return finalize_lookup_employer_by_ans(ans_name);
-}
-
-async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
-    let encoded_ans: [u8; 32] = encode_ans(ans_name);
-    return ans_reverse_lookup.get_or_use(encoded_ans, [
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-    ]);
-}
-
-function encode_ans(ans_name: [u8; 32]) -> [u8; 32] {
-    return hash_to_field(ans_name);
-}
 }
