@@ -1,0 +1,9 @@
+[package]
+name = "ans_registry"
+version = "1.0.0"
+edition = "2024.1"
+description = "Aleo Name Service (ANS) registry for mapping labels to addresses and enabling reverse lookup."
+authors = ["PNW Engineering Team"]
+license = "Proprietary"
+main = "sec/main.leo"
+
