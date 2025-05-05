@@ -1,6 +1,6 @@
 
 {
-  "name": "employer_registry",
+  "program": "employer_registry.aleo",
   "location": "./src/employer_registry",
   "description": "Program for registering employer data and mapping workers.",
   "version": "1.0.0",
