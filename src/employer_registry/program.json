@@ -1,0 +1,11 @@
+
+{
+  "name": "employer_registry",
+  "location": "./src/employer_registry",
+  "description": "Program for registering employer data and mapping workers.",
+  "version": "1.0.0",
+  "build": {
+    "entry": "src/main.leo",
+    "output": "build/employer_registry.avm"
+  }
+}
