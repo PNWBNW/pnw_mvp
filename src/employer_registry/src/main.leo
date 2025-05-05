@@ -1,4 +1,4 @@
-program employer_registry.aleo;
+program employer_registry.aleo{
 
 mapping employer_records: address => Employer;
 mapping employer_registry: [u8; 32] => bool;
