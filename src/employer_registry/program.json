@@ -1,9 +1,8 @@
 {
+{
   "program": "employer_registry.aleo",
-  "location": "./src/employer_registry",
-  "description": "Program for registering employer data and mapping workers.",
-  "version": "1.0.0",
-  "license": "Proprietary"
-  "main": "src/main.leo",
+  "version": "25.04.26",
+  "description": "oversightdao",
+  "license": "Proprietary",
   "output": "build/employer_registry.avm"
 }
