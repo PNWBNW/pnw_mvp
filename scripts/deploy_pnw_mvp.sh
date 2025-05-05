@@ -27,6 +27,9 @@ PROJECTS=(
     "weekly_payroll_pool"
     "process_tax_compliance"
     "payroll_audit_log"
+    "ans_registry"
+    "employer_registry"
+    "worker_profiles"
 )
 
 # Root directory where all src folders live
