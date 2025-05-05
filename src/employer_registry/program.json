@@ -1,11 +1,10 @@
 
-{
+
   "program": "employer_registry.aleo",
   "location": "./src/employer_registry",
   "description": "Program for registering employer data and mapping workers.",
   "version": "1.0.0",
   "license": "Proprietary"
-  "entry": "src/main.leo",
+  "main": "src/main.leo",
   "output": "build/employer_registry.avm"
-  }
-}
+  
