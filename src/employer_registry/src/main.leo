@@ -51,7 +51,7 @@ program employer_registry.aleo {
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
         ]);
-        assert(reverse_entry == [0u8; 32]);
+        assert(reverse_entry == [0u8]);
 
         employer_registry.set(employer_ans, true);
         employer_tax_compliance.set(employer_ans, false);
