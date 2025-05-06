@@ -1,4 +1,4 @@
-program employer_registry.aleo{
+program employer_registry.aleo {
 
 mapping employer_records: address => Employer;
 mapping employer_registry: [u8; 32] => bool;
@@ -8,13 +8,13 @@ mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
 
 struct Employer {
     employer_hash: field,
-    _nonce: group
+    nonce: group
 }
 
 async transition register_employer(employer: address, employer_hash: field) -> Employer {
     let record: Employer = Employer {
         employer_hash,
-        _nonce: random()
+        nonce: random()
     };
     employer_records.set(employer, record);
     return record;
