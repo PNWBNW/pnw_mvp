@@ -12,12 +12,12 @@ struct Employer {
 }
 
 async transition register_employer(employer: address, employer_hash: field) -> Employer {
-    let record: Employer = Employer {
+    let employer_entry: Employer = Employer {
         employer_hash,
         nonce: random()
     };
     employer_records.set(employer, record);
-    return record;
+    return employer_entry;
 }
 
 async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
