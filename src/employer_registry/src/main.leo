@@ -48,7 +48,7 @@ async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32
 
 async transition lookup_employer_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
-    return ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+    return ans_reverse_lookup.get_or_use(encoded_ans, [0u8]);
 }
 
 function encode_ans(ans_name: [u8; 32]) -> [u8; 32] {
