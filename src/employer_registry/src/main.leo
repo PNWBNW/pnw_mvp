@@ -22,7 +22,7 @@ async transition register_employer(employer: address, employer_hash: field) -> E
 
 async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     let future: Future = employer_registry.aleo/finalize_verify_employer_tax(employer_ans);
-    let result: await future;
+    let result = await future;
     return result;
 }
 
