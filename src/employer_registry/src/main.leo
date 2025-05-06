@@ -16,7 +16,7 @@ async transition register_employer(employer: address, employer_hash: field) -> E
         employer_hash,
         nonce: random()
     };
-    employer_records.set(employer, record);
+    employer_records.set(employer, employer_entry);
     return employer_entry;
 }
 
