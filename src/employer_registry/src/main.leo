@@ -27,7 +27,7 @@ async transition verify_employer_tax(employer_ans: [u8; 32]) -> bool {
     return true;
 }
 
-async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8]) -> bool {
+async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32]) -> bool {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
 
     let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
