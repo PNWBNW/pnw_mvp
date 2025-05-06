@@ -33,8 +33,11 @@ async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32
     let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
     assert(!registry_entry);
 
-    let reverse_entry: [u8] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
-    assert(reverse_entry == [0u8; 32]);
+    let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [
+    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+    0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8]);
 
     employer_registry.set(employer_ans, true);
     employer_tax_compliance.set(employer_ans, false);
