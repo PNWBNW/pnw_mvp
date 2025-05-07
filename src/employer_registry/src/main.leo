@@ -48,7 +48,7 @@ async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: 
     let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registry_entry);
 
-    let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+    let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [u8]);
     assert(reverse_entry == [0u8; 32]);
 
     employer_registry.set(employer_ans, true);
