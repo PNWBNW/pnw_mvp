@@ -72,3 +72,4 @@ async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) {
 function encode_ans_inline(ans_name: [u8; 32]) -> [u8; 32] {
     return BHP256::hash_to_bytes(ans_name);
 }
+}
