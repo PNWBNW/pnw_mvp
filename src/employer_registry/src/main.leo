@@ -66,6 +66,6 @@ async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) {
     // Optional: log or assert the entry
 }
 
-inline function encode_ans(ans_name: [u8; 32]) -> [u8; 32] {
+function encode_ans(ans_name: [u8; 32]) -> [u8; 32] {
     return BHP256::hash_to_field(ans_name);
 }
