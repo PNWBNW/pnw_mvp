@@ -1,4 +1,7 @@
 program employer_registry.aleo {
+    import aleo_std::random_group;
+    import poseidon2::Poseidon2;
+
     mapping employer_records: address => Employer;
     mapping employer_registry: [u8; 32] => bool;
     mapping employer_tax_compliance: [u8; 32] => bool;
@@ -18,7 +21,7 @@ program employer_registry.aleo {
     async function finalize_register_employer(employer: address, employer_hash: field) {
         let employer_entry: Employer = Employer {
             employer_hash,
-            nonce: random()
+            nonce: random_group()
         };
         employer_records.set(employer, employer_entry);
     }
@@ -45,13 +48,8 @@ program employer_registry.aleo {
         let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
         assert(!registry_entry);
 
-        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-        ]);
-        assert(reverse_entry == [0u8]);
+        let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+        assert(reverse_entry == [0u8; 32]);
 
         employer_registry.set(employer_ans, true);
         employer_tax_compliance.set(employer_ans, false);
@@ -64,12 +62,13 @@ program employer_registry.aleo {
         return future;
     }
 
-    async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) -> [u8; 32] {
+    async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) {
         let encoded_ans: [u8; 32] = encode_ans(ans_name);
-        return ans_reverse_lookup.get_or_use(encoded_ans, [0u8]);
+        let _entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+        // You can log or store this as needed
     }
 
-    function encode_ans(ans_name: [u8; 32]) -> [u8; 32] {
-        return hash_to_field(ans_name);
+    inline function encode_ans(ans_name: [u8; 32]) -> [u8; 32] {
+        return Poseidon2::hash_to_field(ans_name);
     }
 }
