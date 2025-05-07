@@ -47,7 +47,7 @@ async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: 
     assert(!registry_entry);
 
     let reverse_entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
-    assert(reverse_entry == [0u8; 32]);
+    assert(reverse_entry == [0u8]);
 
     employer_registry.set(employer_ans, true);
     employer_tax_compliance.set(employer_ans, false);
@@ -62,7 +62,7 @@ async transition lookup_employer_by_ans(ans_name: [u8; 32]) -> Future {
 
 async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) {
     let encoded_ans: [u8; 32] = encode_ans(ans_name);
-    let _entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+    let _entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8]);
     // Optional: log or assert the entry
 }
 
