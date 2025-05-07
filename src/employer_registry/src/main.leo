@@ -1,12 +1,14 @@
 program employer_registry.aleo {
-    
+
+    import random.aleo
+    import poseidon2.aleo
+
     mapping employer_records: address => Employer;
     mapping employer_registry: [u8; 32] => bool;
     mapping employer_tax_compliance: [u8; 32] => bool;
     mapping ans_registry: [u8; 32] => [u8; 32];
     mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
-    import aleo_std::random_group;
-    import poseidon2::Poseidon2;
+
 
 
     struct Employer {
