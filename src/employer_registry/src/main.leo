@@ -59,7 +59,7 @@ program employer_registry.aleo {
         ans_reverse_lookup.set(encoded_ans, employer_ans);
     }
 
-    async transition lookup_employer_by_ans(ans_name: [u8]) -> Future {
+    async transition lookup_employer_by_ans(ans_name: [u8; 32]) -> Future {
         let future: Future = finalize_lookup_employer_by_ans(ans_name);
         return future;
     }
