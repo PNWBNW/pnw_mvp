@@ -43,7 +43,7 @@ async transition register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32
 }
 
 async function finalize_register_employer_ans(employer_ans: [u8; 32], ans_name: [u8; 32]) {
-    let encoded_ans: [u8; 32] = encode_ans_inline;
+    let encoded_ans: [u8; 32] = encode_ans_inline(ans_name);
 
     let registry_entry: bool = employer_registry.get_or_use(employer_ans, false);
     assert(registry_entry);
@@ -63,13 +63,13 @@ async transition lookup_employer_by_ans(ans_name: [u8; 32]) -> Future {
 }
 
 async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) {
-    let encoded_ans: [u8; 32] = encode_ans_inline;
+    let encoded_ans: [u8; 32] = encode_ans_inline(ans_name);
     let entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [u8]);
 
     // Optional: log or assert entry as needed
 }
 
 function encode_ans_inline(ans_name: [u8; 32]) -> [u8; 32] {
-    return BHP256::hash_to_bytes;
+    return BHP256::hash_to_bytes(ans_name);
 }
 }
