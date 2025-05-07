@@ -64,7 +64,7 @@ async transition lookup_employer_by_ans(ans_name: [u8; 32]) -> Future {
 
 async function finalize_lookup_employer_by_ans(ans_name: [u8; 32]) {
     let encoded_ans: [u8; 32] = encode_ans_inline(ans_name);
-    let entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [0u8; 32]);
+    let entry: [u8; 32] = ans_reverse_lookup.get_or_use(encoded_ans, [u8]);
 
     // Optional: log or assert entry as needed
 }
