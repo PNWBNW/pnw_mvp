@@ -1,7 +1,7 @@
 {
   "program": "employer_registry.aleo",
   "version": "25.04.26",
-  "description": "oversightdao",
+  "description": "registry of employer credentials",
   "license": "Proprietary",
   "output": "build/employer_registry.avm"
 }
