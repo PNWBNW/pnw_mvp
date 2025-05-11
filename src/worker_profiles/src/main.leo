@@ -1,4 +1,4 @@
-program worker_profiles.aleo;
+program worker_profiles.aleo {
 
 mapping worker_data: address => Worker;
 
@@ -37,4 +37,5 @@ async transition register_worker(
 
     worker_data.set(worker, profile);
     return true;
+}
 }
