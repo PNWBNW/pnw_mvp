@@ -9,7 +9,7 @@ struct Worker {
     has_dependents: bool,               // For tax filing purposes
     state_of_residency: [u8; 2],        // US state abbreviation (e.g. "CA")
     subdao_affiliation: address,        // subDAO address this worker belongs to
-    _nonce: group                       // randomness for privacy
+    nonce: group                       // randomness for privacy
 }
 
 async transition register_worker(
@@ -32,7 +32,7 @@ async transition register_worker(
         has_dependents,
         state_of_residency,
         subdao_affiliation,
-        _nonce: random()
+        nonce: random()
     };
 
     worker_data.set(worker, profile);
