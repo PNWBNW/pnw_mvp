@@ -1,0 +1,7 @@
+{
+  "program": "worker_profiles.aleo",
+  "version": "25.04.26",
+  "description": "registry of employee credentials",
+  "license": "Proprietary",
+  "output": "build/worker_profiles.avm"
+}
