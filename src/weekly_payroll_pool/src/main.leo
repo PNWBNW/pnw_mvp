@@ -1,67 +1,42 @@
-program weekly_payroll_pool {
+program weekly_payroll_pool.aleo {
 
-import subdao_reserve.aleo;
-import pncw_payroll.aleo;
-import pniw_payroll.aleo;
+mapping weekly_balance: address => u64;
 
-mapping weekly_balance: [u8; 32] => u64;
-mapping worker_types: [u8; 32] => u8;
-mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
-
-function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
-    return worker_ans;
-}
-
-transition fund_weekly_pool_sync(subdao_ans: [u8; 32], amount: u64) -> bool {
-    assert(amount > 0u64);
-    let current_balance: u64 = weekly_balance.get_or_use(subdao_ans, 0u64);
-    let new_balance: u64 = current_balance.checked_add(amount);
-    weekly_balance.set(subdao_ans, new_balance);
-    return true;
-}
-
-async transition fund_weekly_pool(subdao_ans: [u8; 32], amount: u64) -> bool {
-    fund_weekly_pool_sync(subdao_ans, amount);
-    return true;
-}
-
-transition execute_weekly_payroll_sync(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 32]) -> bool {
+async transition fund_weekly_pool(subdao_address: address, amount: u64) -> Future {
     assert(amount > 0u64);
 
-    let weekly_funds: u64 = weekly_balance.get_or_use(subdao_ans, 0u64);
-    assert(weekly_funds >= amount);
-
-    let new_balance: u64 = weekly_funds.checked_sub(amount);
-    weekly_balance.set(subdao_ans, new_balance);
-
-    return true;
+    let future: Future = finalize_fund_weekly_pool(subdao_address, amount);
+    return future;
 }
 
-async transition execute_weekly_payroll(worker_ans: [u8; 32], subdao_ans: [u8; 32], amount: u64, zpass_hash: [u8; 32]) -> bool {
-    execute_weekly_payroll_sync(worker_ans, subdao_ans, amount, zpass_hash);
+async function finalize_fund_weekly_pool(subdao_address: address, amount: u64) {
+    let current_balance: u64 = weekly_balance.get_or_use(subdao_address, 0u64);
+    let new_balance: u64 = current_balance + amount;
 
-    let worker_address: [u8; 32] = lookup_worker_by_ans(worker_ans);
-    credits::transfer_public(worker_address, amount);
-
-    let employer_ans: [u8; 32] = ans_reverse_lookup.get_or_use(self.caller, [
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-    ]);
-    
-    let worker_type: u8 = worker_types.get_or_use(worker_ans, 0u8);
-
-    if worker_type == 10u8 {
-        pncw_payroll::execute_payroll(worker_ans, employer_ans, amount);
-    } else if worker_type == 20u8 {
-        pniw_payroll::execute_payroll(worker_ans, employer_ans, amount);
-    }
-
-    return true;
+    weekly_balance.set(subdao_address, new_balance);
 }
 
-async transition finalize_weekly_payroll(subdao_ans: [u8; 32]) -> bool {
-    assert(weekly_balance.contains(subdao_ans));
-    return true;
+async transition execute_weekly_payroll(subdao_address: address, amount: u64) -> Future {
+    assert(amount > 0u64);
+
+    let future: Future = finalize_execute_weekly_payroll(subdao_address, amount);
+    return future;
+}
+
+async function finalize_execute_weekly_payroll(subdao_address: address, amount: u64) {
+    let current_balance: u64 = weekly_balance.get_or_use(subdao_address, 0u64);
+    assert(current_balance >= amount);
+
+    let new_balance: u64 = current_balance - amount;
+    weekly_balance.set(subdao_address, new_balance);
+}
+
+async transition verify_pool_exists(subdao_address: address) -> Future {
+    let future: Future = finalize_verify_pool_exists(subdao_address);
+    return future;
+}
+
+async function finalize_verify_pool_exists(subdao_address: address) {
+    assert(weekly_balance.contains(subdao_address));
+}
 }
