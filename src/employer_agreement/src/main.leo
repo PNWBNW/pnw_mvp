@@ -111,7 +111,7 @@ async transition verify_employment_status(worker: address) -> Future {
     return future;
 }
 
-async function finalize_verify_employment_status(worker: address) {
+async function finalize_veri_employ_status(worker: address) {
     assert(agreements.contains(worker));
 }
 }
