@@ -1,60 +1,56 @@
-program subdao_reserve {
+program subdao_reserve.aleo {
 
-import weekly_payroll_pool.aleo;
-import process_tax_compliance.aleo;
-
-mapping reserve_balance: [u8; 32] => u64;
-mapping tax_obligations: [u8; 32] => u64;
+mapping reserve_balance: address => u64;
+mapping tax_obligations: address => u64;
 
 const TAX_RATE: u64 = 10u64;
 
-async transition deposit(subdao_ans: [u8; 32], amount: u64) -> bool {
+async transition deposit(subdao_address: address, amount: u64) -> Future {
     assert(amount > 0u64);
 
-    let current_balance: u64 = reserve_balance.get_or_use(subdao_ans, 0u64);
-    let new_balance: u64 = current_balance.checked_add(amount);
-
-    reserve_balance.set(subdao_ans, new_balance);
-
-    return true;
+    let future: Future = finalize_deposit(subdao_address, amount);
+    return future;
 }
 
-async transition process_taxes(subdao_ans: [u8; 32]) -> bool {
-    let current_balance: u64 = reserve_balance.get_or_use(subdao_ans, 0u64);
+async function finalize_deposit(subdao_address: address, amount: u64) {
+    let current_balance: u64 = reserve_balance.get_or_use(subdao_address, 0u64);
+    let new_balance: u64 = current_balance + amount;
+
+    reserve_balance.set(subdao_address, new_balance);
+}
+
+async transition process_taxes(subdao_address: address) -> Future {
+    let future: Future = finalize_process_taxes(subdao_address);
+    return future;
+}
+
+async function finalize_process_taxes(subdao_address: address) {
+    let current_balance: u64 = reserve_balance.get_or_use(subdao_address, 0u64);
     assert(current_balance > 0u64);
 
-    let tax_amount: u64 = current_balance.checked_mul(TAX_RATE).checked_div(100u64);
-    let net_amount: u64 = current_balance.checked_sub(tax_amount);
+    let tax_amount: u64 = current_balance * TAX_RATE / 100u64;
+    let net_amount: u64 = current_balance - tax_amount;
 
-    reserve_balance.set(subdao_ans, net_amount);
+    reserve_balance.set(subdao_address, net_amount);
 
-    let current_tax_obligation: u64 = tax_obligations.get_or_use(subdao_ans, 0u64);
-    let new_tax_obligation: u64 = current_tax_obligation.checked_add(tax_amount);
+    let current_tax_obligation: u64 = tax_obligations.get_or_use(subdao_address, 0u64);
+    let new_tax_obligation: u64 = current_tax_obligation + tax_amount;
 
-    tax_obligations.set(subdao_ans, new_tax_obligation);
-
-    credits::transfer_public(process_tax_compliance::TAX_SINK, tax_amount);
-
-    return true;
+    tax_obligations.set(subdao_address, new_tax_obligation);
 }
 
-async transition fund_weekly_payroll(subdao_ans: [u8; 32], amount: u64) -> bool {
+async transition withdraw(subdao_address: address, amount: u64) -> Future {
     assert(amount > 0u64);
 
-    let current_balance: u64 = reserve_balance.get_or_use(subdao_ans, 0u64);
-    assert(current_balance >= amount);
-
-    let new_balance: u64 = current_balance.checked_sub(amount);
-
-    reserve_balance.set(subdao_ans, new_balance);
-
-    weekly_payroll_pool::fund_weekly_pool(subdao_ans, amount);
-
-    return true;
+    let future: Future = finalize_withdraw(subdao_address, amount);
+    return future;
 }
 
-async transition finalize_fund_transfer(subdao_ans: [u8; 32]) -> bool {
-    assert(reserve_balance.contains(subdao_ans));
+async function finalize_withdraw(subdao_address: address, amount: u64) {
+    let current_balance: u64 = reserve_balance.get_or_use(subdao_address, 0u64);
+    assert(current_balance >= amount);
 
-    return true;
+    let new_balance: u64 = current_balance - amount;
+    reserve_balance.set(subdao_address, new_balance);
+}
 }
