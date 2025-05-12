@@ -49,7 +49,7 @@ async function finalize_verify_tax_record(employer_address: address) {
     assert(employer_tax.contains(employer_address));
 }
 
-function calculate_tax_due(payroll_type: u8) -> u64 {
+inline function calculate_tax_due(payroll_type: u8) -> u64 {
     if payroll_type == 0u8 {
         return 1000u64;
     } else if payroll_type == 1u8 {
