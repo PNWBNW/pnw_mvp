@@ -3,98 +3,61 @@ program pncw_payroll.aleo {
 import employer_agreement.aleo;
 import subdao_reserve.aleo;
 import credits.aleo;
-import payroll_audit_log.aleo;
+program pncw_payroll.aleo {
 
-mapping employer_funding: [u8; 32] => u32;
-mapping worker_balances: [u8; 32] => u32;
+mapping employer_funding: address => u64;
+mapping worker_balances: address => u64;
 
-struct DateTime {
-    year: u16,
-    month: u8,
-    day: u8,
-    hour: u8,
-    minute: u8,
-    second: u8
+async transition fund_payroll(employer: address, amount: u64) -> Future {
+    assert(amount > 0u64);
+
+    let future: Future = finalize_fund_payroll(employer, amount);
+    return future;
 }
 
-function lookup_worker_by_ans(worker_ans: [u8; 32]) -> [u8; 32] {
-    return worker_ans;
+async function finalize_fund_payroll(employer: address, amount: u64) {
+    let current_funding: u64 = employer_funding.get_or_use(employer, 0u64);
+    let new_funding: u64 = current_funding + amount;
+
+    employer_funding.set(employer, new_funding);
 }
 
-async transition fund_payroll(employer_ans: [u8; 32], amount: u32) -> bool {
-    return finalize_fund_payroll(employer_ans, amount);
+async transition execute_payroll(worker: address, employer: address, amount: u64) -> Future {
+    assert(amount > 0u64);
+
+    let future: Future = finalize_execute_payroll(worker, employer, amount);
+    return future;
 }
 
-async function finalize_fund_payroll(employer_ans: [u8; 32], amount: u32) -> bool {
-    assert(amount > 0u32);
-
-    let is_registered: bool = employer_agreement::employer_registry.get_or_use(employer_ans, false);
-    assert(is_registered);
-
-    let is_compliant: bool = employer_agreement::employer_tax_compliance.get_or_use(employer_ans, false);
-    assert(is_compliant);
-
-    let current_funding: u32 = employer_funding.get_or_use(employer_ans, 0u32);
-    let new_funding: u32 = current_funding + amount;
-    employer_funding.set(employer_ans, new_funding);
-
-    let subdao_ans: [u8; 32] = subdao_reserve::SUBDAO_RESERVE_ANS;
-    subdao_reserve::deposit(subdao_ans, amount);
-
-    return true;
-}
-
-async transition execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u32) -> bool {
-    return finalize_execute_payroll(worker_ans, employer_ans, amount);
-}
-
-async function finalize_execute_payroll(worker_ans: [u8; 32], employer_ans: [u8; 32], amount: u32) -> bool {
-    assert(amount > 0u32);
-
-    let worker_type: u8 = employer_agreement::worker_type.get_or_use(worker_ans, 0u8);
-    assert(worker_type != 0u8);
-
-    let current_funding: u32 = employer_funding.get_or_use(employer_ans, 0u32);
+async function finalize_execute_payroll(worker: address, employer: address, amount: u64) {
+    let current_funding: u64 = employer_funding.get_or_use(employer, 0u64);
     assert(current_funding >= amount);
 
-    let updated_funding: u32 = current_funding - amount;
-    employer_funding.set(employer_ans, updated_funding);
+    let updated_funding: u64 = current_funding - amount;
+    employer_funding.set(employer, updated_funding);
 
-    let worker_balance: u32 = worker_balances.get_or_use(worker_ans, 0u32);
-    let updated_balance: u32 = worker_balance + amount;
-    worker_balances.set(worker_ans, updated_balance);
+    let worker_balance: u64 = worker_balances.get_or_use(worker, 0u64);
+    let updated_balance: u64 = worker_balance + amount;
+    worker_balances.set(worker, updated_balance);
 
-    let worker_address: [u8; 32] = lookup_worker_by_ans(worker_ans);
-    credits::transfer_public(worker_address, amount);
-
-    return true;
+    // --- HOOK READY ---
+    // The coordinator_program will later call:
+    // credits::transfer_public(worker, amount)
+    // payroll_audit_log::record_payment(worker, amount, block_height)
+    // ------------------
 }
 
-async transition finalize_payroll(worker_ans: [u8; 32]) -> bool {
-    return finalize_finalize_payroll(worker_ans);
+async transition verify_worker_balance(worker: address) -> Future {
+    let future: Future = finalize_verify_worker_balance(worker);
+    return future;
 }
 
-async function finalize_finalize_payroll(worker_ans: [u8; 32]) -> bool {
-    let exists: bool = worker_balances.contains(worker_ans);
-    assert(exists);
-
-    let block_time: DateTime = DateTime {
-        year: block.timestamp.year,
-        month: block.timestamp.month,
-        day: block.timestamp.day,
-        hour: block.timestamp.hour,
-        minute: block.timestamp.minute,
-        second: block.timestamp.second
-    };
-
-    let payment_hash: [u8; 32] = hash_to_field(worker_ans, block.height);
-    payroll_audit_log::record_payment(payment_hash, block_time);
-
-    worker_balances.remove(worker_ans);
-
-    return true;
+async function finalize_verify_worker_balance(worker: address) {
+    assert(worker_balances.contains(worker));
 }
 
-function verify_worker_balance(worker_ans: [u8; 32]) -> u32 {
-    return worker_balances.get_or_use(worker_ans, 0u32);
+inline verify_worker_balance_amount(worker: address) -> u64 {
+    return worker_balances.get_or_use(worker, 0u64);
+}
+}or_use(worker_ans, 0u32);
 }
