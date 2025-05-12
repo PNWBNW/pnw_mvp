@@ -1,79 +1,61 @@
 program process_tax_compliance.aleo {
 
-import pncw_payroll.aleo;
-import pniw_payroll.aleo;
-import subdao_reserve.aleo;
-import employer_agreement.aleo;
-import time_oracle.aleo;
-
-mapping employer_tax: [u8; 32] => EmployerTaxRecord;
-mapping employer_zpass_verified: [u8; 32] => bool;
-mapping ans_registry: [u8; 32] => [u8; 32];
-mapping ans_reverse_lookup: [u8; 32] => [u8; 32];
-
-const TAX_SINK: [u8; 32] = encode_ans(b"govtax.pnw.ans");
+mapping employer_tax: address => EmployerTaxRecord;
 
 struct EmployerTaxRecord {
-    employer_ans: [u8; 32],
-    total_tax_paid: u32,
+    employer_address: address,
+    total_tax_paid: u64,
     last_payment_block: u32,
     is_compliant: bool
 }
 
-async transition process_tax_compliance(employer_ans: [u8; 32], payroll_type: u8) -> bool {
-    await verify_compliance(employer_ans);
-    await apply_tax_payment(employer_ans, payroll_type);
-    return true;
+async transition process_tax_compliance(employer_address: address, payroll_type: u8, block_height: u32) -> Future {
+    let future: Future = finalize_process_tax_compliance(employer_address, payroll_type, block_height);
+    return future;
 }
 
-async function verify_compliance(employer_ans: [u8; 32]) -> bool {
-    let zpass_verified: bool = employer_zpass_verified.get_or_use(employer_ans, false);
-    let is_registered: bool = employer_agreement::employer_registry.get_or_use(employer_ans, false);
-    assert(zpass_verified && is_registered);
-    return true;
-}
+async function finalize_process_tax_compliance(employer_address: address, payroll_type: u8, block_height: u32) {
+    let tax_due: u64 = calculate_tax_due(payroll_type);
 
-async function apply_tax_payment(employer_ans: [u8; 32], payroll_type: u8) -> bool {
-    let tax_due: u32 = calculate_tax_due(payroll_type);
-    let current_block: u32 = time_oracle::current_block_height();
-
-    let current_record: EmployerTaxRecord = employer_tax.get_or_use(employer_ans, EmployerTaxRecord {
-        employer_ans,
-        total_tax_paid: 0u32,
+    let current_record: EmployerTaxRecord = employer_tax.get_or_use(employer_address, EmployerTaxRecord {
+        employer_address,
+        total_tax_paid: 0u64,
         last_payment_block: 0u32,
         is_compliant: false
     });
 
-    let updated_total: u32 = current_record.total_tax_paid + tax_due;
+    let updated_total: u64 = current_record.total_tax_paid + tax_due;
     let compliance_status: bool = updated_total >= tax_due;
 
-    employer_tax.set(employer_ans, EmployerTaxRecord {
-        employer_ans,
+    employer_tax.set(employer_address, EmployerTaxRecord {
+        employer_address,
         total_tax_paid: updated_total,
-        last_payment_block: current_block,
+        last_payment_block: block_height,
         is_compliant: compliance_status
     });
 
-    credits::transfer_public(TAX_SINK, tax_due);
-    return true;
+    // --- HOOK READY ---
+    // At this point, the coordinator_program will later call:
+    // payroll_audit_log::record_tax_payment(employer_address, tax_due)
+    // ------------------
 }
 
-async transition finalize_tax_compliance(employer_ans: [u8; 32]) -> bool {
-    let exists: bool = employer_tax.contains(employer_ans);
-    assert(exists);
-    return true;
+async transition verify_tax_record(employer_address: address) -> Future {
+    let future: Future = finalize_verify_tax_record(employer_address);
+    return future;
 }
 
-function calculate_tax_due(payroll_type: u8) -> u32 {
+async function finalize_verify_tax_record(employer_address: address) {
+    assert(employer_tax.contains(employer_address));
+}
+
+function calculate_tax_due(payroll_type: u8) -> u64 {
     if payroll_type == 0u8 {
-        return 1000u32;
+        return 1000u64;
     } else if payroll_type == 1u8 {
-        return 500u32;
+        return 500u64;
     } else {
-        return 0u32;
+        return 0u64;
     }
 }
-
-function encode_ans(ans_name: [u8]) -> [u8; 32] {
-    hash_arc721(ans_name)
 }
