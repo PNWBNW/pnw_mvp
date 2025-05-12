@@ -51,7 +51,13 @@ async function finalize_verify_worker_balance(worker: address) {
     assert(worker_balances.contains(worker));
 }
 
-inline verify_worker_balance_amount(worker: address) -> u64 {
-    return worker_balances.get_or_use(worker, 0u64);
+async transition get_worker_balance(worker: address) -> Future {
+    let future: Future = finalize_get_worker_balance(worker);
+    return future;
+}
+
+async function finalize_get_worker_balance(worker: address) {
+    let balance: u64 = worker_balances.get_or_use(worker, 0u64);
+    // Optional: you can store or emit balance here via router
 }
 }
