@@ -106,12 +106,12 @@ async function finalize_terminate_agreement(worker: address) {
     agreements.set(worker, terminated);
 }
 
-async transition verify_employment_status(worker: address) -> Future {
-    let future: Future = finalize_verify_employment_status(worker);
+async transition verify_agreement(worker: address) -> Future {
+    let future: Future = finalize_verify_agreement(worker);
     return future;
 }
 
-async function finalize_veri_employ_status(worker: address) {
+async function finalize_verify_agreement(worker: address) {
     assert(agreements.contains(worker));
 }
 }
