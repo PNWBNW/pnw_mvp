@@ -1,10 +1,5 @@
 program pncw_payroll.aleo {
 
-import employer_agreement.aleo;
-import subdao_reserve.aleo;
-import credits.aleo;
-program pncw_payroll.aleo {
-
 mapping employer_funding: address => u64;
 mapping worker_balances: address => u64;
 
@@ -59,5 +54,4 @@ async function finalize_verify_worker_balance(worker: address) {
 inline verify_worker_balance_amount(worker: address) -> u64 {
     return worker_balances.get_or_use(worker, 0u64);
 }
-}or_use(worker_ans, 0u32);
 }
