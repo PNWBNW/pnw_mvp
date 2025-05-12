@@ -5,13 +5,6 @@ mapping agreements: address => EmploymentAgreement;
 struct EmploymentAgreement {
     worker: address,
     employer: address,
-program employer_agreement.aleo {
-
-mapping agreements: address => EmploymentAgreement;
-
-struct EmploymentAgreement {
-    worker: address,
-    employer: address,
     agreed_wage: u64,
     work_hours_per_week: u8,
     pay_period_days: u8,
@@ -120,7 +113,5 @@ async transition verify_employment_status(worker: address) -> Future {
 
 async function finalize_verify_employment_status(worker: address) {
     assert(agreements.contains(worker));
-}
-}agreements.contains(worker));
 }
 }
