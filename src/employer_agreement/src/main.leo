@@ -5,6 +5,13 @@ mapping agreements: address => EmploymentAgreement;
 struct EmploymentAgreement {
     worker: address,
     employer: address,
+program employer_agreement.aleo {
+
+mapping agreements: address => EmploymentAgreement;
+
+struct EmploymentAgreement {
+    worker: address,
+    employer: address,
     agreed_wage: u64,
     work_hours_per_week: u8,
     pay_period_days: u8,
@@ -18,7 +25,7 @@ struct EmploymentAgreement {
     nonce: scalar
 }
 
-async transition create_employment_agreement(
+async transition create_agreement(
     worker: address,
     employer: address,
     agreed_wage: u64,
@@ -31,7 +38,7 @@ async transition create_employment_agreement(
     retirement_option_chosen: u8,
     health_insurance_option_chosen: u8
 ) -> Future {
-    let future: Future = finalize_create_employment_agreement(
+    let future: Future = finalize_create_agreement(
         worker,
         employer,
         agreed_wage,
@@ -47,7 +54,7 @@ async transition create_employment_agreement(
     return future;
 }
 
-async function finalize_create_employment_agreement(
+async function finalize_create_agreement(
     worker: address,
     employer: address,
     agreed_wage: u64,
@@ -79,15 +86,31 @@ async function finalize_create_employment_agreement(
     agreements.set(worker, agreement);
 }
 
-async transition terminate_employment_agreement(worker: address) -> Future {
-    let future: Future = finalize_terminate_employment_agreement(worker);
+async transition terminate_agreement(worker: address) -> Future {
+    let future: Future = finalize_terminate_agreement(worker);
     return future;
 }
 
-async function finalize_terminate_employment_agreement(worker: address) {
-    let mut agreement: EmploymentAgreement = agreements.get(worker);
-    agreement.is_active = false;
-    agreements.set(worker, agreement);
+async function finalize_terminate_agreement(worker: address) {
+    let original: EmploymentAgreement = agreements.get(worker);
+
+    let terminated: EmploymentAgreement = EmploymentAgreement {
+        worker: original.worker,
+        employer: original.employer,
+        agreed_wage: original.agreed_wage,
+        work_hours_per_week: original.work_hours_per_week,
+        pay_period_days: original.pay_period_days,
+        raise_schedule_days: original.raise_schedule_days,
+        contract_start_block: original.contract_start_block,
+        contract_end_block: original.contract_end_block,
+        drug_and_alcohol_policy_signed: original.drug_and_alcohol_policy_signed,
+        retirement_option_chosen: original.retirement_option_chosen,
+        health_insurance_option_chosen: original.health_insurance_option_chosen,
+        is_active: false,
+        nonce: original.nonce
+    };
+
+    agreements.set(worker, terminated);
 }
 
 async transition verify_employment_status(worker: address) -> Future {
@@ -97,5 +120,7 @@ async transition verify_employment_status(worker: address) -> Future {
 
 async function finalize_verify_employment_status(worker: address) {
     assert(agreements.contains(worker));
+}
+}agreements.contains(worker));
 }
 }
