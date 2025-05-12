@@ -1,38 +1,101 @@
-program employer_agreement.aleo{
+program employer_agreement.aleo {
 
-import ans_registry.aleo;
+mapping agreements: address => EmploymentAgreement;
 
-mapping employer_records: address => Employer;
-mapping employer_registry: [u8; 32] => bool;
-
-struct Employer {
-    employer_hash: field,
-    _nonce: group
+struct EmploymentAgreement {
+    worker: address,
+    employer: address,
+    agreed_wage: u64,
+    work_hours_per_week: u8,
+    pay_period_days: u8,
+    raise_schedule_days: u16,
+    contract_start_block: u32,
+    contract_end_block: u32,
+    drug_and_alcohol_policy_signed: bool,
+    retirement_option_chosen: u8,
+    health_insurance_option_chosen: u8,
+    is_active: bool,
+    nonce: scalar
 }
 
-async transition register_employer(employer: address, employer_hash: field) -> bool {
-    let record: Employer = Employer {
-        employer_hash,
-        _nonce: random()
+async transition create_employment_agreement(
+    worker: address,
+    employer: address,
+    agreed_wage: u64,
+    work_hours_per_week: u8,
+    pay_period_days: u8,
+    raise_schedule_days: u16,
+    contract_start_block: u32,
+    contract_end_block: u32,
+    drug_and_alcohol_policy_signed: bool,
+    retirement_option_chosen: u8,
+    health_insurance_option_chosen: u8
+) -> Future {
+    let future: Future = finalize_create_employment_agreement(
+        worker,
+        employer,
+        agreed_wage,
+        work_hours_per_week,
+        pay_period_days,
+        raise_schedule_days,
+        contract_start_block,
+        contract_end_block,
+        drug_and_alcohol_policy_signed,
+        retirement_option_chosen,
+        health_insurance_option_chosen
+    );
+    return future;
+}
+
+async function finalize_create_employment_agreement(
+    worker: address,
+    employer: address,
+    agreed_wage: u64,
+    work_hours_per_week: u8,
+    pay_period_days: u8,
+    raise_schedule_days: u16,
+    contract_start_block: u32,
+    contract_end_block: u32,
+    drug_and_alcohol_policy_signed: bool,
+    retirement_option_chosen: u8,
+    health_insurance_option_chosen: u8
+) {
+    let agreement: EmploymentAgreement = EmploymentAgreement {
+        worker,
+        employer,
+        agreed_wage,
+        work_hours_per_week,
+        pay_period_days,
+        raise_schedule_days,
+        contract_start_block,
+        contract_end_block,
+        drug_and_alcohol_policy_signed,
+        retirement_option_chosen,
+        health_insurance_option_chosen,
+        is_active: true,
+        nonce: ChaCha::rand_scalar()
     };
 
-    employer_records.set(employer, record);
-    return true;
+    agreements.set(worker, agreement);
 }
 
-async transition register_employer_ans(employer: address, ans_hash: [u8; 32]) -> bool {
-    let is_registered: bool = employer_registry.get_or_use(ans_hash, false);
-    assert(!is_registered);
+async transition terminate_employment_agreement(worker: address) -> Future {
+    let future: Future = finalize_terminate_employment_agreement(worker);
+    return future;
+}
 
-    let record: Employer = employer_records.get(employer);
-    assert(record.employer_hash != 0field);
+async function finalize_terminate_employment_agreement(worker: address) {
+    let mut agreement: EmploymentAgreement = agreements.get(worker);
+    agreement.is_active = false;
+    agreements.set(worker, agreement);
+}
 
-    let future: Future = ans_registry.aleo/register_ans(ans_hash);
-    let verified: bool = await future;
+async transition verify_employment_status(worker: address) -> Future {
+    let future: Future = finalize_verify_employment_status(worker);
+    return future;
+}
 
-    assert(verified);
-
-    employer_registry.set(ans_hash, true);
-    return true;
+async function finalize_verify_employment_status(worker: address) {
+    assert(agreements.contains(worker));
 }
 }
