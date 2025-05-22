@@ -15,7 +15,7 @@ jobs:
       SNARKOS_VERSION: v3.7.1
       DEPLOYMENT_ROOT: ${{ github.workspace }}/coordinator_program
       DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
-      ALEO_PRIVATE_KEY: ${{ secrets.ALEO_TEST_KEY }}
+      ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
 
     steps:
       - name: ⬇️ Checkout repository
