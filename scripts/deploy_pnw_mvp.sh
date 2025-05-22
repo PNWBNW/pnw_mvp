@@ -32,6 +32,7 @@ PROJECTS=(
 )
 
 SRC_ROOT="/home/runner/work/pnw_mvp/pnw_mvp/src"
+ENCODER_SOURCE="$SRC_ROOT/encoder.leo"
 
 for PROJECT in "${PROJECTS[@]}"; do
     TOGGLE_VAR="DEPLOY_${PROJECT^^}"
@@ -44,11 +45,15 @@ for PROJECT in "${PROJECTS[@]}"; do
             echo "🔐 Injecting ALEO_PRIVATE_KEY into $PROJECT .env"
             echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
 
+            echo "📦 Copying encoder.leo into $PROJECT/src"
+            cp "$ENCODER_SOURCE" "$PROJECT_PATH/src/encoder.leo"
+
             leo build
             leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
 
-            echo "🧼 Removing ALEO_PRIVATE_KEY from $PROJECT .env"
+            echo "🧼 Cleaning up injected private key and encoder.leo"
             sed -i '/^ALEO_PRIVATE_KEY=/d' .env
+            rm -f "$PROJECT_PATH/src/encoder.leo"
         else
             echo "❌ main.leo not found at $PROJECT_PATH/src/main.leo"
             exit 1
@@ -64,6 +69,9 @@ cd "$DEPLOYMENT_ROOT"
 
 echo "🔐 Injecting ALEO_PRIVATE_KEY into coordinator .env"
 echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
+
+echo "📦 Copying encoder.leo into coordinator_program/src"
+cp "$SRC_ROOT/encoder.leo" "$DEPLOYMENT_ROOT/src/encoder.leo"
 
 leo build
 
@@ -86,7 +94,8 @@ for ((i=1;i<=MAX_RETRIES;i++)); do
     fi
 done
 
-echo "🧼 Removing ALEO_PRIVATE_KEY from coordinator .env"
+echo "🧼 Cleaning up coordinator .env and encoder.leo"
 sed -i '/^ALEO_PRIVATE_KEY=/d' .env
+rm -f "$DEPLOYMENT_ROOT/src/encoder.leo"
 
 echo "✅ Deployment completed!"
