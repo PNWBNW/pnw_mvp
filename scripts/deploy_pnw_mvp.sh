@@ -41,16 +41,14 @@ for PROJECT in "${PROJECTS[@]}"; do
         if [ -f "$PROJECT_PATH/src/main.leo" ]; then
             cd "$PROJECT_PATH"
 
-            # Load this program’s .env to satisfy Leo 2.6.0
-            if [ -f .env ]; then
-                echo "🔑 Sourcing $PROJECT .env"
-                set -a
-                source .env
-                set +a
-            fi
+            echo "🔐 Injecting ALEO_PRIVATE_KEY into $PROJECT .env"
+            echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
 
             leo build
             leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
+
+            echo "🧼 Removing ALEO_PRIVATE_KEY from $PROJECT .env"
+            sed -i '/^ALEO_PRIVATE_KEY=/d' .env
         else
             echo "❌ main.leo not found at $PROJECT_PATH/src/main.leo"
             exit 1
@@ -64,10 +62,8 @@ done
 echo "🚀 Building and deploying: coordinator_program"
 cd "$DEPLOYMENT_ROOT"
 
-# Source .env again for root deploy
-set -a
-source "$ENV_FILE"
-set +a
+echo "🔐 Injecting ALEO_PRIVATE_KEY into coordinator .env"
+echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
 
 leo build
 
@@ -89,5 +85,8 @@ for ((i=1;i<=MAX_RETRIES;i++)); do
         fi
     fi
 done
+
+echo "🧼 Removing ALEO_PRIVATE_KEY from coordinator .env"
+sed -i '/^ALEO_PRIVATE_KEY=/d' .env
 
 echo "✅ Deployment completed!"
