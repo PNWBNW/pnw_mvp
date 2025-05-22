@@ -11,13 +11,12 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# Load environment variables
+# Load root-level environment variables
 echo "📜 Loading environment variables from $ENV_FILE"
 set -a
 source "$ENV_FILE"
 set +a
 
-# List of dependency projects
 PROJECTS=(
     "employer_agreement"
     "oversightdao_reserve"
@@ -32,10 +31,8 @@ PROJECTS=(
     "worker_profiles"
 )
 
-# Root directory where all src folders live
 SRC_ROOT="/home/runner/work/pnw_mvp/pnw_mvp/src"
 
-# Deploy each dependency project using full src path
 for PROJECT in "${PROJECTS[@]}"; do
     TOGGLE_VAR="DEPLOY_${PROJECT^^}"
     if [ "${!TOGGLE_VAR}" == "true" ]; then
@@ -43,6 +40,14 @@ for PROJECT in "${PROJECTS[@]}"; do
         PROJECT_PATH="$SRC_ROOT/$PROJECT"
         if [ -f "$PROJECT_PATH/src/main.leo" ]; then
             cd "$PROJECT_PATH"
+
+            # Load this program’s .env to satisfy Leo 2.6.0
+            if [ -f .env ]; then
+                echo "🔑 Sourcing $PROJECT .env"
+                set -a
+                source .env
+                set +a
+            fi
 
             leo build
             leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
@@ -55,9 +60,14 @@ for PROJECT in "${PROJECTS[@]}"; do
     fi
 done
 
-# Deploy coordinator_program (router) last
+# Deploy coordinator_program last
 echo "🚀 Building and deploying: coordinator_program"
 cd "$DEPLOYMENT_ROOT"
+
+# Source .env again for root deploy
+set -a
+source "$ENV_FILE"
+set +a
 
 leo build
 
