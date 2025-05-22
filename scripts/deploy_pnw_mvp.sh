@@ -43,6 +43,10 @@ for PROJECT in "${PROJECTS[@]}"; do
         PROJECT_PATH="$SRC_ROOT/$PROJECT"
         if [ -f "$PROJECT_PATH/src/main.leo" ]; then
             cd "$PROJECT_PATH"
+
+            # Safely remove outputs if it exists
+            [ -d outputs ] && rm -rf outputs
+
             leo clean
             leo build
             leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
@@ -55,9 +59,12 @@ for PROJECT in "${PROJECTS[@]}"; do
     fi
 done
 
-# Deploy coordinator_program
+# Deploy coordinator_program (router) last
 echo "🚀 Building and deploying: coordinator_program"
 cd "$DEPLOYMENT_ROOT"
+
+[ -d outputs ] && rm -rf outputs
+
 leo clean
 leo build
 
