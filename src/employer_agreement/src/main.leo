@@ -1,4 +1,6 @@
-program employer_agreement.aleo {
+program employer_agreement.aleo;
+
+import "../../encoder.leo";
 
 mapping agreements: address => EmploymentAgreement;
 
@@ -73,7 +75,7 @@ async function finalize_create_agreement(
         retirement_option_chosen,
         health_insurance_option_chosen,
         is_active: true,
-        nonce: ChaCha::rand_scalar()
+        nonce: random_salt()
     };
 
     agreements.set(worker, agreement);
@@ -113,5 +115,4 @@ async transition verify_agreement(worker: address) -> Future {
 
 async function finalize_verify_agreement(worker: address) {
     assert(agreements.contains(worker));
-}
 }
