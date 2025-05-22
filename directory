@@ -1,91 +1,126 @@
 pnw_mvp/
+├── .gitignore
+├── LICENSE_PNW_MVP.txt
+├── README.md
+├── aleo_environment.md
+├── directory
+├── zkshark.md
 ├── .github/
-│   └── workflows/
-│       └── deploy.yml
-│
-├── coordinator_program/
-│   ├── leo.toml
-│   ├── program.json
+│   ├── workflows/
+│   │   └── deploy.yml
+├── scripts/
+│   ├── .license
+│   ├── deploy_crosschain.sh
+│   ├── deploy_pnw_mvp.sh
+├── pnw_router/
 │   ├── .env
+│   ├── assembly.env
+│   ├── pnw_router.toml
+│   ├── program.json
+│   ├── assembly_main.aleo
+│   ├── main.leo
+│   ├── constants/
+│   │   ├── action_ids.leo
+│   │   ├── tax_constants.leo
+│   ├── actions/
+│   │   ├── employment_contract.aleo
+│   │   ├── worker_payraise.aleo
+│   │   ├── weekly_pncw_payroll.aleo
+│   │   ├── weekly_pniw_payroll.aleo
+│   │   ├── tax_payment.aleo
+│   │   ├── audit_log_build.aleo
+│   │   ├── overdao_transfer_out.aleo
+│   │   ├── overdao_transfer_in.aleo
+│   │   ├── subdao_transfer_payroll.aleo
+│   │   ├── employer_fund_subdao.aleo
+│   │   ├── worker_status_update.aleo
+│   │   └── compliance_checks.aleo
 │   ├── imports/
 │   │   └── .gitkeep
-│   └── src/
-│       └── main.leo
-├── .gitignore
-├── README.md
-│
-├── scripts/
-│   ├── deploy_pnw_mvp.sh
-│
-└── src/
-    ├── employer_agreement/
-    │   ├── leo.toml
-    │   ├── program.json
-    │   ├── .env
-    │   ├── imports/
-    │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
-    │
-    ├── oversight_dao/
-    │   ├── leo.toml
-    │   ├── program.json
-    │   ├── .env
-    │   ├── imports/
-    │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
-    │
-    ├── pncw_payroll/
-    │   ├── leo.toml
-    │   ├── program.json
-    │   ├── .env
-    │   ├── imports/
-    │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
-    │
-    ├── pniw_payroll/
-    │   ├── leo.toml
-    │   ├── program.json
-    │   ├── .env
-    │   ├── imports/
-    │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
-    │
-    ├── process_tax_compliance/
-    │   ├── leo.toml
-    │   ├── program.json
-    │   ├── .env
-    │   ├── imports/
-    │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
-    │
-    ├── subdao_reserve/
-    │   ├── leo.toml
-    │   ├── program.json
-    │   ├── .env
-    │   ├── imports/
-    │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
-    │
-    ├── weekly_payroll_pool/
-    │   ├── leo.toml
-    │   ├── program.json
-    │   ├── .env
-    │   ├── imports/
-    │   │   └── .gitkeep
-    │   └── src/
-    │       └── main.leo
-    │
-    └── payroll_audit_log/
-        ├── leo.toml
-        ├── program.json
-        ├── .env
-        ├── imports/
-        │   └── .gitkeep
-        └── src/
-            └── main.leo
+├── src/
+│   ├── encoder.leo
+│   ├── employer_agreement/
+│   │   ├── .env
+│   │   ├── employer_agreement.toml
+│   │   ├── program.json
+│   │   ├── import/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── employer_registry/
+│   │   ├── .env
+│   │   ├── employer_registry.toml
+│   │   ├── program.json
+│   │   ├── imports/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── oversightdao_reserve/
+│   │   ├── .env
+│   │   ├── oversightdao_reserve.toml
+│   │   ├── program.json
+│   │   ├── import/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── payroll_audit_log/
+│   │   ├── .env
+│   │   ├── payroll_audit_log.toml
+│   │   ├── program.json
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── pncw_payroll/
+│   │   ├── .env
+│   │   ├── README.md
+│   │   ├── pncw_payroll.toml
+│   │   ├── program.json
+│   │   ├── import/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── pniw_payroll/
+│   │   ├── .env
+│   │   ├── README.md
+│   │   ├── pniw_payroll.toml
+│   │   ├── program.json
+│   │   ├── import/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── process_tax_compliance/
+│   │   ├── .env
+│   │   ├── README.md
+│   │   ├── process_tax_compliance.toml
+│   │   ├── program.json
+│   │   ├── import/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── subdao_reserve/
+│   │   ├── .env
+│   │   ├── README.md
+│   │   ├── program.json
+│   │   ├── subdao_reserve.toml
+│   │   ├── import/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── weekly_payroll_pool/
+│   │   ├── .env
+│   │   ├── README.md
+│   │   ├── program.json
+│   │   ├── weekly_payroll_pool.toml
+│   │   ├── import/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+│   ├── worker_profiles/
+│   │   ├── .env
+│   │   ├── program.json
+│   │   ├── readme.md
+│   │   ├── worker_profiles.toml
+│   │   ├── imports/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo
+
