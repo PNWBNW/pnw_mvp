@@ -1,4 +1,4 @@
-program employer_agreement.aleo;
+program employer_agreement.aleo{
 
 import "../../encoder.leo";
 
