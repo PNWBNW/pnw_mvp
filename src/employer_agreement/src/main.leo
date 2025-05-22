@@ -1,6 +1,6 @@
 program employer_agreement.aleo{
 
-import "../../encoder.leo";
+import "encoder.leo";
 
 mapping agreements: address => EmploymentAgreement;
 
