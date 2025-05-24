@@ -1,0 +1,11 @@
+[package]
+name = "encoder"
+version = "25.04.26"
+edition = "2025.3"
+description = "encoding program to use an import for each project file."
+authors = "PNW Dev Team"
+license = "Proprietary"
+main = "src/main.leo"  # <-- must match real file location
+
+[program]
+path = "src/main.leo"  # <-- optional but cleaner
