@@ -29,6 +29,7 @@ PROJECTS=(
     "ans_registry"
     "employer_registry"
     "worker_profiles"
+    "encoder"
 )
 
 SRC_ROOT="/home/runner/work/pnw_mvp/pnw_mvp/src"
