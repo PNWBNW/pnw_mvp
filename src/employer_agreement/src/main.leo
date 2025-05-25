@@ -1,7 +1,5 @@
 program employer_agreement.aleo{
 
-import "encoder.leo";
-
 mapping agreements: address => EmploymentAgreement;
 
 struct EmploymentAgreement {
