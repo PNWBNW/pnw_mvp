@@ -1,6 +1,12 @@
-program employer_agreement.aleo{
+program employer_agreement.aleo {
+
+import chacha.random;
 
 mapping agreements: address => EmploymentAgreement;
+
+inline function random_salt() -> scalar {
+    return ChaCha::rand_scalar();
+}
 
 struct EmploymentAgreement {
     worker: address,
@@ -114,4 +120,5 @@ async transition verify_agreement(worker: address) -> Future {
 async function finalize_verify_agreement(worker: address) {
     assert(agreements.contains(worker));
 }
+
 }
