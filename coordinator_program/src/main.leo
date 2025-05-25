@@ -1,8 +1,12 @@
 program coordinator_program.aleo {
 
-    async transition noop_toggle() {
-        let pass: u8 = 1u8;
-        assert(pass == 1u8);
+    async function noop_check() -> u8 {
+        1u8
+    }
+
+    async transition noop_toggle() -> u8 {
+        let result: u8 = await noop_check();
+        result
     }
 
 }
