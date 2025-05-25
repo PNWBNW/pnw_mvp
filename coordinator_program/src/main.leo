@@ -1,12 +1,8 @@
 program coordinator_program.aleo {
 
-async function echo_payload(payload: [u8; 32]) -> [u8; 32] {
-    return payload;
-}
+    async transition noop_toggle() {
+        let pass: u8 = 1u8;
+        assert(pass == 1u8);
+    }
 
-async transition route_action(action: [u8; 16], payload: [u8; 32]) -> [u8; 32]; Future {
-    let result: Future = echo_payload(payload);
-    return await result;
 }
-
-}}
