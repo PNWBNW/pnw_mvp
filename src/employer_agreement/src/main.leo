@@ -114,3 +114,4 @@ async transition verify_agreement(worker: address) -> Future {
 async function finalize_verify_agreement(worker: address) {
     assert(agreements.contains(worker));
 }
+}
