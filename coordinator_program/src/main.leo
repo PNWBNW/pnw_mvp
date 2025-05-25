@@ -1,4 +1,4 @@
-program coordinator_program.aleo;
+program coordinator_program.aleo{
 
 import "encoder.leo";
 
