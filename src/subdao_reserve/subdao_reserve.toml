@@ -10,6 +10,3 @@ main = "src/main.leo"
 [program]
 path = "src/main.leo"
 
-[dependencies]
-weekly_payroll_pool = { path = "../weekly_payroll_pool" }
-process_tax_compliance = { path = "../process_tax_compliance" }
