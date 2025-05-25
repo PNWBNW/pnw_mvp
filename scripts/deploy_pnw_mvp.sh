@@ -45,7 +45,6 @@ for PROJECT in "${PROJECTS[@]}"; do
             echo "🔐 Injecting ALEO_PRIVATE_KEY into $PROJECT .env"
             echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
 
-            leo clean
             leo build
             leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
 
@@ -66,6 +65,7 @@ cd "$DEPLOYMENT_ROOT"
 
 echo "🔐 Injecting ALEO_PRIVATE_KEY into coordinator .env"
 echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
+
 
 leo build
 
