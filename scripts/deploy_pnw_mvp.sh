@@ -2,7 +2,7 @@
 
 set -e
 
-echo "🔥 Starting PNW MVP deployment with .env toggles..."
+echo "🔥 Starting PNW MVP deployment with clean builds and .env toggles..."
 
 ENV_FILE="$DEPLOYMENT_ROOT/.env"
 
@@ -34,6 +34,34 @@ PROJECTS=(
 
 SRC_ROOT="/home/runner/work/pnw_mvp/pnw_mvp/src"
 
+# Function to clean project artifacts
+clean_project() {
+    local project_path=$1
+    echo "🧹 Cleaning build artifacts for $(basename "$project_path")..."
+    
+    # Remove build directory
+    if [ -d "$project_path/build" ]; then
+        rm -rf "$project_path/build"
+        echo "  ✅ Removed build/ directory"
+    fi
+    
+    # Remove outputs directory
+    if [ -d "$project_path/outputs" ]; then
+        rm -rf "$project_path/outputs"
+        echo "  ✅ Removed outputs/ directory"
+    fi
+    
+    # Remove .aleo files
+    find "$project_path" -name "*.aleo" -type f -delete 2>/dev/null || true
+    echo "  ✅ Removed .aleo files"
+    
+    # Clean any cached Leo files
+    if [ -d "$project_path/.leo" ]; then
+        rm -rf "$project_path/.leo"
+        echo "  ✅ Removed .leo cache"
+    fi
+}
+
 for PROJECT in "${PROJECTS[@]}"; do
     TOGGLE_VAR="DEPLOY_${PROJECT^^}"
     if [ "${!TOGGLE_VAR}" == "true" ]; then
@@ -42,10 +70,18 @@ for PROJECT in "${PROJECTS[@]}"; do
         if [ -f "$PROJECT_PATH/src/main.leo" ]; then
             cd "$PROJECT_PATH"
 
+            # Clean existing build artifacts
+            clean_project "$PROJECT_PATH"
+
             echo "🔐 Injecting ALEO_PRIVATE_KEY into $PROJECT .env"
             echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
 
+            # Clean build before building
+            echo "🏗️ Performing clean build for $PROJECT..."
+            leo clean || true
             leo build
+
+            echo "📡 Deploying $PROJECT..."
             leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
 
             echo "🧼 Cleaning up ALEO_PRIVATE_KEY"
@@ -63,10 +99,16 @@ done
 echo "🚀 Building and deploying: coordinator_program"
 cd "$DEPLOYMENT_ROOT"
 
+# Clean coordinator program artifacts
+echo "🧹 Cleaning coordinator_program build artifacts..."
+clean_project "$DEPLOYMENT_ROOT"
+
 echo "🔐 Injecting ALEO_PRIVATE_KEY into coordinator .env"
 echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
 
-
+# Clean build before building
+echo "🏗️ Performing clean build for coordinator_program..."
+leo clean || true
 leo build
 
 MAX_RETRIES=3
@@ -91,4 +133,5 @@ done
 echo "🧼 Cleaning up coordinator .env"
 sed -i '/^ALEO_PRIVATE_KEY=/d' .env
 
-echo "✅ All programs deployed successfully!"
+echo "✅ All programs deployed successfully with fresh builds!"
+echo "📊 New deployment timestamps will appear in your Aleo explorer shortly."
