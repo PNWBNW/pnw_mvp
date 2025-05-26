@@ -1,4 +1,4 @@
-program coordinator_program.aleo {
+program pnw_router.aleo {
 
 struct DateTime {
     year: u16,
