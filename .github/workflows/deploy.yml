@@ -1,4 +1,4 @@
-name: Deploy Coordinator Program to Aleo Testnet
+name: Deploy PNW Router to Aleo Testnet
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     env:
       NETWORK: testnet
       SNARKOS_VERSION: v3.7.1
-      DEPLOYMENT_ROOT: ${{ github.workspace }}/coordinator_program
+      DEPLOYMENT_ROOT: ${{ github.workspace }}/pnw_router
       DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
       ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
 
@@ -32,7 +32,7 @@ jobs:
       - name: 📁 Create deployment logs folder
         run: mkdir -p "$DEPLOYMENT_LOGS"
 
-      - name: 🚀 Build and Deploy Coordinator Program
+      - name: 🚀 Build and Deploy PNW Router
         run: |
           chmod +x scripts/deploy_pnw_mvp.sh
           ./scripts/deploy_pnw_mvp.sh
@@ -40,5 +40,5 @@ jobs:
       - name: 📤 Upload deployment logs
         uses: actions/upload-artifact@v4
         with:
-          name: coordinator_program_logs
+          name: pnw_router_logs
           path: ${{ env.DEPLOYMENT_LOGS }}
