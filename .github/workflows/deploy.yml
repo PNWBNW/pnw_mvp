@@ -10,13 +10,13 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-env:
-  NETWORK: testnet
-  SNARKOS_VERSION: v3.7.1
-  DEPLOYMENT_ROOT: ${{ github.workspace }}/pnw_router
-  DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
-  ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
-  PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}  # ← ADD THIS
+    env:
+     NETWORK: testnet
+     SNARKOS_VERSION: v3.7.1
+     DEPLOYMENT_ROOT: ${{ github.workspace }}/pnw_router
+     DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
+     ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
+     PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}  # ← ADD THIS
 
     steps:
       - name: ⬇️ Checkout repository
