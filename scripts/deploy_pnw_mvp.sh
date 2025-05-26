@@ -95,19 +95,19 @@ for PROJECT in "${PROJECTS[@]}"; do
     fi
 done
 
-# Deploy coordinator_program last
-echo "🚀 Building and deploying: coordinator_program"
-cd "$DEPLOYMENT_ROOT"
+# Deploy pnw_router last
+echo "🚀 Building and deploying: pnw_router"
+cd "$DEPLOYMENT_ROOT/pnw_router"
 
-# Clean coordinator program artifacts
-echo "🧹 Cleaning coordinator_program build artifacts..."
-clean_project "$DEPLOYMENT_ROOT"
+# Clean pnw_router artifacts
+echo "🧹 Cleaning pnw_router build artifacts..."
+clean_project "$DEPLOYMENT_ROOT/pnw_router"
 
-echo "🔐 Injecting ALEO_PRIVATE_KEY into coordinator .env"
+echo "🔐 Injecting ALEO_PRIVATE_KEY into pnw_router .env"
 echo "ALEO_PRIVATE_KEY=$ALEO_PRIVATE_KEY" >> .env
 
 # Clean build before building
-echo "🏗️ Performing clean build for coordinator_program..."
+echo "🏗️ Performing clean build for pnw_router..."
 leo clean || true
 leo build
 
@@ -115,9 +115,9 @@ MAX_RETRIES=3
 RETRY_DELAY=15
 
 for ((i=1;i<=MAX_RETRIES;i++)); do
-    echo "🚀 Attempt $i to deploy coordinator_program..."
+    echo "🚀 Attempt $i to deploy pnw_router..."
     if leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes; then
-        echo "✅ coordinator_program deployed successfully!"
+        echo "✅ pnw_router deployed successfully!"
         break
     else
         if [ $i -lt $MAX_RETRIES ]; then
@@ -130,8 +130,5 @@ for ((i=1;i<=MAX_RETRIES;i++)); do
     fi
 done
 
-echo "🧼 Cleaning up coordinator .env"
+echo "🧼 Cleaning up pnw_router .env"
 sed -i '/^ALEO_PRIVATE_KEY=/d' .env
-
-echo "✅ All programs deployed successfully with fresh builds!"
-echo "📊 New deployment timestamps will appear in your Aleo explorer shortly."
