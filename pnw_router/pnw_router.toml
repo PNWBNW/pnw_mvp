@@ -16,3 +16,6 @@ process_tax_compliance = { path = "../process_tax_compliance" }
 subDAO_reserve = { path = "../subDAO_reserve" }
 payroll_audit_log = { path = "../payroll_audit_log" }
 oversight_dao = { path = "../oversight_dao" }
+employer_registry = { path = "../employer_registry" }
+worker_profiles = { path = "../worker_profiles" }
+
