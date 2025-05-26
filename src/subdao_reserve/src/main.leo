@@ -1,4 +1,4 @@
-program subdao_reserve.aleo {
+program subdao_reserve.aleo{
 
 mapping reserve_balance: address => u64;
 mapping tax_obligations: address => u64;
