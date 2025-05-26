@@ -1,5 +1,5 @@
 [package]
-name = "coordinator_program"
+name = "pnw_router"
 version = "25.04.28"
 edition = "2025.3"
 description = "A control module for deploying and coordinating PNW smart contracts selectively."
