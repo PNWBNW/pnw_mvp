@@ -11,10 +11,13 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# Load environment variables
-echo "📜 Loading environment variables from $ENV_FILE"
+# Use envsubst to expand GitHub secrets into a temporary env file
+echo "📜 Expanding variables from $ENV_FILE"
+envsubst < "$ENV_FILE" > "$DEPLOYMENT_ROOT/.env.expanded"
+
+# Load expanded environment variables
 set -a
-source "$ENV_FILE"
+source "$DEPLOYMENT_ROOT/.env.expanded"
 set +a
 
 # List of dependency projects
@@ -31,10 +34,9 @@ PROJECTS=(
     "worker_profiles"
 )
 
-# Root directory where all src folders live
 SRC_ROOT="/home/runner/work/pnw_mvp/pnw_mvp/src"
 
-# Deploy each dependency project using full src path
+# Deploy dependency contracts
 for PROJECT in "${PROJECTS[@]}"; do
     TOGGLE_VAR="DEPLOY_${PROJECT^^}"
     if [ "${!TOGGLE_VAR}" == "true" ]; then
@@ -44,7 +46,7 @@ for PROJECT in "${PROJECTS[@]}"; do
             cd "$PROJECT_PATH"
             leo clean
             leo build
-            leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes
+            leo deploy --private-key "$PRIVATE_KEY" --network "$NETWORK" --yes
         else
             echo "❌ main.leo not found at $PROJECT_PATH/src/main.leo"
             exit 1
@@ -54,7 +56,7 @@ for PROJECT in "${PROJECTS[@]}"; do
     fi
 done
 
-# Deploy pnw_router last
+# Deploy final program (pnw_router)
 echo "🚀 Building and deploying: pnw_router"
 cd "$DEPLOYMENT_ROOT"
 
@@ -66,7 +68,7 @@ RETRY_DELAY=15
 
 for ((i=1;i<=MAX_RETRIES;i++)); do
     echo "🚀 Attempt $i to deploy pnw_router..."
-    if leo deploy --private-key "$ALEO_PRIVATE_KEY" --network "$NETWORK" --yes; then
+    if leo deploy --private-key "$PRIVATE_KEY" --network "$NETWORK" --yes; then
         echo "✅ pnw_router deployed successfully!"
         break
     else
