@@ -1,5 +1,5 @@
 {
-  "program": "coordinator_program.aleo",
+  "program": "pnw_router.aleo",
   "description": "Master control layer for modular PNW program deployment",
   "developer": "PNW Engineering Team",
   "version": "1.0.0",
