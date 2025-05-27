@@ -1,4 +1,4 @@
-program worker_profiles.aleo;
+program worker_profiles.aleo{
 
 mapping worker_data: [u8; 32] => Worker;
 
@@ -74,4 +74,4 @@ async function finalize_register_worker(
     };
 
     worker_data.set(credential_hash, profile);
-}
+}}
