@@ -1,4 +1,4 @@
-program worker_profiles.aleo{
+program worker_profiles.aleo;
 
 mapping worker_data: field => Worker;
 
@@ -31,15 +31,13 @@ async transition register_worker(
     assert(industry_code >= 1u8 && industry_code <= 15u8);
     assert(is_valid_state(state_of_residency));
 
-    // Dependents logic
     assert(has_dependents ? num_dependents > 0u8 : num_dependents == 0u8);
     assert(has_dependents ? num_minor_dependents <= num_dependents : num_minor_dependents == 0u8);
 
-    // Migrant logic
     assert(is_pniw ? is_valid_country_code(input_country_code) : input_country_code == [85u8, 83u8, 65u8, 32u8]);
 
     let final_country_id: u8 = is_pniw ? input_country_id : 0u8;
-    let final_country_code: [u8; 4] = is_pniw ? input_country_code : [85u8, 83u8, 65u8, 32u8]; // "USA "
+    let final_country_code: [u8; 4] = is_pniw ? input_country_code : [85u8, 83u8, 65u8, 32u8];
 
     let future: Future = finalize_register_worker(
         is_pniw,
@@ -68,13 +66,8 @@ async function finalize_register_worker(
 ) {
     let nonce: scalar = ChaCha::rand_scalar();
 
-    let c0 = country_of_origin_code[0];
-    let c1 = country_of_origin_code[1];
-    let c2 = country_of_origin_code[2];
-    let c3 = country_of_origin_code[3];
-
-    let s0 = state_of_residency[0];
-    let s1 = state_of_residency[1];
+    let [c0, c1, c2, c3] = country_of_origin_code;
+    let [s0, s1] = state_of_residency;
 
     let input: [u8; 32] = [
         is_pniw as u8,
@@ -113,6 +106,11 @@ async function finalize_register_worker(
     worker_data.set(credential_hash, profile);
 }
 
+function get_worker(credential_hash: field) -> Worker {
+    let profile: Worker = worker_data.get(credential_hash);
+    return profile;
+}
+
 inline function is_valid_state(state: [u8; 2]) -> bool {
     return
         state == [65,76] || state == [65,75] || state == [65,90] || state == [65,82] ||
@@ -141,4 +139,4 @@ inline function is_valid_country_code(code: [u8; 4]) -> bool {
         code == [66,82,65,32] || code == [67,72,76,32] || code == [67,79,76,32] || code == [69,67,85,32] ||
         code == [71,85,89,32] || code == [80,82,89,32] || code == [80,69,82,32] || code == [83,85,82,32] ||
         code == [85,82,89,32] || code == [86,69,78,32];
-}}
+}
