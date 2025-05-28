@@ -1,4 +1,4 @@
-program worker_profiles.aleo;
+program worker_profiles.aleo{
 
 mapping worker_data: field => Worker;
 
@@ -168,4 +168,4 @@ function check_country(i: u8, code: [u8; 4]) -> bool {
     };
 
     return check_country(i + 1u8, code);
-}
+}}
