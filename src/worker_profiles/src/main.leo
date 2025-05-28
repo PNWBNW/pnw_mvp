@@ -133,11 +133,11 @@ function check_state(i: u8, state: [u8; 2]) -> bool {
 
     if i >= 50u8 {
         return false;
-    };
+    }
 
     if state == allowed_states.get(i) {
         return true;
-    };
+    }
 
     return check_state(i + 1u8, state);
 }
