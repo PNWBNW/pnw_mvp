@@ -127,12 +127,13 @@ function is_valid_state(state: [u8; 2]) -> bool {
         [87u8,73u8], [87u8,89u8]
     ];
 
-    let mut i: u8 = 0u8;
-    while i < 50u8 {
+    let _ = 0u8;
+    while _ < 50u8 {
+        let i: u8 = _;
         if state == allowed_states.get(i) {
             return true;
         };
-        i = i + 1u8;
+        _ = _ + 1u8;
     };
     return false;
 }
@@ -150,12 +151,13 @@ function is_valid_country_code(code: [u8; 4]) -> bool {
         [85u8,82u8,89u8,32u8], [86u8,69u8,78u8,32u8]
     ];
 
-    let mut i: u8 = 0u8;
-    while i < 33u8 {
+    let _ = 0u8;
+    while _ < 33u8 {
+        let i: u8 = _;
         if code == allowed.get(i) {
             return true;
         };
-        i = i + 1u8;
+        _ = _ + 1u8;
     };
     return false;
 }}
