@@ -161,11 +161,11 @@ function check_country(i: u8, code: [u8; 4]) -> bool {
 
     if i >= 33u8 {
         return false;
-    };
+    }
 
     if code == allowed.get(i) {
         return true;
-    };
+    }
 
     return check_country(i + 1u8, code);
 }}
