@@ -1,4 +1,4 @@
-program worker_profiles.aleo{
+program worker_profiles.aleo;
 
 mapping worker_data: field => Worker;
 
@@ -117,6 +117,10 @@ function get_worker(credential_hash: field) -> Worker {
 }
 
 function is_valid_state(state: [u8; 2]) -> bool {
+    return check_state(0u8, state);
+}
+
+function check_state(i: u8, state: [u8; 2]) -> bool {
     let allowed_states: [[u8; 2]; 50] = [
         [65u8,76u8], [65u8,75u8], [65u8,90u8], [65u8,82u8], [67u8,65u8], [67u8,79u8], [67u8,84u8], [68u8,69u8],
         [70u8,76u8], [71u8,65u8], [72u8,73u8], [73u8,68u8], [73u8,76u8], [73u8,78u8], [73u8,65u8], [75u8,83u8],
@@ -127,18 +131,22 @@ function is_valid_state(state: [u8; 2]) -> bool {
         [87u8,73u8], [87u8,89u8]
     ];
 
-    let _ = 0u8;
-    while _ < 50u8 {
-        let i: u8 = _;
-        if state == allowed_states.get(i) {
-            return true;
-        };
-        _ = _ + 1u8;
+    if i >= 50u8 {
+        return false;
     };
-    return false;
+
+    if state == allowed_states.get(i) {
+        return true;
+    };
+
+    return check_state(i + 1u8, state);
 }
 
 function is_valid_country_code(code: [u8; 4]) -> bool {
+    return check_country(0u8, code);
+}
+
+function check_country(i: u8, code: [u8; 4]) -> bool {
     let allowed: [[u8; 4]; 33] = [
         [85u8,83u8,65u8,32u8], [67u8,65u8,78u8,32u8], [77u8,69u8,88u8,32u8], [71u8,84u8,77u8,32u8],
         [72u8,78u8,68u8,32u8], [83u8,76u8,86u8,32u8], [78u8,73u8,67u8,32u8], [67u8,82u8,73u8,32u8],
@@ -151,13 +159,13 @@ function is_valid_country_code(code: [u8; 4]) -> bool {
         [85u8,82u8,89u8,32u8], [86u8,69u8,78u8,32u8]
     ];
 
-    let _ = 0u8;
-    while _ < 33u8 {
-        let i: u8 = _;
-        if code == allowed.get(i) {
-            return true;
-        };
-        _ = _ + 1u8;
+    if i >= 33u8 {
+        return false;
     };
-    return false;
-}}
+
+    if code == allowed.get(i) {
+        return true;
+    };
+
+    return check_country(i + 1u8, code);
+}
