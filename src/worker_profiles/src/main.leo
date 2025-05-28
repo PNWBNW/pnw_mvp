@@ -1,4 +1,4 @@
-program worker_profiles.aleo;
+program worker_profiles.aleo{
 
 mapping worker_data: field => Worker;
 
@@ -139,4 +139,4 @@ inline function is_valid_country_code(code: [u8; 4]) -> bool {
         code == [66,82,65,32] || code == [67,72,76,32] || code == [67,79,76,32] || code == [69,67,85,32] ||
         code == [71,85,89,32] || code == [80,82,89,32] || code == [80,69,82,32] || code == [83,85,82,32] ||
         code == [85,82,89,32] || code == [86,69,78,32];
-}
+}}
