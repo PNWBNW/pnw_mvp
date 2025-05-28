@@ -68,13 +68,13 @@ async function finalize_register_worker(
 ) {
     let nonce: scalar = ChaCha::rand_scalar();
 
-    let c0: u8 = country_of_origin_code[0];
-    let c1: u8 = country_of_origin_code[1];
-    let c2: u8 = country_of_origin_code[2];
-    let c3: u8 = country_of_origin_code[3];
+    let c0 = country_of_origin_code[0];
+    let c1 = country_of_origin_code[1];
+    let c2 = country_of_origin_code[2];
+    let c3 = country_of_origin_code[3];
 
-    let s0: u8 = state_of_residency[0];
-    let s1: u8 = state_of_residency[1];
+    let s0 = state_of_residency[0];
+    let s1 = state_of_residency[1];
 
     let input: [u8; 32] = [
         is_pniw as u8,
