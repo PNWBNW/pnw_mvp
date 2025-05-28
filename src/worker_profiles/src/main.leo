@@ -116,7 +116,7 @@ function get_worker(credential_hash: field) -> Worker {
     return profile;
 }
 
-inline function is_valid_state(state: [u8; 2]) -> bool {
+function is_valid_state(state: [u8; 2]) -> bool {
     return
         state == [65,76] || state == [65,75] || state == [65,90] || state == [65,82] ||
         state == [67,65] || state == [67,79] || state == [67,84] || state == [68,69] ||
@@ -133,7 +133,7 @@ inline function is_valid_state(state: [u8; 2]) -> bool {
         state == [87,73] || state == [87,89];
 }
 
-inline function is_valid_country_code(code: [u8; 4]) -> bool {
+function is_valid_country_code(code: [u8; 4]) -> bool {
     return
         code == [85,83,65,32] || code == [67,65,78,32] || code == [77,69,88,32] || code == [71,84,77,32] ||
         code == [72,78,68,32] || code == [83,76,86,32] || code == [78,73,67,32] || code == [67,82,73,32] ||
