@@ -4,6 +4,7 @@ mapping worker_data: field => Worker;
 
 struct Worker {
     is_pniw: bool,
+    is_pncw: bool,
     country_id: u8,
     country_of_origin_code: [u8; 4],
     industry_code: u8,
@@ -17,6 +18,7 @@ struct Worker {
 
 async transition register_worker(
     is_pniw: bool,
+    is_pncw: bool,
     input_country_id: u8,
     input_country_code: [u8; 4],
     industry_code: u8,
@@ -25,29 +27,23 @@ async transition register_worker(
     num_minor_dependents: u8,
     state_of_residency: [u8; 2]
 ) -> Future {
+    assert(is_pniw != is_pncw);
     assert(industry_code >= 1u8 && industry_code <= 15u8);
     assert(is_valid_state(state_of_residency));
 
-    // Validate dependents
-    if has_dependents {
-        assert(num_dependents > 0u8);
-        assert(num_minor_dependents <= num_dependents);
-    } else {
-        assert(num_dependents == 0u8);
-        assert(num_minor_dependents == 0u8);
-    }
+    // Dependents logic
+    assert(has_dependents ? num_dependents > 0u8 : num_dependents == 0u8);
+    assert(has_dependents ? num_minor_dependents <= num_dependents : num_minor_dependents == 0u8);
 
-    // Handle PNIW vs PNCW logic
-    let (final_country_id, final_country_code): (u8, [u8; 4]) = 
-        if is_pniw {
-            assert(is_valid_country_code(input_country_code));
-            (input_country_id, input_country_code)
-        } else {
-            (0u8, [85u8, 83u8, 65u8, 32u8]) // Default to "USA "
-        };
+    // Migrant logic
+    assert(is_pniw ? is_valid_country_code(input_country_code) : input_country_code == [85u8, 83u8, 65u8, 32u8]);
+
+    let final_country_id: u8 = is_pniw ? input_country_id : 0u8;
+    let final_country_code: [u8; 4] = is_pniw ? input_country_code : [85u8, 83u8, 65u8, 32u8]; // "USA "
 
     let future: Future = finalize_register_worker(
         is_pniw,
+        is_pncw,
         final_country_id,
         final_country_code,
         industry_code,
@@ -61,6 +57,7 @@ async transition register_worker(
 
 async function finalize_register_worker(
     is_pniw: bool,
+    is_pncw: bool,
     country_id: u8,
     country_of_origin_code: [u8; 4],
     industry_code: u8,
@@ -81,6 +78,7 @@ async function finalize_register_worker(
 
     let input: [u8; 32] = [
         is_pniw as u8,
+        is_pncw as u8,
         country_id,
         c0, c1, c2, c3,
         industry_code,
@@ -92,7 +90,7 @@ async function finalize_register_worker(
         0u8, 0u8, 0u8, 0u8,
         0u8, 0u8, 0u8, 0u8,
         0u8, 0u8, 0u8, 0u8,
-        0u8, 0u8, 0u8, 0u8
+        0u8, 0u8
     ];
 
     let hash_bytes: [u8; 32] = sha3_256(input);
@@ -100,6 +98,7 @@ async function finalize_register_worker(
 
     let profile: Worker = Worker {
         is_pniw,
+        is_pncw,
         country_id,
         country_of_origin_code,
         industry_code,
