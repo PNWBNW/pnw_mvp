@@ -1,7 +1,8 @@
-import poseidon2.aleo;
-
 program worker_profiles.aleo{
 
+import poseidon2;
+
+// Identity structure to be hashed
 struct WorkerIdentity {
     first_name: u128,
     last_name: u128,
@@ -10,72 +11,78 @@ struct WorkerIdentity {
     zip: u8
 }
 
+// On-chain record of worker profile
 struct Worker {
-    credential_hash: WorkerCredential,
-    num_dependents: u8,
-    num_minors: u8,
-    is_pniw: bool,
-    is_pncw: bool,
-    has_dependents: bool,
-    country_code: u128,
-    industry_code: u16,
-    _nonce: group
+    credential_hash: field,
+    wallet_address: address,
+    block_height: u32,
+    nonce: group
 }
 
-struct WorkerCredential {
-    value: field
+// Mapping: credential_hash -> wallet (active identity)
+mapping credential_hashes: field => address;
+
+// Mapping: wallet -> credential_hash (1:1 active worker)
+mapping registered_wallets: address => field;
+
+// Mapping: credential_hash -> archived status
+mapping archived_credentials: field => bool;
+
+// Hash identity to field
+function hash_worker_identity(
+    identity: WorkerIdentity,
+    salt: u128
+) -> field {
+    poseidon2::hash_to_field(identity, salt)
 }
 
-mapping workers: field => Worker;
+// Check if a credential_hash is currently active
+function is_worker_registered(credential_hash: field) -> bool {
+    credential_hashes.contains(credential_hash)
+}
 
+// Transition: Register new worker OR overwrite an existing one
 async transition register_worker(
-    credential_input: WorkerIdentity,
-    is_pniw: bool,
-    is_pncw: bool,
-    has_dependents: bool,
-    num_dependents: u8,
-    num_minors: u8,
-    country_code: u128,
-    state_code: u128,
-    city_code: u128,
-    zip: u8,
-    industry_code: u16
+    identity: WorkerIdentity,
+    salt: u128,
+    wallet_address: address,
+    block_height: u32,
+    nonce: group
 ) {
-    // Validate dependents
-    let dependent_check: bool = has_dependents ? num_dependents > 0u8 : num_dependents == 0u8;
-    assert(dependent_check);
+    let credential_hash: field = hash_worker_identity(identity, salt);
 
-    let minor_check: bool = has_dependents ? num_minors <= num_dependents : num_minors == 0u8;
-    assert(minor_check);
+    // If already registered under another hash, archive the old one
+    if registered_wallets.contains(wallet_address) {
+        let old_hash: field = registered_wallets.get(wallet_address);
+        archived_credentials[old_hash] = true;
+        credential_hashes.remove(old_hash);
+    }
 
-    // Build identity and hash it
-    let worker_identity: WorkerIdentity = WorkerIdentity {
-        first_name: credential_input.first_name,
-        last_name: credential_input.last_name,
-        state: state_code,
-        city: city_code,
-        zip
-    };
+    // Prevent duplicate reuse of archived hashes
+    assert(!archived_credentials.contains(credential_hash));
+    assert(!credential_hashes.contains(credential_hash));
 
-    let credential_hash_value: field = poseidon2::hash_to_field(worker_identity);
-    let credential_hash: WorkerCredential = WorkerCredential { value: credential_hash_value };
+    // Store new mappings
+    credential_hashes[credential_hash] = wallet_address;
+    registered_wallets[wallet_address] = credential_hash;
 
-    // Store the worker
-    let new_worker: Worker = Worker {
+    // Return updated Worker record
+    let worker = Worker {
         credential_hash,
-        num_dependents,
-        num_minors,
-        is_pniw,
-        is_pncw,
-        has_dependents,
-        country_code,
-        industry_code,
-        _nonce: random()
+        wallet_address,
+        block_height,
+        nonce
     };
 
-    workers.set(credential_hash_value, new_worker);
+    output worker;
 }
 
-async function get_worker(credential_hash: field) -> Worker {
-    return workers.get(credential_hash);
+// View function to get wallet from credential
+function get_worker_address(credential_hash: field) -> address {
+    credential_hashes.get(credential_hash)
+}
+
+// Check if a hash is archived (previous version)
+function is_archived(credential_hash: field) -> bool {
+    archived_credentials.contains(credential_hash)
 }}
