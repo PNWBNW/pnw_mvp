@@ -1,6 +1,6 @@
-program worker_profiles.aleo{
-
 import poseidon2.aleo;
+
+program worker_profiles.aleo{
 
 struct WorkerIdentity {
     first_name: u128,
