@@ -66,13 +66,8 @@ async function finalize_register_worker(
 ) {
     let nonce: scalar = ChaCha::rand_scalar();
 
-    let c0: u8 = country_of_origin_code.get(0u8);
-    let c1: u8 = country_of_origin_code.get(1u8);
-    let c2: u8 = country_of_origin_code.get(2u8);
-    let c3: u8 = country_of_origin_code.get(3u8);
-
-    let s0: u8 = state_of_residency.get(0u8);
-    let s1: u8 = state_of_residency.get(1u8);
+    let [c0, c1, c2, c3]: [u8; 4] = country_of_origin_code;
+    let [s0, s1]: [u8; 2] = state_of_residency;
 
     let input: [u8; 32] = [
         is_pniw as u8,
@@ -135,7 +130,7 @@ function check_state(i: u8, state: [u8; 2]) -> bool {
         return false;
     }
 
-    if state == allowed_states.get(i) {
+    if state == allowed_states[i] {
         return true;
     }
 
@@ -163,9 +158,9 @@ function check_country(i: u8, code: [u8; 4]) -> bool {
         return false;
     }
 
-    if code == allowed.get(i) {
+    if code == allowed[i] {
         return true;
-    }
+    }}
 
     return check_country(i + 1u8, code);
-}}
+}
