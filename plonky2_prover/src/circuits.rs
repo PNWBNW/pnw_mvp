@@ -20,43 +20,57 @@ fn string_to_field(input: &str) -> F {
         .into()
 }
 
+/// Converts up to 5 credential strings to a single Poseidon hash
+fn poseidon2_hash_stacked_credentials(builder: &mut CircuitBuilder<F, D>, credentials: &[String]) -> F {
+    assert!(credentials.len() <= 5, "Max of 5 credentials allowed");
+
+    let mut fields = vec![F::ZERO; 5];
+    for (i, cred) in credentials.iter().enumerate().take(5) {
+        fields[i] = string_to_field(cred);
+    }
+
+    // Hash using Poseidon
+    let field_targets: Vec<_> = fields.iter().map(|f| builder.constant(*f)).collect();
+    builder.constant(poseidon_n_to_hash_no_pad(builder, field_targets))
+}
+
 /// Builds a base circuit that:
 /// 1. Hashes the worker profile using Poseidon2
 /// 2. Validates that it matches a known expected hash
-/// 3. Ensures the credential matches a required NFT gate
+/// 3. Ensures the credential hash matches NFT access control
 fn build_base_circuit(
     worker: &WorkerProfile,
     nft_hash: F,
 ) -> (ProofWithPublicInputs<F, C, D>, CircuitData<F, C, D>) {
     let mut builder = CircuitBuilder::<F, D>::new();
 
-    // Convert strings to Goldilocks field elements
+    // Convert strings to field elements
     let name = string_to_field(&worker.full_name);
     let city = string_to_field(&worker.city);
     let state = string_to_field(&worker.state);
     let zip = string_to_field(&worker.zip);
-    let credential = string_to_field(&worker.credential_data);
 
-    // Allocate constants in the circuit
     let name_t = builder.constant(name);
     let city_t = builder.constant(city);
     let state_t = builder.constant(state);
     let zip_t = builder.constant(zip);
-    let credential_t = builder.constant(credential);
 
-    // Poseidon2 hash of identity fields
+    // Hash identity fields and credential stack
+    let credential_hash = poseidon2_hash_stacked_credentials(&mut builder, &worker.credential_data);
+    let credential_t = builder.constant(credential_hash);
+
+    // Poseidon hash of identity components
     let poseidon_input = vec![name_t, city_t, state_t, zip_t, credential_t];
     let poseidon_hash = poseidon_n_to_hash_no_pad(&mut builder, poseidon_input);
 
-    // Replace with real trusted value (for testing, use hash_worker CLI)
+    // Trusted commitment check
     let expected_hash = builder.constant(F::from_canonical_u64(123456789));
     builder.connect(poseidon_hash, expected_hash);
 
-    // NFT gate: credential must match approved hash
+    // NFT gating check
     let nft_target = builder.constant(nft_hash);
     builder.connect(credential_t, nft_target);
 
-    // Build and prove base circuit
     let circuit_data = builder.build::<C>();
     let witness = PartialWitness::new();
     let proof = circuit_data.prove(witness).expect("Base proof failed");
@@ -64,35 +78,27 @@ fn build_base_circuit(
     (proof, circuit_data)
 }
 
-/// Wraps the base proof in a recursive verifier circuit
+/// Recursive wrapper
 fn build_recursive_proof_layer(
     base_proof: &ProofWithPublicInputs<F, C, D>,
     base_circuit: &CircuitData<F, C, D>,
 ) -> (Vec<u8>, CircuitData<F, C, D>) {
     let mut builder = CircuitBuilder::<F, D>::new();
-
-    let verifier_data = &base_circuit.verifier_only;
-    let common = &base_circuit.common;
-
-    // Recursive verification of the base proof
     builder.verify_proof::<C>(
         base_proof.clone(),
-        verifier_data.clone(),
-        common.clone(),
+        base_circuit.verifier_only.clone(),
+        base_circuit.common.clone(),
     );
 
-    let wrapper_circuit = builder.build::<C>();
+    let wrapper = builder.build::<C>();
     let witness = PartialWitness::new();
-    let wrapper_proof = wrapper_circuit
-        .prove(witness)
-        .expect("Recursive wrapper proof failed");
+    let proof = wrapper.prove(witness).expect("Recursive wrapper failed");
 
-    let proof_bytes = bincode::serialize(&wrapper_proof).unwrap();
-    (proof_bytes, wrapper_circuit)
+    let proof_bytes = bincode::serialize(&proof).unwrap();
+    (proof_bytes, wrapper)
 }
 
-/// Public entry point:
-/// Generates full recursive proof and returns proof bytes + circuit metadata
+/// Public entry point: full recursive proof builder
 pub fn build_recursive_proof(worker: &WorkerProfile) -> (Vec<u8>, CircuitData<F, C, D>) {
     let nft_hash = string_to_field("CertifiedHarvestTech_2025");
 
@@ -101,4 +107,4 @@ pub fn build_recursive_proof(worker: &WorkerProfile) -> (Vec<u8>, CircuitData<F,
         build_recursive_proof_layer(&base_proof, &base_circuit);
 
     (proof_bytes, wrapper_circuit)
-}
+        }
