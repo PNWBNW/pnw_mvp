@@ -6,12 +6,32 @@ pnw_mvp/
 ├── directory
 ├── zkshark.md
 ├── .github/
-│   ├── workflows/
-│   │   └── deploy.yml
+│   └── workflows/
+│       └── deploy.yml
 ├── scripts/
 │   ├── .license
 │   ├── deploy_crosschain.sh
 │   ├── deploy_pnw_mvp.sh
+│   ├── submit_worker_hash.ts
+│   └── verify_zpass_badge.ts
+├── front_end/
+│   ├── index.html
+│   ├── worker_submit.js
+│   └── zpass_verifier.js
+├── zk_config/
+│   ├── circuit_config.json
+│   └── trusted_setup.ptau
+├── plonky2_prover/
+│   ├── Cargo.toml
+│   └── src/
+│       ├── main.rs
+│       ├── circuits.rs
+│       ├── hash_utils.rs
+│       ├── inputs/
+│       │   └── sample_worker.json
+│       └── output/
+│           ├── proof.json
+│           └── hash.txt
 ├── pnw_router/
 │   ├── .env
 │   ├── assembly.env
@@ -19,6 +39,11 @@ pnw_mvp/
 │   ├── program.json
 │   ├── assembly_main.aleo
 │   ├── main.leo
+│   ├── constants/
+│   │   ├── action_ids.leo
+│   │   ├── tax_constants.leo
+│   ├── imports/
+│   │   └── .gitkeep
 ├── src/
 │   ├── encoder.leo
 │   ├── employer_agreement/
@@ -105,4 +130,3 @@ pnw_mvp/
 │   │   │   └── .gitkeep
 │   │   ├── src/
 │   │   │   └── main.leo
-
