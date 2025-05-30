@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PNW-MVP Credential Prover</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f0f4f8, #e0eafc);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+    form {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+      color: #34495e;
+    }
+    input {
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.75rem;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #1f618d;
+    }
+    pre {
+      margin-top: 2rem;
+      background: #ecf0f1;
+      padding: 1rem;
+      border-radius: 5px;
+      width: 100%;
+      max-width: 500px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+  <script type="module" src="worker_submit.js"></script>
+</head>
+<body>
+  <h1><i class="fas fa-id-badge"></i> PNW-MVP Worker Credential Prover</h1>
+
+  <form id="credentialForm">
+    <label for="fullName">Full Name:</label>
+    <input type="text" id="fullName" required>
+
+    <label for="city">City:</label>
+    <input type="text" id="city" required>
+
+    <label for="state">State:</label>
+    <input type="text" id="state" required>
+
+    <label for="zip">ZIP Code:</label>
+    <input type="text" id="zip" required>
+
+    <label for="credentials">Credential(s) (comma-separated, max 5):</label>
+    <input type="text" id="credentials" required>
+
+    <button type="submit"><i class="fas fa-lock"></i> Generate Proof & Submit</button>
+  </form>
+
+  <pre id="output"></pre>
+
+  <script type="module">
+    import init, { generate_proof } from './plonky2_wasm/pkg/plonky2_wasm.js';
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await init();
+
+      const form = document.getElementById('credentialForm');
+      const output = document.getElementById('output');
+
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+
+        const full_name = document.getElementById('fullName').value;
+        const city = document.getElementById('city').value;
+        const state = document.getElementById('state').value;
+        const zip = document.getElementById('zip').value;
+        const credentialList = document.getElementById('credentials').value
+          .split(',').map(c => c.trim()).slice(0, 5);
+
+        const workerData = {
+          full_name,
+          city,
+          state,
+          zip,
+          credential_data: credentialList
+        };
+
+        try {
+          const { hash, proof } = await generate_proof(workerData);
+
+          output.textContent = `✅ Proof generated successfully!\n\nHash: ${hash}`;
+
+          // Optional: Submit hash to worker_profiles.aleo via worker_submit.js
+          window.submitWorkerHash(hash);
+        } catch (err) {
+          output.textContent = `❌ Error generating proof: ${err.message}`;
+        }
+      };
+    });
+  </script>
+</body>
+  </html>
