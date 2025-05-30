@@ -123,7 +123,7 @@
 
     async function loadCredentialWhitelist() {
       try {
-        const response = await fetch('../zk_config/credential_whitelist.json');
+        const response = await fetch('zk_config/credential_whitelist.json');
         const data = await response.json();
         const credentials = data.allowed_credentials;
 
@@ -136,7 +136,7 @@
           buttonContainer.appendChild(btn);
         });
       } catch (err) {
-        console.error("Failed to load whitelist:", err);
+        console.error("❌ Failed to load credential whitelist:", err);
       }
     }
 
@@ -184,8 +184,7 @@
           credential_data: selected
         };
 
-        // Send to backend or run proof logic here
-        console.log("Submitted:", workerData);
+        console.log("📦 Submitted Worker Profile:", workerData);
         alert("✅ Credentials submitted! (stub)");
       });
     });
@@ -216,9 +215,9 @@
   </form>
 
   <div class="sample-credentials">
-    <h2>📚 Dynamic Credential List Loaded from Whitelist</h2>
-    <p>Select up to 5 verified credentials to include in your worker profile.</p>
-    <p>This list is sourced directly from <code>credential_whitelist.json</code>.</p>
+    <h2>📚 Credential Selection</h2>
+    <p>Select up to <strong>5 verified credentials</strong> from the list above. These will be hashed, proven, and linked to your ZPass wallet.</p>
+    <p>The credential list is dynamically loaded from <code>zk_config/credential_whitelist.json</code>.</p>
   </div>
 </body>
-  </html>
+</html>
