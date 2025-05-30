@@ -19,24 +19,6 @@ pnw_mvp/
 │   ├── program.json
 │   ├── assembly_main.aleo
 │   ├── main.leo
-│   ├── constants/
-│   │   ├── action_ids.leo
-│   │   ├── tax_constants.leo
-│   ├── actions/
-│   │   ├── employment_contract.aleo
-│   │   ├── worker_payraise.aleo
-│   │   ├── weekly_pncw_payroll.aleo
-│   │   ├── weekly_pniw_payroll.aleo
-│   │   ├── tax_payment.aleo
-│   │   ├── audit_log_build.aleo
-│   │   ├── overdao_transfer_out.aleo
-│   │   ├── overdao_transfer_in.aleo
-│   │   ├── subdao_transfer_payroll.aleo
-│   │   ├── employer_fund_subdao.aleo
-│   │   ├── worker_status_update.aleo
-│   │   └── compliance_checks.aleo
-│   ├── imports/
-│   │   └── .gitkeep
 ├── src/
 │   ├── encoder.leo
 │   ├── employer_agreement/
