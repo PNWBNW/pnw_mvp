@@ -6,8 +6,10 @@ use plonky2::plonk::circuit_data::CircuitData;
 use plonky2::plonk::proof::ProofWithPublicInputs;
 use plonky2::iop::witness::PartialWitness;
 use plonky2::gadgets::poseidon::poseidon_n_to_hash_no_pad;
-
+use types::WorkerProfile;
 use crate::WorkerProfile;
+
+mod types;
 
 type C = PoseidonGoldilocksConfig;
 const D: usize = 2;
