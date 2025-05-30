@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PNW-MVP Credential Prover</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -16,10 +15,12 @@
       flex-direction: column;
       align-items: center;
     }
+
     h1 {
       color: #2c3e50;
       margin-bottom: 1rem;
     }
+
     form {
       background: white;
       border-radius: 10px;
@@ -30,18 +31,21 @@
       display: flex;
       flex-direction: column;
     }
+
     label {
       margin-top: 1rem;
       margin-bottom: 0.5rem;
       font-weight: bold;
       color: #34495e;
     }
+
     input {
       padding: 0.75rem;
       border: 1px solid #ccc;
       border-radius: 5px;
       font-size: 1rem;
     }
+
     button {
       margin-top: 1.5rem;
       padding: 0.75rem;
@@ -53,10 +57,40 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
+
     button:hover {
       background-color: #1f618d;
     }
-    pre {
+
+    .button-container button {
+      margin: 5px;
+      padding: 8px 12px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .button-container button:hover {
+      background-color: #2980b9;
+    }
+
+    .selected-cred-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    .selected-cred-list li {
+      background: #ecf0f1;
+      margin: 4px 0;
+      padding: 6px;
+      border-radius: 4px;
+    }
+
+    pre, .sample-credentials {
       margin-top: 2rem;
       background: #ecf0f1;
       padding: 1rem;
@@ -65,6 +99,20 @@
       max-width: 500px;
       white-space: pre-wrap;
       word-wrap: break-word;
+    }
+
+    .sample-credentials h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      color: #2c3e50;
+    }
+
+    .sample-credentials ul {
+      padding-left: 1.2rem;
+    }
+
+    .sample-credentials li {
+      margin-bottom: 0.5rem;
     }
   </style>
   <script type="module" src="worker_submit.js"></script>
@@ -85,23 +133,31 @@
     <label for="zip">ZIP Code:</label>
     <input type="text" id="zip" required>
 
-    <label for="credentials">Credential(s) (comma-separated, max 5):</label>
-    <input type="text" id="credentials" required>
+    <label>Select Credential(s):</label>
+    <div id="credentialButtons" class="button-container">
+      <button type="button" data-cred="CertifiedHarvestTech_2025">CertifiedHarvestTech_2025</button>
+      <button type="button" data-cred="ForkliftOperator_Lvl2">ForkliftOperator_Lvl2</button>
+      <button type="button" data-cred="OrganicCropSupervisor_2024">OrganicCropSupervisor_2024</button>
+      <button type="button" data-cred="TractorMaintenanceCert">TractorMaintenanceCert</button>
+      <button type="button" data-cred="FieldSafetyCompliance_2023">FieldSafetyCompliance_2023</button>
+    </div>
+
+    <ul id="selectedCredentials" class="selected-cred-list"></ul>
 
     <button type="submit"><i class="fas fa-lock"></i> Generate Proof & Submit</button>
   </form>
 
   <div class="sample-credentials">
-  <h2>✅ Sample Allowed Credential Formats</h2>
-  <p>Credentials must be formatted in PascalCase with underscores. Examples include:</p>
-  <ul>
-    <li>CertifiedHarvestTech_2025</li>
-    <li>ForkliftOperator_Lvl2</li>
-    <li>OrganicCropSupervisor_2024</li>
-    <li>TractorMaintenanceCert</li>
-    <li>FieldSafetyCompliance_2023</li>
-  </ul>
-  <p>Maximum: 5 credentials per worker profile</p>
+    <h2>✅ Sample Allowed Credential Formats</h2>
+    <p>Credentials must be formatted in PascalCase with underscores. Examples include:</p>
+    <ul>
+      <li>CertifiedHarvestTech_2025</li>
+      <li>ForkliftOperator_Lvl2</li>
+      <li>OrganicCropSupervisor_2024</li>
+      <li>TractorMaintenanceCert</li>
+      <li>FieldSafetyCompliance_2023</li>
+    </ul>
+    <p>Maximum: 5 credentials per worker profile</p>
   </div>
 
   <pre id="output"></pre>
@@ -114,6 +170,19 @@
 
       const form = document.getElementById('credentialForm');
       const output = document.getElementById('output');
+      const selected = [];
+      const buttonContainer = document.getElementById('credentialButtons');
+      const selectedList = document.getElementById('selectedCredentials');
+
+      buttonContainer.addEventListener('click', (e) => {
+        const cred = e.target.dataset.cred;
+        if (!cred || selected.includes(cred) || selected.length >= 5) return;
+
+        selected.push(cred);
+        const li = document.createElement('li');
+        li.textContent = cred;
+        selectedList.appendChild(li);
+      });
 
       form.onsubmit = async (e) => {
         e.preventDefault();
@@ -122,23 +191,18 @@
         const city = document.getElementById('city').value;
         const state = document.getElementById('state').value;
         const zip = document.getElementById('zip').value;
-        const credentialList = document.getElementById('credentials').value
-          .split(',').map(c => c.trim()).slice(0, 5);
 
         const workerData = {
           full_name,
           city,
           state,
           zip,
-          credential_data: credentialList
+          credential_data: selected
         };
 
         try {
           const { hash, proof } = await generate_proof(workerData);
-
           output.textContent = `✅ Proof generated successfully!\n\nHash: ${hash}`;
-
-          // Optional: Submit hash to worker_profiles.aleo via worker_submit.js
           window.submitWorkerHash(hash);
         } catch (err) {
           output.textContent = `❌ Error generating proof: ${err.message}`;
@@ -147,4 +211,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
