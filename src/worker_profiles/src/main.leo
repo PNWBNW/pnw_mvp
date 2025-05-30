@@ -1,7 +1,5 @@
 program worker_profiles.aleo{
 
-import poseidon2;
-
 // Identity structure to be hashed
 struct WorkerIdentity {
     first_name: u128,
