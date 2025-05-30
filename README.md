@@ -113,7 +113,7 @@ All data lives on-chain, encrypted — and only the proof is public.
 
 - [aleo.org](https://aleo.org)
 - [github.com/ProvableHQ](https://github.com/ProvableHQ)
-- [plonky2 docs](https://docs.polygon.technology/plonky2/)
+- [Plonky2](https://github.com/mir-protocol/plonky2)
 
 ---
 
