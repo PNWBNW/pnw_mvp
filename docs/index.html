@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PNW-MVP Credential Prover</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -27,7 +27,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       padding: 2rem;
       width: 100%;
-      max-width: 500px;
+      max-width: 600px;
       display: flex;
       flex-direction: column;
     }
@@ -86,19 +86,28 @@
     .selected-cred-list li {
       background: #ecf0f1;
       margin: 4px 0;
-      padding: 6px;
+      padding: 6px 8px;
       border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    pre, .sample-credentials {
+    .selected-cred-list li button {
+      background: transparent;
+      border: none;
+      color: #e74c3c;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .sample-credentials {
       margin-top: 2rem;
       background: #ecf0f1;
       padding: 1rem;
       border-radius: 5px;
       width: 100%;
-      max-width: 500px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+      max-width: 600px;
     }
 
     .sample-credentials h2 {
@@ -106,23 +115,88 @@
       font-size: 1.1rem;
       color: #2c3e50;
     }
-
-    .sample-credentials ul {
-      padding-left: 1.2rem;
-    }
-
-    .sample-credentials li {
-      margin-bottom: 0.5rem;
-    }
   </style>
-  <script type="module" src="worker_submit.js"></script>
+  <script type="module">
+    const selected = [];
+    const buttonContainer = document.getElementById('credentialButtons');
+    const selectedList = document.getElementById('selectedCredentials');
+
+    async function loadCredentialWhitelist() {
+      try {
+        const response = await fetch('../zk_config/credential_whitelist.json');
+        const data = await response.json();
+        const credentials = data.allowed_credentials;
+
+        credentials.forEach(cred => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.dataset.cred = cred;
+          btn.textContent = cred;
+          btn.classList.add('cred-btn');
+          buttonContainer.appendChild(btn);
+        });
+      } catch (err) {
+        console.error("Failed to load whitelist:", err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCredentialWhitelist();
+
+      buttonContainer.addEventListener('click', (e) => {
+        const cred = e.target.dataset.cred;
+        if (!cred || selected.includes(cred) || selected.length >= 5) return;
+
+        selected.push(cred);
+
+        const li = document.createElement('li');
+        li.textContent = cred;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = '❌';
+        removeBtn.onclick = () => {
+          selected.splice(selected.indexOf(cred), 1);
+          selectedList.removeChild(li);
+        };
+
+        li.appendChild(removeBtn);
+        selectedList.appendChild(li);
+      });
+
+      document.getElementById("workerForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const full_name = document.getElementById("full_name").value;
+        const city = document.getElementById("city").value;
+        const state = document.getElementById("state").value;
+        const zip = document.getElementById("zip").value;
+
+        if (selected.length === 0) {
+          alert("Please select at least one credential.");
+          return;
+        }
+
+        const workerData = {
+          full_name,
+          city,
+          state,
+          zip,
+          credential_data: selected
+        };
+
+        // Send to backend or run proof logic here
+        console.log("Submitted:", workerData);
+        alert("✅ Credentials submitted! (stub)");
+      });
+    });
+  </script>
 </head>
 <body>
   <h1><i class="fas fa-id-badge"></i> PNW-MVP Worker Credential Prover</h1>
 
-  <form id="credentialForm">
-    <label for="fullName">Full Name:</label>
-    <input type="text" id="fullName" required>
+  <form id="workerForm">
+    <label for="full_name">Full Name:</label>
+    <input type="text" id="full_name" required>
 
     <label for="city">City:</label>
     <input type="text" id="city" required>
@@ -134,81 +208,17 @@
     <input type="text" id="zip" required>
 
     <label>Select Credential(s):</label>
-    <div id="credentialButtons" class="button-container">
-      <button type="button" data-cred="CertifiedHarvestTech_2025">CertifiedHarvestTech_2025</button>
-      <button type="button" data-cred="ForkliftOperator_Lvl2">ForkliftOperator_Lvl2</button>
-      <button type="button" data-cred="OrganicCropSupervisor_2024">OrganicCropSupervisor_2024</button>
-      <button type="button" data-cred="TractorMaintenanceCert">TractorMaintenanceCert</button>
-      <button type="button" data-cred="FieldSafetyCompliance_2023">FieldSafetyCompliance_2023</button>
-    </div>
+    <div id="credentialButtons" class="button-container"></div>
 
     <ul id="selectedCredentials" class="selected-cred-list"></ul>
 
-    <button type="submit"><i class="fas fa-lock"></i> Generate Proof & Submit</button>
+    <button type="submit"><i class="fas fa-lock"></i> Submit Profile</button>
   </form>
 
   <div class="sample-credentials">
-    <h2>✅ Sample Allowed Credential Formats</h2>
-    <p>Credentials must be formatted in PascalCase with underscores. Examples include:</p>
-    <ul>
-      <li>CertifiedHarvestTech_2025</li>
-      <li>ForkliftOperator_Lvl2</li>
-      <li>OrganicCropSupervisor_2024</li>
-      <li>TractorMaintenanceCert</li>
-      <li>FieldSafetyCompliance_2023</li>
-    </ul>
-    <p>Maximum: 5 credentials per worker profile</p>
+    <h2>📚 Dynamic Credential List Loaded from Whitelist</h2>
+    <p>Select up to 5 verified credentials to include in your worker profile.</p>
+    <p>This list is sourced directly from <code>credential_whitelist.json</code>.</p>
   </div>
-
-  <pre id="output"></pre>
-
-  <script type="module">
-    import init, { generate_proof } from './plonky2_wasm/pkg/plonky2_wasm.js';
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      await init();
-
-      const form = document.getElementById('credentialForm');
-      const output = document.getElementById('output');
-      const selected = [];
-      const buttonContainer = document.getElementById('credentialButtons');
-      const selectedList = document.getElementById('selectedCredentials');
-
-      buttonContainer.addEventListener('click', (e) => {
-        const cred = e.target.dataset.cred;
-        if (!cred || selected.includes(cred) || selected.length >= 5) return;
-
-        selected.push(cred);
-        const li = document.createElement('li');
-        li.textContent = cred;
-        selectedList.appendChild(li);
-      });
-
-      form.onsubmit = async (e) => {
-        e.preventDefault();
-
-        const full_name = document.getElementById('fullName').value;
-        const city = document.getElementById('city').value;
-        const state = document.getElementById('state').value;
-        const zip = document.getElementById('zip').value;
-
-        const workerData = {
-          full_name,
-          city,
-          state,
-          zip,
-          credential_data: selected
-        };
-
-        try {
-          const { hash, proof } = await generate_proof(workerData);
-          output.textContent = `✅ Proof generated successfully!\n\nHash: ${hash}`;
-          window.submitWorkerHash(hash);
-        } catch (err) {
-          output.textContent = `❌ Error generating proof: ${err.message}`;
-        }
-      };
-    });
-  </script>
 </body>
-</html>
+  </html>
