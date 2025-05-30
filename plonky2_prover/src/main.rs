@@ -1,7 +1,9 @@
 use std::fs::{self, File};
 use std::io::Write;
 use serde::{Deserialize, Serialize};
+use types::WorkerProfile;
 
+mod types;
 mod circuits;
 mod hash_utils;
 
