@@ -4,7 +4,7 @@ pnw_mvp/
 ├── README.md
 ├── aleo_environment.md
 ├── directory
-├── zkshark.md
+├── index.html
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml
@@ -15,7 +15,6 @@ pnw_mvp/
 │   ├── submit_worker_hash.ts
 │   └── verify_zpass_badge.ts
 ├── front_end/
-│   ├── index.html
 │   ├── worker_submit.js
 │   └── zpass_verifier.js
 ├── zk_config/
