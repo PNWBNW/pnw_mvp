@@ -1,0 +1,9 @@
+{
+  "field": "goldilocks",
+  "hash": "poseidon2",
+  "recursion_depth": 2,
+  "nft_gate_credential": "CertifiedHarvestTech_2025",
+  "expected_poseidon_hash_hex": "0x01d23cf98192ab...",
+  "proof_output_path": "src/output/proof.json",
+  "circuit_output_path": "src/output/circuit_data.bin"
+}
