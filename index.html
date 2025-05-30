@@ -101,66 +101,47 @@
       cursor: pointer;
     }
 
-    .sample-credentials {
-      margin-top: 2rem;
-      background: #ecf0f1;
-      padding: 1rem;
-      border-radius: 5px;
-      width: 100%;
-      max-width: 600px;
+    #clearAllBtn {
+      margin-top: 1rem;
+      background-color: #e74c3c;
     }
 
-    .sample-credentials h2 {
-      margin-top: 0;
-      font-size: 1.1rem;
-      color: #2c3e50;
+    #clearAllBtn:hover {
+      background-color: #c0392b;
     }
   </style>
   <script type="module">
     const selected = [];
-    const buttonContainer = document.getElementById('credentialButtons');
     const selectedList = document.getElementById('selectedCredentials');
 
-    async function loadCredentialWhitelist() {
-      try {
-        const response = await fetch('zk_config/credential_whitelist.json');
-        const data = await response.json();
-        const credentials = data.allowed_credentials;
-
-        credentials.forEach(cred => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.dataset.cred = cred;
-          btn.textContent = cred;
-          btn.classList.add('cred-btn');
-          buttonContainer.appendChild(btn);
-        });
-      } catch (err) {
-        console.error("❌ Failed to load credential whitelist:", err);
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-      loadCredentialWhitelist();
+      const buttons = document.querySelectorAll('.cred-btn');
 
-      buttonContainer.addEventListener('click', (e) => {
-        const cred = e.target.dataset.cred;
-        if (!cred || selected.includes(cred) || selected.length >= 5) return;
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cred = btn.dataset.cred;
+          if (!cred || selected.includes(cred) || selected.length >= 5) return;
 
-        selected.push(cred);
+          selected.push(cred);
 
-        const li = document.createElement('li');
-        li.textContent = cred;
+          const li = document.createElement('li');
+          li.textContent = cred;
 
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = '❌';
-        removeBtn.onclick = () => {
-          selected.splice(selected.indexOf(cred), 1);
-          selectedList.removeChild(li);
-        };
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = '❌';
+          removeBtn.onclick = () => {
+            selected.splice(selected.indexOf(cred), 1);
+            selectedList.removeChild(li);
+          };
 
-        li.appendChild(removeBtn);
-        selectedList.appendChild(li);
+          li.appendChild(removeBtn);
+          selectedList.appendChild(li);
+        });
+      });
+
+      document.getElementById('clearAllBtn').addEventListener('click', () => {
+        selected.length = 0;
+        selectedList.innerHTML = '';
       });
 
       document.getElementById("workerForm").addEventListener("submit", async (event) => {
@@ -207,17 +188,26 @@
     <input type="text" id="zip" required>
 
     <label>Select Credential(s):</label>
-    <div id="credentialButtons" class="button-container"></div>
+    <div id="credentialButtons" class="button-container">
+      <button type="button" class="cred-btn" data-cred="ZPassLevel1_Basic">ZPassLevel1_Basic</button>
+      <button type="button" class="cred-btn" data-cred="ZPassLevel2_Intermediate">ZPassLevel2_Intermediate</button>
+      <button type="button" class="cred-btn" data-cred="CertifiedHarvestTech_2025">CertifiedHarvestTech_2025</button>
+      <button type="button" class="cred-btn" data-cred="CropTrace_Certified">CropTrace_Certified</button>
+      <button type="button" class="cred-btn" data-cred="ColdStorage_Certified">ColdStorage_Certified</button>
+      <button type="button" class="cred-btn" data-cred="Pesticide_Handler_Level2">Pesticide_Handler_Level2</button>
+      <button type="button" class="cred-btn" data-cred="OSHA_10">OSHA_10</button>
+      <button type="button" class="cred-btn" data-cred="Forklift_Operator">Forklift_Operator</button>
+      <button type="button" class="cred-btn" data-cred="ChainOfCustody_Expert">ChainOfCustody_Expert</button>
+      <button type="button" class="cred-btn" data-cred="Timekeeper_Certified">Timekeeper_Certified</button>
+    </div>
+
+    <div style="margin-top: 10px;">
+      <button type="button" id="clearAllBtn">❌ Clear All Credentials</button>
+    </div>
 
     <ul id="selectedCredentials" class="selected-cred-list"></ul>
 
     <button type="submit"><i class="fas fa-lock"></i> Submit Profile</button>
   </form>
-
-  <div class="sample-credentials">
-    <h2>📚 Credential Selection</h2>
-    <p>Select up to <strong>5 verified credentials</strong> from the list above. These will be hashed, proven, and linked to your ZPass wallet.</p>
-    <p>The credential list is dynamically loaded from <code>zk_config/credential_whitelist.json</code>.</p>
-  </div>
 </body>
 </html>
