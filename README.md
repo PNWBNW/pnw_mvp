@@ -6,7 +6,7 @@
 
 ## What Is PNW-MVP?
 
-The **PNW-MVP** project is a modular system built to help **farmers, workers (citizen and noncitizen), and employers** manage payroll and taxes securely — without paperwork, intermediaries, or data exposure.
+The **PNW-MVP** project is a modular system built to help **farmers, workers (citizen and noncitizen), and employers** manage payroll, identity, and taxes securely — without paperwork, intermediaries, or data exposure.
 
 This system runs on the **Aleo blockchain**, where all smart contracts are **private by default**, but still **verifiable for compliance**.
 
@@ -16,16 +16,16 @@ This system runs on the **Aleo blockchain**, where all smart contracts are **pri
 
 In industries like agriculture and seasonal labor, employers face challenges:
 
-- Navigating tax compliance
-- Protecting worker identities
-- Minimizing payroll overhead
-- Avoiding legal and financial risk
+- Navigating tax compliance  
+- Protecting worker identities  
+- Minimizing payroll overhead  
+- Avoiding legal and financial risk  
 
 **PNW-MVP provides a zero-knowledge solution** that empowers all sides:
 
-- Workers retain dignity and privacy
-- Employers stay compliant
-- Auditors gain transparent proof — without surveillance
+- Workers retain dignity and privacy  
+- Employers stay compliant  
+- Auditors gain transparent proof — without surveillance  
 
 ---
 
@@ -41,13 +41,40 @@ In industries like agriculture and seasonal labor, employers face challenges:
 ## Core Modules
 
 - `worker_profiles.aleo` – Stores private worker metadata and credential hashes
-- `employer_profiles.aleo` – Mirrors worker logic for employers, storing attested credentials privately ✅
+- `employer_profiles.aleo` – Mirrors worker logic for employers, storing attested credentials privately
 - `employer_registry.aleo` – Manages employers and linked SubDAO funds
 - `credential_nft.aleo` – Soulbound badge NFT system for worker certification
-- `oversightdao_nft.aleo` – NFT badge system for SubDAO or audit-level employer credentials ✅
+- `oversightdao_nft.aleo` – NFT badge system for SubDAO or audit-level employer credentials
+- `pnw_name_registry.aleo` – Registers `.pnw` names required for platform participation ✅
 - `pncw_payroll` & `pniw_payroll` – Weekly payroll streams by classification
 - `oversightdao_reserve` – Reserve held for DAO-approved audits and compliance
 - `subdao_reserve` – Local pools for community-led pay and tax contributions
+
+---
+
+## 🌐 PNW Name Registry (.pnw)
+
+All participants — workers and employers — **must register a `.pnw` identity name** during onboarding.
+
+This name:
+- Is **soulbound** (non-transferable)  
+- Can only be minted once per identity  
+- Is required for record submissions and credential validation  
+
+The `.pnw` system uses a **sliding fee model**:
+
+| Name Length | Cost (Aleo credits) |
+|-------------|---------------------|
+| 3 letters   | 50                  |
+| 4 letters   | 40                  |
+| 5 letters   | 30                  |
+| 6 letters   | 20                  |
+| 7 letters   | 15                  |
+| 8 letters   | 10                  |
+| 9 letters   | 5                   |
+| 10–16       | 2                   |
+
+Names are checked for uniqueness and stored in an on-chain public mapping for discoverability. These names are integrated into the worker and employer Plonky2 flows for credential traceability without breaking privacy.
 
 ---
 
@@ -57,29 +84,22 @@ PNW-MVP integrates a **hybrid off-chain ZK proof flow** using [Plonky2](https://
 
 ---
 
-### 🔧 Frontend ZPass Flow for Workers
+### 🔧 ZPass Flow for Workers
 
-1. A worker fills out a form (name, city, state, credential list).
-2. The frontend generates a **recursive Plonky2 proof**.
-3. This proof produces a unique **credential hash** using `poseidon2` with optional NFT-gated logic.
-4. The hash is sent to the `worker_profiles.aleo` contract along with u128-encoded identity fields.
-5. Optionally, a DAO agent mints a **ZPass badge** from `credential_nft.aleo`.
-
-The result: Workers can prove who they are, what they’re certified for — without ever exposing raw data.
+1. Worker selects a `.pnw` name in the DApp.  
+2. Frontend generates a **recursive Plonky2 proof** with identity and credential data.  
+3. Credential hash is committed using `poseidon2`.  
+4. Result is sent to `worker_profiles.aleo` and `.pnw` name is registered.  
+5. Optionally, a DAO agent mints a **ZPass NFT** for the worker.  
 
 ---
 
-### 🏢 ZK Attestation Flow for Employers (NEW)
+### 🏢 ZK Attestation for Employers
 
-Employers follow a nearly identical flow:
-
-1. A cooperative or agent fills out the employer’s business profile (e.g., EIN, state, license class).
-2. The system creates a **Plonky2 proof** of that attestation.
-3. A `poseidon2` hash is generated to commit the employer profile.
-4. This credential hash is stored in `employer_profiles.aleo`, along with optional u128 metadata.
-5. Optionally, the DAO mints a **compliance NFT** for the employer from `oversightdao_nft.aleo`.
-
-This enables employers to **prove audit status and compliance** — without revealing proprietary or regulatory-sensitive info.
+1. Cooperative or DAO fills out employer details.  
+2. Generates a **Plonky2 credential proof** with `.pnw` name.  
+3. Credential hash is stored in `employer_profiles.aleo`.  
+4. DAO mints an optional **compliance NFT** from `oversightdao_nft.aleo`.  
 
 ---
 
@@ -87,12 +107,10 @@ This enables employers to **prove audit status and compliance** — without reve
 
 PNW-MVP uses **zero-knowledge cryptography and recursive proving** to:
 
-- Prove worker certification, payroll eligibility, and location-based access
-- Prove employer compliance and license validity
-- Protect sensitive worker and employer identities
-- Prevent double-registration, impersonation, or manipulation
-
-All data lives on-chain, encrypted — and only the proof is public.
+- Prove worker certification, payroll eligibility, and residency  
+- Prove employer compliance and credential status  
+- Obfuscate raw identity data while enabling public credential validation  
+- Prevent double-registration or impersonation  
 
 ---
 
@@ -107,21 +125,21 @@ All data lives on-chain, encrypted — and only the proof is public.
 
 ## What’s Next?
 
-- ✅ ZPass credential loader with NFT gate logic for worker onboarding
-- ✅ Credential hash attestation for employer profiles
-- Launch mobile-friendly UI for both roles
-- Integrate employer tax payment escrow system
-- Allow DAOs to issue employer compliance NFTs
-- Launch pilot program in rural labor region
+- ✅ Credential loader and badge logic for ZPass workers  
+- ✅ `.pnw` identity registry and wallet signing  
+- ✅ Employer compliance badge via oversight DAO  
+- Mobile UI for fast worker/employer onboarding  
+- DAO governance for dispute mediation and compliance tracking  
+- Pilot region rollout in labor-heavy agricultural zones  
 
 ---
 
 ## Contribute / Learn More
 
-- [aleo.org](https://aleo.org)
-- [github.com/ProvableHQ](https://github.com/ProvableHQ)
-- [Plonky2](https://github.com/mir-protocol/plonky2)
+- [aleo.org](https://aleo.org)  
+- [github.com/ProvableHQ](https://github.com/ProvableHQ)  
+- [Plonky2](https://github.com/mir-protocol/plonky2)  
 
 ---
 
-**PNW-MVP believes in privacy, dignity, and security for all — no matter your passport or payroll.**
+**PNW-MVP believes in privacy, dignity, and opportunity — for all.**
