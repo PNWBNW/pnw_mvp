@@ -6,5 +6,6 @@ pub struct WorkerProfile {
     pub city: String,
     pub state: String,
     pub zip: String,
+    pub pnw_name: String, // .pnw name input
     pub credential_data: Vec<String>, // Up to 5
 }
