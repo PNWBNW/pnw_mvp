@@ -1,0 +1,7 @@
+[package]
+name = "pnw_name_registry"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aleo = "2.6.1"
