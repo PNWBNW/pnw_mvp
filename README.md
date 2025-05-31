@@ -41,8 +41,10 @@ In industries like agriculture and seasonal labor, employers face challenges:
 ## Core Modules
 
 - `worker_profiles.aleo` – Stores private worker metadata and credential hashes
+- `employer_profiles.aleo` – Mirrors worker logic for employers, storing attested credentials privately ✅
 - `employer_registry.aleo` – Manages employers and linked SubDAO funds
 - `credential_nft.aleo` – Soulbound badge NFT system for worker certification
+- `oversightdao_nft.aleo` – NFT badge system for SubDAO or audit-level employer credentials ✅
 - `pncw_payroll` & `pniw_payroll` – Weekly payroll streams by classification
 - `oversightdao_reserve` – Reserve held for DAO-approved audits and compliance
 - `subdao_reserve` – Local pools for community-led pay and tax contributions
@@ -51,30 +53,33 @@ In industries like agriculture and seasonal labor, employers face challenges:
 
 ## How Plonky2 Proving Works
 
-PNW-MVP integrates a **hybrid off-chain ZK proof flow** using [Plonky2](https://github.com/mir-protocol/plonky2) to enhance credential verification.
+PNW-MVP integrates a **hybrid off-chain ZK proof flow** using [Plonky2](https://github.com/mir-protocol/plonky2) to enhance credential verification for both **workers and employers**.
 
-### 🔧 Frontend Flow for Workers
+---
+
+### 🔧 Frontend ZPass Flow for Workers
 
 1. A worker fills out a form (name, city, state, credential list).
 2. The frontend generates a **recursive Plonky2 proof**.
 3. This proof produces a unique **credential hash** using `poseidon2` with optional NFT-gated logic.
 4. The hash is sent to the `worker_profiles.aleo` contract along with u128-encoded identity fields.
-5. Optionally, a DAO agent mints a **credential NFT** in `credential_nft.aleo`.
+5. Optionally, a DAO agent mints a **ZPass badge** from `credential_nft.aleo`.
 
 The result: Workers can prove who they are, what they’re certified for — without ever exposing raw data.
 
 ---
 
-## Employer Path (Planned)
+### 🏢 ZK Attestation Flow for Employers (NEW)
 
-The next phase will introduce a **mirror Plonky2 flow for employers**, including:
+Employers follow a nearly identical flow:
 
-- Digital credential attestation by cooperatives or government
-- Verified business license encoding
-- Optional SubDAO membership badge (NFT-style)
-- Anchor to `employer_registry.aleo` for audit tracking
+1. A cooperative or agent fills out the employer’s business profile (e.g., EIN, state, license class).
+2. The system creates a **Plonky2 proof** of that attestation.
+3. A `poseidon2` hash is generated to commit the employer profile.
+4. This credential hash is stored in `employer_profiles.aleo`, along with optional u128 metadata.
+5. Optionally, the DAO mints a **compliance NFT** for the employer from `oversightdao_nft.aleo`.
 
-Employers will mint their profile hash just like workers — enabling provable compliance without revealing business metadata.
+This enables employers to **prove audit status and compliance** — without revealing proprietary or regulatory-sensitive info.
 
 ---
 
@@ -83,6 +88,7 @@ Employers will mint their profile hash just like workers — enabling provable c
 PNW-MVP uses **zero-knowledge cryptography and recursive proving** to:
 
 - Prove worker certification, payroll eligibility, and location-based access
+- Prove employer compliance and license validity
 - Protect sensitive worker and employer identities
 - Prevent double-registration, impersonation, or manipulation
 
@@ -101,10 +107,11 @@ All data lives on-chain, encrypted — and only the proof is public.
 
 ## What’s Next?
 
-- Finish employer Plonky2 credential flow
-- Launch mobile-friendly UI for worker onboarding
+- ✅ ZPass credential loader with NFT gate logic for worker onboarding
+- ✅ Credential hash attestation for employer profiles
+- Launch mobile-friendly UI for both roles
 - Integrate employer tax payment escrow system
-- Allow DAOs to issue custom NFT credentials
+- Allow DAOs to issue employer compliance NFTs
 - Launch pilot program in rural labor region
 
 ---
