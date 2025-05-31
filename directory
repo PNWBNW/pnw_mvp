@@ -13,10 +13,12 @@ pnw_mvp/
 │   ├── deploy_crosschain.sh
 │   ├── deploy_pnw_mvp.sh
 │   ├── submit_worker_hash.ts
-│   └── verify_zpass_badge.ts
+│   ├── verify_zpass_badge.ts
+│   └── verify_zkpass_attestation.ts       # ✅ NEW
 ├── front_end/
 │   ├── worker_submit.js
-│   └── zpass_verifier.js
+│   ├── zpass_verifier.js
+│   └── credential_loader.js               # ✅ NEW
 ├── zk_config/
 │   ├── circuit_config.json
 │   └── trusted_setup.ptau
@@ -70,12 +72,12 @@ pnw_mvp/
 │   │   │   └── .gitkeep
 │   │   ├── src/
 │   │   │   └── main.leo
-│   ├── oversightdao_nft/
+│   ├── oversightdao_nft/                  # ✅ NEW MODULE
 │   │   ├── .env
 │   │   ├── oversightdao_nft.toml
 │   │   ├── program.json
 │   │   ├── src/
-│   │   │   └── main.leo  ← 🎯 NFT mint & revoke logic lives here
+│   │   │   └── main.leo                   # 🎯 NFT mint, commit, revoke logic
 │   ├── pncw_payroll/
 │   │   ├── .env
 │   │   ├── README.md
