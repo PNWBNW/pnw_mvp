@@ -27,4 +27,10 @@ pub fn poseidon2_hash(input_bytes: &[u8]) -> F {
 pub fn poseidon2_hash_fields(fields: &[F]) -> F {
     let hash_out: HashOut<F> = PoseidonHash::hash_no_pad(fields);
     hash_out.elements[0]
-      }
+}
+
+/// Hashes a `.pnw` name string into a field using Poseidon2
+pub fn hash_pnw_name(name: &str) -> F {
+    let full_name = format!("{}.pnw", name.trim_end_matches(".pnw"));
+    poseidon2_hash(full_name.as_bytes())
+}
