@@ -1,4 +1,4 @@
-# Proven Noncitizen Workers (PNW-MVP)
+# Proven National Workers (PNW-MVP)
 
 **A privacy-focused digital payroll and compliance system built for agricultural workers, independent contractors, and small employers — powered by zero-knowledge cryptography.**
 
