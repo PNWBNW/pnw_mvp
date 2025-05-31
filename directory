@@ -14,11 +14,13 @@ pnw_mvp/
 │   ├── deploy_pnw_mvp.sh
 │   ├── submit_worker_hash.ts
 │   ├── verify_zpass_badge.ts
-│   └── verify_zkpass_attestation.ts       # ✅ NEW
+│   ├── verify_zkpass_attestation.ts       # ✅ for workers
+│   └── verify_employer_attestation.ts     # ✅ NEW for employers
 ├── front_end/
 │   ├── worker_submit.js
 │   ├── zpass_verifier.js
-│   └── credential_loader.js               # ✅ NEW
+│   ├── credential_loader.js               # ✅ loads worker credentials
+│   └── employer_submit.js                 # ✅ NEW handles employer profile input
 ├── zk_config/
 │   ├── circuit_config.json
 │   └── trusted_setup.ptau
@@ -30,7 +32,8 @@ pnw_mvp/
 │       ├── hash_utils.rs
 │       ├── credential_helper.rs
 │       ├── inputs/
-│       │   └── sample_worker.json
+│       │   ├── sample_worker.json
+│       │   └── sample_employer.json       # ✅ NEW sample
 │       └── output/
 │           ├── proof.json
 │           └── hash.txt
@@ -64,6 +67,15 @@ pnw_mvp/
 │   │   │   └── .gitkeep
 │   │   ├── src/
 │   │   │   └── main.leo
+│   ├── employer_profiles/                 # ✅ NEW MODULE
+│   │   ├── .env
+│   │   ├── program.json
+│   │   ├── readme.md
+│   │   ├── employer_profiles.toml
+│   │   ├── imports/
+│   │   │   └── .gitkeep
+│   │   ├── src/
+│   │   │   └── main.leo                   # 🎯 NFT commit, mint, revoke for employer
 │   ├── oversightdao_reserve/
 │   │   ├── .env
 │   │   ├── oversightdao_reserve.toml
@@ -72,12 +84,12 @@ pnw_mvp/
 │   │   │   └── .gitkeep
 │   │   ├── src/
 │   │   │   └── main.leo
-│   ├── oversightdao_nft/                  # ✅ NEW MODULE
+│   ├── oversightdao_nft/
 │   │   ├── .env
 │   │   ├── oversightdao_nft.toml
 │   │   ├── program.json
 │   │   ├── src/
-│   │   │   └── main.leo                   # 🎯 NFT mint, commit, revoke logic
+│   │   │   └── main.leo                   # 🎯 NFT logic for DAO badges
 │   ├── pncw_payroll/
 │   │   ├── .env
 │   │   ├── README.md
