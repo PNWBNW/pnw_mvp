@@ -1,0 +1,18 @@
+{
+  "program": "pnw_name_registry.aleo",
+  "description": "Public mapping system for .pnw human-readable names to Aleo addresses and credential hashes.",
+  "developer": "ProvableHQ",
+  "version": "0.1.0",
+  "license": "Proprietary",
+  "functions": [
+    "register_name",
+    "resolve_name",
+    "get_credential_by_name",
+    "get_address_by_name"
+  ],
+  "transitions": [
+    "register_name",
+    "revoke_name",
+    "update_credential_hash"
+  ]
+}
