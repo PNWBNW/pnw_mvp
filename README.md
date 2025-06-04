@@ -10,6 +10,8 @@ The **PNW-MVP** project is a modular system built to help **farmers, workers (ci
 
 This system runs on the **Aleo blockchain**, where all smart contracts are **private by default**, but still **verifiable for compliance**.
 
+PNW also integrates **Stellar** as the external payment and gas funding rail — allowing real-world USDC payouts while maintaining cryptographic audit trails via Aleo.
+
 ---
 
 ## Why It Matters
@@ -49,6 +51,8 @@ In industries like agriculture and seasonal labor, employers face challenges:
 - `pncw_payroll` & `pniw_payroll` – Weekly payroll streams by classification
 - `oversightdao_reserve` – Reserve held for DAO-approved audits and compliance
 - `subdao_reserve` – Local pools for community-led pay and tax contributions
+- `payroll_hash_log.aleo` – Stores Poseidon2-hashed payroll proofs
+- `gas_station_stellar.ts` – Off-chain module for Stellar-based gas funding
 
 ---
 
@@ -61,20 +65,24 @@ This name:
 - Can only be minted once per identity  
 - Is required for record submissions and credential validation  
 
-The `.pnw` system uses a **sliding fee model**:
+---
 
-| Name Length | Cost (Aleo credits) |
-|-------------|---------------------|
-| 3 letters   | 50                  |
-| 4 letters   | 40                  |
-| 5 letters   | 30                  |
-| 6 letters   | 20                  |
-| 7 letters   | 15                  |
-| 8 letters   | 10                  |
-| 9 letters   | 5                   |
-| 10–16       | 2                   |
+## 🔁 Payroll + Stellar Gas Station
 
-Names are checked for uniqueness and stored in an on-chain public mapping for discoverability. These names are integrated into the worker and employer Plonky2 flows for credential traceability without breaking privacy.
+PNW uses a **hybrid payroll architecture**:
+
+- Aleo for ZK-anchored proofs of payroll commitments
+- Stellar for **USDC disbursement and gas fee management**
+
+### Workflow:
+
+1. **Employer funds** USDC on Stellar into a SubDAO Treasury and Gas Station Wallet.
+2. Payroll is processed off-chain → hashed with `poseidon2` → ZK proof is submitted on Aleo.
+3. Worker receives real **USDC on Stellar**. Half the gas fee (e.g., $0.015) is deducted from their payout.
+4. **Gas Station Wallet** periodically swaps collected USDC → ALEO and refuels the Aleo relayer wallet.
+5. All hashes remain verifiable and privacy-preserving.
+
+This model maintains privacy and compliance while allowing direct fiat-offramp-friendly payouts.
 
 ---
 
@@ -117,6 +125,8 @@ PNW-MVP uses **zero-knowledge cryptography and recursive proving** to:
 ## Built With
 
 - **Aleo Blockchain**: For scalable ZK contracts and private on-chain state
+- **Stellar Blockchain**: For real-world USDC payments and gas fund flows
+- **Soroban (optional)**: Stellar smart contracts for DAO control of funds
 - **Leo Language**: Smart contract DSL optimized for zero-knowledge
 - **Plonky2**: Recursive proof system for off-chain credential processing
 - **Poseidon2**: Native hash function for low-cost zk commitment generation
@@ -128,6 +138,9 @@ PNW-MVP uses **zero-knowledge cryptography and recursive proving** to:
 - ✅ Credential loader and badge logic for ZPass workers  
 - ✅ `.pnw` identity registry and wallet signing  
 - ✅ Employer compliance badge via oversight DAO  
+- ✅ Gas Station wallet integration via Stellar SDK  
+- ✅ Stellar-based worker payouts with ZK-backed receipts
+- change "non-citizen" worker logic from PNiW (immigrant) to PNmW (migrant) 
 - Mobile UI for fast worker/employer onboarding  
 - DAO governance for dispute mediation and compliance tracking  
 - Pilot region rollout in labor-heavy agricultural zones  
@@ -137,6 +150,7 @@ PNW-MVP uses **zero-knowledge cryptography and recursive proving** to:
 ## Contribute / Learn More
 
 - [aleo.org](https://aleo.org)  
+- [stellar.org](https://stellar.org)  
 - [github.com/ProvableHQ](https://github.com/ProvableHQ)  
 - [Plonky2](https://github.com/mir-protocol/plonky2)  
 
