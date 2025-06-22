@@ -11,27 +11,37 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-     NETWORK: testnet
-     SNARKOS_VERSION: v3.7.1
-     DEPLOYMENT_ROOT: ${{ github.workspace }}/pnw_router
-     DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
-     ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
-     PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}  # ← ADD THIS
+      NETWORK: testnet
+      SNARKOS_VERSION: v3.8.0
+      DEPLOYMENT_ROOT: ${{ github.workspace }}/pnw_router
+      DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
+      ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
+      PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
 
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🛠️ Install Leo CLI
+      - name: 🛠️ Install Leo CLI (v2.7.1)
         run: |
-          curl -L "https://github.com/ProvableHQ/leo/releases/download/v2.6.1/leo-mainnet-x86_64-unknown-linux-gnu.zip" -o leo.zip
+          curl -L "https://github.com/ProvableHQ/leo/releases/download/v2.7.1/leo-mainnet-x86_64-unknown-linux-gnu.zip" -o leo.zip
           unzip leo.zip -d /tmp
           sudo mv /tmp/leo /usr/local/bin/leo
           sudo chmod +x /usr/local/bin/leo
           leo --version
 
-      - name: 📁 Create deployment logs folder
-        run: mkdir -p "$DEPLOYMENT_LOGS"
+      - name: ⚙️ Install snarkOS (v3.8.0)
+        run: |
+          curl -L "https://github.com/ProvableHQ/snarkOS/releases/download/v3.8.0/aleo-v3.8.0-x86_64-unknown-linux-gnu.zip" -o snarkos.zip
+          unzip snarkos.zip -d /tmp
+          sudo mv /tmp/snarkos /usr/local/bin/snarkos
+          sudo chmod +x /usr/local/bin/snarkos
+          snarkos --version
+
+      - name: 🧳 Repackage Leo Programs
+        run: |
+          chmod +x scripts/repackage.sh
+          ./scripts/repackage.sh
 
       - name: 🚀 Build and Deploy PNW Router
         run: |
