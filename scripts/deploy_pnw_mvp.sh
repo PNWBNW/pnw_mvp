@@ -32,35 +32,20 @@ PROJECTS=(
 )
 
 SRC_ROOT="/home/runner/work/pnw_mvp/pnw_mvp/src"
+MODULES=()
 
 for PROJECT in "${PROJECTS[@]}"; do
     TOGGLE_VAR="DEPLOY_${PROJECT^^}"
     if [ "${!TOGGLE_VAR}" == "true" ]; then
-        echo "🚀 Building and deploying: $PROJECT"
-        PROJECT_PATH="$SRC_ROOT/$PROJECT"
-        if [ -f "$PROJECT_PATH/src/main.leo" ]; then
-            cd "$PROJECT_PATH"
-            leo clean
-            leo build
-
-            echo "📦 Compressing and checksumming build outputs for $PROJECT..."
-            for f in build/*.aleo build/*.wasm; do
-                [ -e "$f" ] || continue
-                gzip -kf "$f"
-                cp "$f.gz" "$DEPLOYMENT_ROOT/outputs/"
-                sha256sum "$f.gz" > "$DEPLOYMENT_ROOT/outputs/$(basename "$f").gz.sha256"
-                echo "✅ Compressed & checksummed: $(basename "$f")"
-            done
-
-            leo deploy --private-key "$PRIVATE_KEY" --network "$NETWORK" --yes
-        else
-            echo "❌ main.leo not found at $PROJECT_PATH/src/main.leo"
-            exit 1
-        fi
+        echo "✅ Enabled for deploy: $PROJECT"
+        MODULES+=("$PROJECT")
     else
-        echo "❎ Skipping $PROJECT (toggle is not enabled)"
+        echo "❎ Skipping $PROJECT (toggle not enabled)"
     fi
 done
+
+echo "📦 Sending selected modules to repackage.sh: ${MODULES[*]}"
+bash "$DEPLOYMENT_ROOT/scripts/repackage.sh" "${MODULES[@]}"
 
 echo "🚀 Building and deploying: pnw_router"
 cd "$DEPLOYMENT_ROOT"
@@ -96,4 +81,4 @@ for ((i=1;i<=MAX_RETRIES;i++)); do
     fi
 done
 
-echo "✅ Deployment completed!"
+echo "✅ All deployments completed!"
