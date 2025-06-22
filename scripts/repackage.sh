@@ -11,7 +11,7 @@ rm -rf build/* output/* deploy_logs/*
 
 echo "📦 Rebuilding Leo programs and Wasm..."
 leo clean
-leo build --network ${NETWORK:-testnet}
+leo build --network ${NETWORK:-testnet} --endpoint ${ENDPOINT:-https://api.explorer.provable.com/v1}
 
 echo "📂 Copying .aleo and .wasm files to output/..."
 find build -name "*.aleo" -exec cp {} output/ \;
