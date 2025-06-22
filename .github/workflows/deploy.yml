@@ -53,3 +53,9 @@ jobs:
         with:
           name: pnw_router_logs
           path: ${{ env.DEPLOYMENT_LOGS }}
+
+      - name: 📦 Upload compressed build outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: pnw_router_outputs
+          path: outputs/
