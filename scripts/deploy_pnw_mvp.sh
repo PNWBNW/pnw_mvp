@@ -11,16 +11,13 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# Use envsubst to expand GitHub secrets into a temporary env file
 echo "📜 Expanding variables from $ENV_FILE"
 envsubst < "$ENV_FILE" > "$DEPLOYMENT_ROOT/.env.expanded"
 
-# Load expanded environment variables
 set -a
 source "$DEPLOYMENT_ROOT/.env.expanded"
 set +a
 
-# List of dependency projects
 PROJECTS=(
     "employer_agreement"
     "oversightdao_reserve"
@@ -36,7 +33,6 @@ PROJECTS=(
 
 SRC_ROOT="/home/runner/work/pnw_mvp/pnw_mvp/src"
 
-# Deploy dependency contracts
 for PROJECT in "${PROJECTS[@]}"; do
     TOGGLE_VAR="DEPLOY_${PROJECT^^}"
     if [ "${!TOGGLE_VAR}" == "true" ]; then
@@ -46,6 +42,16 @@ for PROJECT in "${PROJECTS[@]}"; do
             cd "$PROJECT_PATH"
             leo clean
             leo build
+
+            echo "📦 Compressing and checksumming build outputs for $PROJECT..."
+            for f in build/*.aleo build/*.wasm; do
+                [ -e "$f" ] || continue
+                gzip -kf "$f"
+                cp "$f.gz" "$DEPLOYMENT_ROOT/outputs/"
+                sha256sum "$f.gz" > "$DEPLOYMENT_ROOT/outputs/$(basename "$f").gz.sha256"
+                echo "✅ Compressed & checksummed: $(basename "$f")"
+            done
+
             leo deploy --private-key "$PRIVATE_KEY" --network "$NETWORK" --yes
         else
             echo "❌ main.leo not found at $PROJECT_PATH/src/main.leo"
@@ -56,12 +62,20 @@ for PROJECT in "${PROJECTS[@]}"; do
     fi
 done
 
-# Deploy final program (pnw_router)
 echo "🚀 Building and deploying: pnw_router"
 cd "$DEPLOYMENT_ROOT"
 
 leo clean
 leo build
+
+echo "📦 Compressing and checksumming build outputs for pnw_router..."
+for f in build/*.aleo build/*.wasm; do
+    [ -e "$f" ] || continue
+    gzip -kf "$f"
+    cp "$f.gz" "$DEPLOYMENT_ROOT/outputs/"
+    sha256sum "$f.gz" > "$DEPLOYMENT_ROOT/outputs/$(basename "$f").gz.sha256"
+    echo "✅ Compressed & checksummed: $(basename "$f")"
+done
 
 MAX_RETRIES=3
 RETRY_DELAY=15
