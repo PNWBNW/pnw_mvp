@@ -11,7 +11,7 @@ rm -rf build/* output/* deploy_logs/*
 
 echo "📦 Rebuilding Leo programs and Wasm..."
 leo clean
-leo build --wasm
+leo build
 
 echo "📂 Copying .aleo and .wasm files to output/..."
 find build -name "*.aleo" -exec cp {} output/ \;
