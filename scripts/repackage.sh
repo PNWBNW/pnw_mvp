@@ -3,19 +3,29 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-echo "📁 Ensuring build/ and output/ folders exist..."
-mkdir -p build output deploy_logs
+MODULES=("$@")  # Modules passed from deploy_pnw_mvp.sh
+
+mkdir -p build outputs deploy_logs
 
 echo "🧹 Cleaning previous build artifacts..."
-rm -rf build/* output/* deploy_logs/*
+rm -rf build/* outputs/* deploy_logs/*
 
-echo "📦 Compressing output files (if any exist)..."
-for file in output/*.{aleo,wasm}; do
-  [ -e "$file" ] || continue
-  gzip -kf "$file"
-  sha256sum "$file.gz" > "$file.gz.sha256"
-  echo "✅ Compressed & checksummed: $(basename "$file")"
+for MODULE in "${MODULES[@]}"; do
+  echo "🔨 Building $MODULE..."
+  pushd "$MODULE" > /dev/null
+  leo clean
+  leo build --network "$NETWORK" --endpoint "$ENDPOINT"
+  cp build/*.aleo ../outputs/ 2>/dev/null || true
+  cp build/*.wasm ../outputs/ 2>/dev/null || true
+  popd > /dev/null
+
+  echo "📦 Compressing outputs for $MODULE..."
+  for file in outputs/*.{aleo,wasm}; do
+    [ -e "$file" ] || continue
+    gzip -kf "$file"
+    sha256sum "$file.gz" > "$file.gz.sha256"
+    echo "✅ Compressed & checksummed: $(basename "$file")"
+  done
 done
 
-echo "📄 Handing off to deploy_pnw_mvp.sh..."
-bash ./scripts/deploy_pnw_mvp.sh
+echo "✅ Selective repackaging complete."
