@@ -15,12 +15,7 @@
       flex-direction: column;
       align-items: center;
     }
-
-    h1 {
-      color: #2c3e50;
-      margin-bottom: 1rem;
-    }
-
+    h1 { color: #2c3e50; margin-bottom: 1rem; }
     form {
       background: white;
       border-radius: 10px;
@@ -31,21 +26,13 @@
       display: flex;
       flex-direction: column;
     }
-
-    label {
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-      font-weight: bold;
-      color: #34495e;
-    }
-
+    label { margin-top: 1rem; margin-bottom: 0.5rem; font-weight: bold; color: #34495e; }
     input {
       padding: 0.75rem;
       border: 1px solid #ccc;
       border-radius: 5px;
       font-size: 1rem;
     }
-
     button {
       margin-top: 1.5rem;
       padding: 0.75rem;
@@ -57,11 +44,7 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
-
-    button:hover {
-      background-color: #1f618d;
-    }
-
+    button:hover { background-color: #1f618d; }
     .button-container button {
       margin: 5px;
       padding: 8px 12px;
@@ -72,17 +55,8 @@
       cursor: pointer;
       font-size: 0.9rem;
     }
-
-    .button-container button:hover {
-      background-color: #2980b9;
-    }
-
-    .selected-cred-list {
-      list-style: none;
-      padding: 0;
-      margin-top: 10px;
-    }
-
+    .button-container button:hover { background-color: #2980b9; }
+    .selected-cred-list { list-style: none; padding: 0; margin-top: 10px; }
     .selected-cred-list li {
       background: #ecf0f1;
       margin: 4px 0;
@@ -92,7 +66,6 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .selected-cred-list li button {
       background: transparent;
       border: none;
@@ -100,40 +73,33 @@
       font-size: 1rem;
       cursor: pointer;
     }
-
     #clearAllBtn {
       margin-top: 1rem;
       background-color: #e74c3c;
     }
-
-    #clearAllBtn:hover {
-      background-color: #c0392b;
-    }
+    #clearAllBtn:hover { background-color: #c0392b; }
   </style>
   <script type="module">
     const selected = [];
-    const selectedList = document.getElementById('selectedCredentials');
+    let selectedList;
 
     document.addEventListener('DOMContentLoaded', () => {
+      selectedList = document.getElementById('selectedCredentials');
       const buttons = document.querySelectorAll('.cred-btn');
 
       buttons.forEach(btn => {
         btn.addEventListener('click', () => {
           const cred = btn.dataset.cred;
           if (!cred || selected.includes(cred) || selected.length >= 5) return;
-
           selected.push(cred);
-
           const li = document.createElement('li');
           li.textContent = cred;
-
           const removeBtn = document.createElement('button');
           removeBtn.textContent = '❌';
           removeBtn.onclick = () => {
             selected.splice(selected.indexOf(cred), 1);
             selectedList.removeChild(li);
           };
-
           li.appendChild(removeBtn);
           selectedList.appendChild(li);
         });
@@ -146,11 +112,16 @@
 
       document.getElementById("workerForm").addEventListener("submit", async (event) => {
         event.preventDefault();
-
         const full_name = document.getElementById("full_name").value;
         const city = document.getElementById("city").value;
         const state = document.getElementById("state").value;
         const zip = document.getElementById("zip").value;
+        const stellar = document.getElementById("stellarWallet").value.trim();
+
+        if (!stellar.startsWith('G') || stellar.length !== 56) {
+          alert("Invalid Stellar wallet address.");
+          return;
+        }
 
         if (selected.length === 0) {
           alert("Please select at least one credential.");
@@ -162,18 +133,18 @@
           city,
           state,
           zip,
+          stellar_wallet: stellar,
           credential_data: selected
         };
 
         console.log("📦 Submitted Worker Profile:", workerData);
-        alert("✅ Credentials submitted! (stub)");
+        alert("✅ Credentials submitted with Stellar wallet! (stub)");
       });
     });
   </script>
 </head>
 <body>
   <h1><i class="fas fa-id-badge"></i> PNW-MVP Worker Credential Prover</h1>
-
   <form id="workerForm">
     <label for="full_name">Full Name:</label>
     <input type="text" id="full_name" required>
@@ -186,6 +157,9 @@
 
     <label for="zip">ZIP Code:</label>
     <input type="text" id="zip" required>
+
+    <label for="stellarWallet">Stellar Wallet (G...):</label>
+    <input type="text" id="stellarWallet" required>
 
     <label>Select Credential(s):</label>
     <div id="credentialButtons" class="button-container">
