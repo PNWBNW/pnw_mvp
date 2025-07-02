@@ -6,11 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
   submitBtn.addEventListener('click', async () => {
     const name = document.getElementById('workerName').value.trim();
     const pnwName = document.getElementById('pnwName').value.trim().toLowerCase();
-    const state = document.getElementById('workerState').value;
-    const city = document.getElementById('workerCity').value;
-    const zip = document.getElementById('workerZip').value;
-    const credentialHash = document.getElementById('credentialHash').value;
-    const edition = document.getElementById('editionSalt').value;
+    const state = document.getElementById('workerState').value.trim();
+    const city = document.getElementById('workerCity').value.trim();
+    const zip = document.getElementById('workerZip').value.trim();
+    const credentialHash = document.getElementById('credentialHash').value.trim();
+    const edition = document.getElementById('editionSalt').value.trim();
+    const stellarWallet = document.getElementById('stellarWallet').value.trim();
 
     // Enforce .pnw name rule
     if (!pnwName.endsWith('.pnw')) {
@@ -23,7 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Sample call to smart contract or Aleo DApp function to register the name
+    // Basic Stellar wallet format validation (G... string)
+    if (!stellarWallet.startsWith('G') || stellarWallet.length !== 56) {
+      alert('Invalid Stellar wallet address. Please check the format.');
+      return;
+    }
+
     try {
       const registrationResult = await registerPNWName(pnwName);
       if (!registrationResult.success) {
@@ -31,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Proceed with worker profile submission if name registered
       const workerProfile = {
         name,
         pnwName,
@@ -39,13 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
         city,
         zip,
         credentialHash,
-        edition
+        edition,
+        stellarWallet
       };
 
-      // Replace with actual submit logic (e.g., Aleo DApp call)
       console.log('Submitting worker profile:', workerProfile);
       await submitWorkerProfile(workerProfile);
-      alert('Worker profile successfully submitted with .pnw name.');
+
+      alert('Worker profile successfully submitted with .pnw name and Stellar wallet.');
     } catch (err) {
       console.error('Submission error:', err);
       alert('There was an error submitting your worker profile.');
@@ -55,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function registerPNWName(pnwName) {
   // Placeholder logic for interacting with the PNW Name Registry smart contract
-  // Must sign with wallet, send register_name() transition, and await confirmation
   return {
     success: true,
     txId: 'aleo123txn'
@@ -64,6 +69,5 @@ async function registerPNWName(pnwName) {
 
 async function submitWorkerProfile(profile) {
   // Placeholder for backend or Aleo smart contract submission
-  // Should submit credentialHash and other profile fields on-chain
   return true;
 }
