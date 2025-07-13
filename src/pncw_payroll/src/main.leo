@@ -1,63 +1,78 @@
-program pncw_payroll.aleo {
+program pncw_payroll.aleo;
 
-mapping employer_funding: address => u64;
-mapping worker_balances: address => u64;
+import payroll_audit_log.aleo;
+import paystub_nft.aleo;
+import coordinator_program.aleo;
 
-async transition fund_payroll(employer: address, amount: u64) -> Future {
+struct PayrollEscrow {
+    employer_hash: field,
+    worker_hash: field,
+    amount: u64,
+    duration_days: u16,
+    block_height: u32,
+    status: u8, // 0 = pending, 1 = confirmed
+    _nonce: group
+}
+
+mapping escrows: field => PayrollEscrow;
+
+async transition request_payroll(
+    employer_hash: field,
+    worker_hash: field,
+    amount: u64,
+    duration_days: u16
+) -> Future {
     assert(amount > 0u64);
 
-    let future: Future = finalize_fund_payroll(employer, amount);
+    let payment_hash: field = Poseidon2::hash([employer_hash, worker_hash, amount]);
+
+    let escrow: PayrollEscrow = PayrollEscrow {
+        employer_hash,
+        worker_hash,
+        amount,
+        duration_days,
+        block_height: block.height,
+        status: 0u8,
+        _nonce: group.random()
+    };
+
+    escrows.set(payment_hash, escrow);
+
+    let future: Future = coordinator_program/dispatch_stellar_payout(payment_hash);
     return future;
 }
 
-async function finalize_fund_payroll(employer: address, amount: u64) {
-    let current_funding: u64 = employer_funding.get_or_use(employer, 0u64);
-    let new_funding: u64 = current_funding + amount;
+async transition confirm_stellar_payment(payment_hash: field) -> Future {
+    let escrow: PayrollEscrow = escrows.get(payment_hash);
+    assert(escrow.status == 0u8);
 
-    employer_funding.set(employer, new_funding);
-}
+    let updated: PayrollEscrow = PayrollEscrow {
+        employer_hash: escrow.employer_hash,
+        worker_hash: escrow.worker_hash,
+        amount: escrow.amount,
+        duration_days: escrow.duration_days,
+        block_height: escrow.block_height,
+        status: 1u8,
+        _nonce: group.random()
+    };
 
-async transition execute_payroll(worker: address, employer: address, amount: u64) -> Future {
-    assert(amount > 0u64);
+    escrows.set(payment_hash, updated);
 
-    let future: Future = finalize_execute_payroll(worker, employer, amount);
+    let future: Future = release_paystub(payment_hash);
     return future;
 }
 
-async function finalize_execute_payroll(worker: address, employer: address, amount: u64) {
-    let current_funding: u64 = employer_funding.get_or_use(employer, 0u64);
-    assert(current_funding >= amount);
+async function release_paystub(payment_hash: field) {
+    let escrow: PayrollEscrow = escrows.get(payment_hash);
+    assert(escrow.status == 1u8);
 
-    let updated_funding: u64 = current_funding - amount;
-    employer_funding.set(employer, updated_funding);
+    async paystub_nft/mint_paystub(
+        escrow.worker_hash,
+        escrow.employer_hash,
+        escrow.amount,
+        escrow.duration_days,
+        escrow.block_height
+    );
 
-    let worker_balance: u64 = worker_balances.get_or_use(worker, 0u64);
-    let updated_balance: u64 = worker_balance + amount;
-    worker_balances.set(worker, updated_balance);
-
-    // --- HOOK READY ---
-    // The coordinator_program will later call:
-    // credits::transfer_public(worker, amount)
-    // payroll_audit_log::record_payment(worker, amount, block_height)
-    // ------------------
-}
-
-async transition verify_worker_balance(worker: address) -> Future {
-    let future: Future = finalize_verify_worker_balance(worker);
-    return future;
-}
-
-async function finalize_verify_worker_balance(worker: address) {
-    assert(worker_balances.contains(worker));
-}
-
-async transition get_worker_balance(worker: address) -> Future {
-    let future: Future = finalize_get_worker_balance(worker);
-    return future;
-}
-
-async function finalize_get_worker_balance(worker: address) {
-    let balance: u64 = worker_balances.get_or_use(worker, 0u64);
-    // Optional: you can store or emit balance here via router
-}
+    async payroll_audit_log/record_payment_hash(payment_hash, block.height);
 }
