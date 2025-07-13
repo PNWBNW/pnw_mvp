@@ -1,159 +1,168 @@
-# Proven National Workers (PNW-MVP)
+# 🌲 Proven National Workers (PNW-MVP)
 
-**A privacy-focused digital payroll and compliance system built for agricultural workers, independent contractors, and small employers — powered by zero-knowledge cryptography.**
-
----
-
-## What Is PNW-MVP?
-
-The **PNW-MVP** project is a modular system built to help **farmers, workers (citizen and noncitizen), and employers** manage payroll, identity, and taxes securely — without paperwork, intermediaries, or data exposure.
-
-This system runs on the **Aleo blockchain**, where all smart contracts are **private by default**, but still **verifiable for compliance**.
-
-PNW also integrates **Stellar** as the external payment and gas funding rail — allowing real-world USDC payouts while maintaining cryptographic audit trails via Aleo.
+**A zero-knowledge payroll infrastructure for real-world USDC payouts and fully private auditing. Built on Aleo + Stellar.**
 
 ---
 
-## Why It Matters
+## 🔍 Overview
 
-In industries like agriculture and seasonal labor, employers face challenges:
+**PNW-MVP** is a hybrid on-chain/off-chain system designed for:
+- 💼 Employers
+- 🧑🏽‍🌾 Migrant (PNiW) and citizen workers (PNcW)
+- 🏛 SubDAOs & compliance DAOs
+- 🪙 Gas-optimized cross-chain payroll
 
-- Navigating tax compliance  
-- Protecting worker identities  
-- Minimizing payroll overhead  
-- Avoiding legal and financial risk  
-
-**PNW-MVP provides a zero-knowledge solution** that empowers all sides:
-
-- Workers retain dignity and privacy  
-- Employers stay compliant  
-- Auditors gain transparent proof — without surveillance  
+It combines:
+- Aleo for private state, ZK proof, and NFT paystubs
+- Stellar for real-world USDC disbursements
+- Internal escrow logic and wallet binding to enable seamless coordination
 
 ---
 
-## Who It's For
+## 🧱 Architecture Summary
 
-- **Workers (PNCW & PNIW)**: Get paid weekly and prove credentials without revealing private info.
-- **Employers**: Stay compliant with zero paperwork, and offer ethical, secure work arrangements.
-- **SubDAOs / Co-ops**: Manage payroll in distributed rural groups.
-- **Government agencies**: View tax proofs on-chain — without exposing identities.
+**ZK-Attested Identity & Payroll Records (Aleo)**  
+→  
+**.wasm Outputs Trigger Stellar Payouts via SDK + Horizon API**  
+→  
+**Escrow confirms before releasing private NFT paystub**  
+→  
+**Stellar tx hash and audit hash stored privately**  
 
----
-
-## Core Modules
-
-- `worker_profiles.aleo` – Stores private worker metadata and credential hashes
-- `employer_profiles.aleo` – Mirrors worker logic for employers, storing attested credentials privately
-- `employer_registry.aleo` – Manages employers and linked SubDAO funds
-- `credential_nft.aleo` – Soulbound badge NFT system for worker certification
-- `oversightdao_nft.aleo` – NFT badge system for SubDAO or audit-level employer credentials
-- `pnw_name_registry.aleo` – Registers `.pnw` names required for platform participation ✅
-- `pncw_payroll` & `pniw_payroll` – Weekly payroll streams by classification
-- `oversightdao_reserve` – Reserve held for DAO-approved audits and compliance
-- `subdao_reserve` – Local pools for community-led pay and tax contributions
-- `payroll_hash_log.aleo` – Stores Poseidon2-hashed payroll proofs
-- `gas_station_stellar.ts` – Off-chain module for Stellar-based gas funding
+All operations maintain privacy while ensuring full accountability.
 
 ---
 
-## 🌐 PNW Name Registry (.pnw)
+## ✅ Phase Roadmap
 
-All participants — workers and employers — **must register a `.pnw` identity name** during onboarding.
+### Phase 1 – Worker Credential System  
+- Bind Stellar wallet to Aleo wallet  
+- ZK-prove credential hash using Poseidon2  
+- Store worker identity & country-of-origin/residency in struct  
+- Commit PNiW/PNcW classification  
 
-This name:
-- Is **soulbound** (non-transferable)  
-- Can only be minted once per identity  
-- Is required for record submissions and credential validation  
+### Phase 2 – Employer Agreement Rebuild  
+- Require SubDAO and .pnw domain  
+- Ensure employer prefunds both ALEO and USDC gas  
+- Use duration × worker count to determine gas requirement  
+- Register contract start block height  
 
----
+### Phase 3 – Gas Station Contracts  
+- `aleo_gas_station.aleo`: validates ALEO prefunding  
+- `stellar_gas_station.aleo`: validates Stellar USDC + tax reserve  
+  - Placeholder: 1 USDC + 30% tax buffer per worker per cycle  
 
-## 🔁 Payroll + Stellar Gas Station
+### Phase 4 – Payroll System  
+- `pniw_payroll.aleo` and `pncw_payroll.aleo`:  
+  - Use escrow record w/ `status` field  
+  - Wait for Stellar SDK payout confirmation  
+  - Trigger NFT mint after tx is verified  
+  - Consume payroll record and hash audit to chain  
 
-PNW uses a **hybrid payroll architecture**:
-
-- Aleo for ZK-anchored proofs of payroll commitments
-- Stellar for **USDC disbursement and gas fee management**
-
-### Workflow:
-
-1. **Employer funds** USDC on Stellar into a SubDAO Treasury and Gas Station Wallet.
-2. Payroll is processed off-chain → hashed with `poseidon2` → ZK proof is submitted on Aleo.
-3. Worker receives real **USDC on Stellar**. Half the gas fee (e.g., $0.015) is deducted from their payout.
-4. **Gas Station Wallet** periodically swaps collected USDC → ALEO and refuels the Aleo relayer wallet.
-5. All hashes remain verifiable and privacy-preserving.
-
-This model maintains privacy and compliance while allowing direct fiat-offramp-friendly payouts.
-
----
-
-## How Plonky2 Proving Works
-
-PNW-MVP integrates a **hybrid off-chain ZK proof flow** using [Plonky2](https://github.com/mir-protocol/plonky2) to enhance credential verification for both **workers and employers**.
-
----
-
-### 🔧 ZPass Flow for Workers
-
-1. Worker selects a `.pnw` name in the DApp.  
-2. Frontend generates a **recursive Plonky2 proof** with identity and credential data.  
-3. Credential hash is committed using `poseidon2`.  
-4. Result is sent to `worker_profiles.aleo` and `.pnw` name is registered.  
-5. Optionally, a DAO agent mints a **ZPass NFT** for the worker.  
+### Phase 5 – NFT Paystub Layer  
+- `paystub_nft.aleo`:  
+  - Private, field-by-field viewing  
+  - Bound to `.pnw` identity  
+  - Tenure score + hashed audit metadata  
+  - ZPass-style resume for future employers  
 
 ---
 
-### 🏢 ZK Attestation for Employers
+## 🧠 Core Smart Contracts
 
-1. Cooperative or DAO fills out employer details.  
-2. Generates a **Plonky2 credential proof** with `.pnw` name.  
-3. Credential hash is stored in `employer_profiles.aleo`.  
-4. DAO mints an optional **compliance NFT** from `oversightdao_nft.aleo`.  
-
----
-
-## Privacy & Security
-
-PNW-MVP uses **zero-knowledge cryptography and recursive proving** to:
-
-- Prove worker certification, payroll eligibility, and residency  
-- Prove employer compliance and credential status  
-- Obfuscate raw identity data while enabling public credential validation  
-- Prevent double-registration or impersonation  
+| File                         | Description |
+|------------------------------|-------------|
+| `worker_profiles.aleo`       | Identity and credential hashing for workers |
+| `employer_profiles.aleo`     | Employer credential verification |
+| `employer_agreement.aleo`    | Contract link between worker, employer, subDAO |
+| `aleo_gas_station.aleo`      | ALEO prefunding checker |
+| `stellar_gas_station.aleo`   | USDC + tax prefunding logic |
+| `pniw_payroll.aleo` / `pncw_payroll.aleo` | Triggered escrow-based payroll contracts |
+| `paystub_nft.aleo`           | Private NFT receipt system |
+| `pnw_name_registry.aleo`     | Worker/Employer .pnw suffix name system |
 
 ---
 
-## Built With
+## 🌐 .pnw Name Registry
 
-- **Aleo Blockchain**: For scalable ZK contracts and private on-chain state
-- **Stellar Blockchain**: For real-world USDC payments and gas fund flows
-- **Soroban (optional)**: Stellar smart contracts for DAO control of funds
-- **Leo Language**: Smart contract DSL optimized for zero-knowledge
-- **Plonky2**: Recursive proof system for off-chain credential processing
-- **Poseidon2**: Native hash function for low-cost zk commitment generation
+All platform users must have a registered `.pnw` identity:
 
----
+| Suffix      | Type           |
+|-------------|----------------|
+| `.svc.pnw`  | Service Employer |
+| `.bld.pnw`  | Construction Employer |
+| `.wrk.pnw`  | Worker (any)   |
+| ...         | (More industry types supported) |
 
-## What’s Next?
-
-- ✅ Credential loader and badge logic for ZPass workers  
-- ✅ `.pnw` identity registry and wallet signing  
-- ✅ Employer compliance badge via oversight DAO  
-- ✅ Gas Station wallet integration via Stellar SDK  
-- ✅ Stellar-based worker payouts with ZK-backed receipts
-- change "non-citizen" worker logic from PNiW (immigrant) to PNmW (migrant) 
-- Mobile UI for fast worker/employer onboarding  
-- DAO governance for dispute mediation and compliance tracking  
-- Pilot region rollout in labor-heavy agricultural zones  
+- Soulbound  
+- Verified once per unique identity  
+- Required to execute platform transactions  
 
 ---
 
-## Contribute / Learn More
+## 💸 Gas + Payout Flow (Hybrid Escrow)
 
-- [aleo.org](https://aleo.org)  
-- [stellar.org](https://stellar.org)  
-- [github.com/ProvableHQ](https://github.com/ProvableHQ)  
-- [Plonky2](https://github.com/mir-protocol/plonky2)  
+1. Employer registers a worker and contract duration  
+2. Required ALEO + USDC prefund amount is calculated:
+   - **1 ALEO / 90 days / worker**
+   - **1 USDC + 30% for taxes / cycle**
+3. Escrow record is created and submitted  
+4. Stellar SDK triggers payout and confirms tx hash  
+5. NFT paystub is minted for worker  
+6. Record is consumed and audit hash is stored  
 
 ---
 
-**PNW-MVP believes in privacy, dignity, and opportunity — for all.**
+## 📦 Front-End & SDK Integration
+
+| Folder | Role |
+|--------|------|
+| `front_end/` | Receives Stellar wallet input from workers |
+| `stellar_handler.js` | Horizon SDK tx manager |
+| `stellar_tx_log.js` | Privacy-preserving audit file |
+| `worker_submit.js` | Aleo credential + wallet linker |
+| `index.html` | DApp interface for mobile / onboarding |
+
+---
+
+## 🔐 Privacy Enforcement
+
+- Poseidon2 Hashing  
+- Escrow records with internal `status`  
+- NFT fields only viewable by authorized entities  
+- No raw identity data exposed  
+- Payment hashes stored in separate audit logs (`payroll_hash_log.aleo`)
+
+---
+
+## 📍 Live (Planned)
+
+- [ ] Stellar testnet wallet handling  
+- [ ] .wasm + SNARKVM proof integration  
+- [ ] DAO-based NFT attestation  
+- [ ] Optional staking pool for ALEO gas coverage  
+- [ ] Mobile-first onboarding UI  
+
+---
+
+## 🛠 Built With
+
+- **Aleo** for private, verifiable state and .wasm proofs  
+- **Leo 2.6+** language for smart contracts  
+- **Stellar Horizon SDK** for external gas and USDC delivery  
+- **Poseidon2 / Plonky2** for ZK hashing & proof composition  
+- **ZPass** pattern NFT privacy architecture  
+
+---
+
+## 🤝 Licensing & Attribution
+
+PNW-MVP is protected under a **proprietary license**.
+
+**No reuse, derivative work, or forking is allowed** without written permission from the author.
+
+Please refer to `LICENSE_PNW_MVP.txt` in the root folder.
+
+---
+
+**PNW-MVP: Empowering workers through zero-knowledge privacy.**
