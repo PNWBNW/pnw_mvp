@@ -87,12 +87,18 @@ All operations maintain privacy while ensuring full accountability.
 
 All platform users must have a registered `.pnw` identity:
 
-| Suffix      | Type           |
-|-------------|----------------|
-| `.svc.pnw`  | Service Employer |
-| `.bld.pnw`  | Construction Employer |
-| `.wrk.pnw`  | Worker (any)   |
-| ...         | (More industry types supported) |
+# PNW Employer Suffix Categories (4-letter standard)
+
+.serv.pnw    # Service industry
+.agri.pnw    # Agriculture and farming
+.busi.pnw    # General business and commercial use
+.bldg.pnw    # Building and construction
+.corp.pnw    # Incorporated businesses
+.coop.pnw    # Cooperatives and collectives
+.orgn.pnw    # Nonprofits and organizations
+.land.pnw    # Landscaping and outdoor services
+.work.pnw    # General workforce and hiring entities
+.food.pnw    # Food service, hospitality, restaurants
 
 - Soulbound  
 - Verified once per unique identity  
