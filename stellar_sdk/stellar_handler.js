@@ -3,6 +3,7 @@
 import { Server, Keypair, Networks, TransactionBuilder, Operation, Asset } from 'stellar-sdk';
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
+import { logTransaction } from './stellar_tx_log.js'; // ← Added
 
 dotenv.config();
 
@@ -74,6 +75,12 @@ async function main() {
 
     if (result.successful) {
       await confirmToAleo(hash);
+      logTransaction({                    // ← Added
+        paymentHash: hash,
+        txHash: result.hash,
+        amountUSDC: amountUSDC,
+        destinationWallet: stellarWallet
+      });
       console.log(`✅ Payment ${hash} confirmed`);
     } else {
       console.log(`❌ Payment failed for ${hash}`, result);
