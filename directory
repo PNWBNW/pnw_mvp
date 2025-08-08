@@ -157,7 +157,3 @@ pnw_mvp/
 │   │   ├── program.json               # Compiled metadata
 │   │   └── src/
 │   │       └── main.leo               # Worker identity hash + Aleo wallet + Stellar wallet binding
-│
-│   └── zkpass_transgate/
-│       └── src/
-│           └── main.leo               # Adapter for ZKPass-like flows into PNW (optional bridge)
