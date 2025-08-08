@@ -1,144 +1,163 @@
 pnw_mvp/
-├── .env
-├── .gitignore
-├── README.md
-├── index.html
-├── directory
-├── aleo_environment.md
-├── LICENSE_PNW_MVP.txt
+├── .env                               # Root environment vars (local dev)
+├── .gitignore                         # Ignore rules for repo hygiene
+├── README.md                          # Project overview + onboarding
+├── index.html                         # Minimal landing / test UI entry
+├── directory                          # Snapshot of this tree (human-readable)
+├── aleo_environment.md                # Aleo toolchain setup + version notes
+├── LICENSE_PNW_MVP.txt                # Proprietary license (PNW terms)
 │
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml
+│       └── deploy.yml                 # CI/CD: build & deploy (GitHub Actions)
 │
 ├── scripts/
-│   ├── deploy_crosschain.sh
-│   ├── deploy_pnw_mvp.sh
-│   ├── submit_worker_hash.ts
-│   ├── verify_zpass_badge.ts
-│   ├── verify_zkpass_attestation.ts
-│   └── verify_employer_attestation.ts
+│   ├── deploy_crosschain.sh           # Convenience script to deploy all parts (Aleo + off-chain)
+│   ├── deploy_pnw_mvp.sh              # Aleo-only deploy script (programs + .toml)
+│   ├── submit_worker_hash.ts          # CLI: push worker credential hash to chain
+│   ├── verify_zpass_badge.ts          # CLI: verify worker ZPass credential/NFT
+│   ├── verify_zkpass_attestation.ts   # CLI: verify zk attestation (worker path)
+│   └── verify_employer_attestation.ts # CLI: verify zk attestation (employer path)
 │
 ├── front_end/
-│   ├── worker_submit.js
-│   ├── employer_submit.js
-│   ├── credential_loader.js
-│   └── zpass_verifier.js
+│   ├── worker_submit.js               # Worker profile form; binds Stellar wallet; submits to Aleo
+│   ├── employer_submit.js             # Employer onboarding; sets .pnw category; links subDAO
+│   ├── credential_loader.js           # Loads/normalizes creds; Poseidon2 hashing helper
+│   └── zpass_verifier.js              # Client-side verifier for ZPass-style proofs
 │
 ├── zk_config/
-│   ├── circuit_config.json
-│   └── credentials_whitelist.json
+│   ├── circuit_config.json            # ZK circuit parameters (sizes, curves, etc.)
+│   └── credentials_whitelist.json     # Allowed credential types/IDs (UI + verifier)
 │
 ├── plonky2_prover/
-│   ├── Cargo.toml
+│   ├── Cargo.toml                     # Rust crate for off-chain proving
 │   └── src/
-│       ├── main.rs
-│       ├── circuits.rs
-│       ├── hash_utils.rs
-│       ├── credential_helper.rs
+│       ├── main.rs                    # Entrypoint: generate/verify proofs, write outputs
+│       ├── circuits.rs                # Circuit definitions for worker/employer attestations
+│       ├── hash_utils.rs              # Poseidon2 / hashing helpers for commitments
+│       ├── credential_helper.rs       # Structs + parsers for credential inputs
 │       ├── inputs/
-│       │   ├── sample_worker.json
-│       │   └── sample_employer.json
+│       │   ├── sample_worker.json     # Example worker input to prove against
+│       │   └── sample_employer.json   # Example employer input to prove against
 │       └── output/
-│           ├── proof.json
-│           └── hash.txt
+│           ├── proof.json             # Last generated ZK proof (artifact)
+│           └── hash.txt               # Last computed identity/credential hash
 │
 ├── pnw_router/
-│   ├── .env
-│   ├── assembly.env
-│   ├── pnw_router.toml
-│   ├── program.json
-│   ├── assembly_main.aleo
-│   ├── main.leo
+│   ├── .env                           # Program-local env (ids, endpoints)
+│   ├── assembly.env                   # (If used) SnarkVM/assembly settings
+│   ├── pnw_router.toml                # Leo program config (router)
+│   ├── program.json                   # Compiled program metadata
+│   ├── assembly_main.aleo             # (Optional) assembly variant
+│   ├── main.leo                       # Router: orchestrates calls between PNW modules
 │   ├── constants/
-│   │   ├── action_ids.leo
-│   │   ├── tax_constants.leo
+│   │   ├── action_ids.leo             # Enum/int constants for router actions
+│   │   └── tax_constants.leo          # Tax constants used by payroll checks
 │   └── imports/
-│       └── .gitkeep
+│       └── .gitkeep                   # Placeholder to keep imports/ in git
 │
 ├── src/
 │   ├── aleo_gas_station/
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Tracks ALEO token reserves (on-chain gas for Aleo ops)
+│
 │   ├── coordinator_program/
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Emits dispatch events; confirms payouts; escrow status gate
+│
 │   ├── credential_nft/
-│   │   └── credential_nft.toml
+│   │   └── credential_nft.toml        # Config for credential NFT program (compile/deploy)
+│
 │   ├── employer_agreement/
-│   │   ├── employer_agreement.toml
-│   │   ├── program.json
+│   │   ├── employer_agreement.toml    # Config for employer agreement program
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Agreement terms; links worker/employer/subDAO; prefund checks
+│
 │   ├── employer_registry/
-│   │   ├── employer_registry.toml
-│   │   ├── program.json
+│   │   ├── employer_registry.toml     # Registry config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Registry of employers; .pnw suffix; status flags
+│
 │   ├── employer_profiles/
-│   │   ├── employer_profiles.toml
-│   │   ├── program.json
+│   │   ├── employer_profiles.toml     # Config for employer profile module
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Employer credentials + attestations (private)
+│
 │   ├── oversightdao_nft/
-│   │   ├── oversightdao_nft.toml
-│   │   ├── program.json
+│   │   ├── oversightdao_nft.toml      # DAO badge config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # DAO badge/NFT logic (compliance, permissions)
+│
 │   ├── oversightdao_reserve/
-│   │   ├── oversightdao_reserve.toml
-│   │   ├── program.json
+│   │   ├── oversightdao_reserve.toml  # Reserve config (DAO treasury)
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # DAO reserve accounting; transfers to subDAOs
+│
 │   ├── payroll_audit_log/
-│   │   ├── payroll_audit_log.toml
-│   │   ├── program.json
+│   │   ├── payroll_audit_log.toml     # Config for audit log contract
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Stores hashed payment/audit refs (no PII)
+│
 │   ├── paystub_nft/
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # ZK paystub NFT; selective field reveal; binds .pnw + tenure
+│
 │   ├── pncw_payroll/
-│   │   ├── pncw_payroll.toml
-│   │   ├── program.json
+│   │   ├── pncw_payroll.toml          # Domestic payroll config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Escrow payroll (citizens); waits for Stellar confirm → mint NFT
+│
 │   ├── pniw_payroll/
-│   │   ├── pniw_payroll.toml
-│   │   ├── program.json
+│   │   ├── pniw_payroll.toml          # Migrant payroll config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Escrow payroll (migrants); same flow as pncw with different flags
+│
 │   ├── pnw_name_registry/
-│   │   ├── pnw_name_registry.toml
-│   │   ├── program.json
+│   │   ├── pnw_name_registry.toml     # .pnw registry config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Registers `.pnw` names (workers/employers); soulbound rules
+│
 │   ├── process_tax_compliance/
-│   │   ├── process_tax_compliance.toml
-│   │   ├── program.json
+│   │   ├── process_tax_compliance.toml# Tax module config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Tax calc + obligations storage (private)
+│
 │   ├── stellar_gas_station/
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Tracks USDC prefunding for Stellar payouts (+30% tax + gas buffer)
+│
 │   ├── stellar_integration/
-│   │   ├── stellar_tx_log.js
-│   │   └── README.md
+│   │   ├── stellar_tx_log.js          # Privacy-preserving tx log → `stellar_audit_log.json`
+│   │   └── README.md                  # How the Horizon SDK daemon ties into Aleo events
+│
 │   ├── subdao_reserve/
-│   │   ├── subdao_reserve.toml
-│   │   ├── program.json
+│   │   ├── subdao_reserve.toml        # SubDAO treasury config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # SubDAO-controlled funds for payroll/ops (not public treasury)
+│
 │   ├── weekly_payroll_pool/
-│   │   ├── weekly_payroll_pool.toml
-│   │   ├── program.json
+│   │   ├── weekly_payroll_pool.toml   # Weekly pool config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Sums weekly obligations; batches escrow creation
+│
 │   ├── worker_profiles/
-│   │   ├── worker_profiles.toml
-│   │   ├── program.json
+│   │   ├── worker_profiles.toml       # Worker profile config
+│   │   ├── program.json               # Compiled metadata
 │   │   └── src/
-│   │       └── main.leo
+│   │       └── main.leo               # Worker identity hash + Aleo wallet + Stellar wallet binding
+│
 │   └── zkpass_transgate/
 │       └── src/
-│           └── main.leo
+│           └── main.leo               # Adapter for ZKPass-like flows into PNW (optional bridge)
