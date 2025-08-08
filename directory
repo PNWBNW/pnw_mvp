@@ -1,109 +1,115 @@
 pnw_mvp/
-├── .gitignore
-├── LICENSE_PNW_MVP.txt
-├── README.md                          # Project overview + onboarding instructions
-├── aleo_environment.md
-├── directory.md                       # This file — updated regularly
-├── index.html                         # Web DApp entrypoint
+├── docs/
+│   ├── ui_workflow_employer.md
+│   ├── ui_workflow_worker.md
+│   ├── stellar_integration.md
+│   └── audit_privacy_model.md
 │
-├── .github/
-│   └── workflows/
-│       ├── deploy.yml
-│       └── test_and_build.yml
+├── aleo_gas_station/
+│   ├── .env
+│   ├── aleo_gas_station.toml
+│   ├── program.json
+│   ├── import/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
 │
-├── scripts/
-│   ├── deploy_crosschain.sh           # Deploys Aleo + Stellar components
-│   ├── deploy_pnw_mvp.sh               # Aleo program deploy helper
-│   ├── repackage.sh                    # Gzip & checksum before deploy
-│   ├── submit_worker_hash.ts
-│   ├── verify_zpass_badge.ts
-│   ├── verify_zkpass_attestation.ts
-│   ├── verify_employer_attestation.ts
-│   ├── stellar_handler.js              # Handles Stellar Horizon API tx
-│   ├── stellar_tx_log.js               # Privacy-preserving tx logs
-│   ├── stellar_gas_check.js            # Estimates Stellar fee + tax
-│   └── crosschain_bridge.js            # Future: WASM-based Aleo↔Stellar relay
+├── stellar_gas_station/
+│   ├── .env
+│   ├── stellar_gas_station.toml
+│   ├── program.json
+│   ├── import/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
+│
+├── process_tax_compliance/
+│   ├── .env
+│   ├── process_tax_compliance.toml
+│   ├── program.json
+│   ├── import/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
+│
+├── subdao_reserve/
+│   ├── .env
+│   ├── subdao_reserve.toml
+│   ├── program.json
+│   ├── import/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
+│
+├── weekly_payroll_pool/
+│   ├── .env
+│   ├── weekly_payroll_pool.toml
+│   ├── program.json
+│   ├── import/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
+│
+├── worker_profiles/
+│   ├── .env
+│   ├── worker_profiles.toml
+│   ├── program.json
+│   ├── imports/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
+│
+├── pnw_pniw_payroll/
+│   ├── .env
+│   ├── pnw_pniw_payroll.toml
+│   ├── program.json
+│   ├── import/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
+│
+├── pnw_pncw_payroll/
+│   ├── .env
+│   ├── pnw_pncw_payroll.toml
+│   ├── program.json
+│   ├── import/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
+│
+├── paystub_nft/
+│   ├── .env
+│   ├── paystub_nft.toml
+│   ├── program.json
+│   ├── import/
+│   │   └── .gitkeep
+│   └── src/
+│       └── main.leo
+│
+├── stellar/
+│   ├── stellar_handler.js
+│   ├── stellar_tx_log.js
+│   └── config/
+│       └── stellar.env
 │
 ├── front_end/
-│   ├── worker_submit.js                # Worker onboarding form logic
-│   ├── employer_submit.js              # Employer onboarding form logic
-│   ├── credential_loader.js            # Loads + hashes credentials (Poseidon2)
-│   ├── stellar_ui.js                   # Payroll request + tx confirmation
-│   ├── paystub_viewer.js                # Retrieves Aleo paystub NFTs
-│   └── zpass_verifier.js
+│   ├── index.html
+│   ├── styles/
+│   │   └── main.css
+│   ├── js/
+│   │   ├── wallet_connect.js
+│   │   ├── payroll_submit.js
+│   │   ├── credential_loader.js
+│   │   └── utils.js
+│   └── assets/
+│       └── images/
 │
-├── zk_config/
-│   ├── circuit_config.json
-│   └── trusted_setup.ptau
+├── scripts/
+│   ├── deploy_pnw_mvp.sh
+│   ├── repackage.sh
+│   └── env.example
 │
-├── plonky2_prover/
-│   ├── Cargo.toml
-│   └── src/
-│       ├── main.rs
-│       ├── circuits.rs
-│       ├── hash_utils.rs
-│       ├── credential_helper.rs
-│       ├── inputs/
-│       │   ├── sample_worker.json
-│       │   └── sample_employer.json
-│       └── output/
-│           ├── proof.json
-│           └── hash.txt
-│
-├── pnw_router/                         # Routes payroll + compliance
-│   ├── main.leo
-│   ├── pnw_router.toml
-│   ├── constants/
-│   │   ├── action_ids.leo
-│   │   ├── tax_constants.leo
-│
-├── src/
-│   ├── encoder.leo
-│   ├── aleo_gas_station/
-│   │   └── main.leo
-│   ├── stellar_gas_station/
-│   │   └── main.leo
-│   ├── employer_agreement/
-│   │   └── main.leo
-│   ├── employer_registry/
-│   │   └── main.leo
-│   ├── employer_profiles/
-│   │   └── main.leo
-│   ├── oversightdao_reserve/
-│   │   └── main.leo
-│   ├── oversightdao_nft/
-│   │   └── main.leo
-│   ├── pncw_payroll/                    # Domestic payroll
-│   │   └── main.leo
-│   ├── pniw_payroll/                    # Migrant payroll
-│   │   └── main.leo
-│   ├── paystub_nft/                     # ZK receipt NFT
-│   │   └── main.leo
-│   ├── process_tax_compliance/
-│   │   └── main.leo
-│   ├── subdao_reserve/
-│   │   └── main.leo
-│   ├── weekly_payroll_pool/
-│   │   └── main.leo
-│   ├── worker_profiles/
-│   │   └── main.leo
-│
-└── docs/
-    ├── ui_workflow_employer.md          # Step-by-step employer UI flow
-    ├── ui_workflow_worker.md            # Step-by-step worker UI flow
-    ├── stellar_integration.md           # Cross-chain design notes
-    └── audit_privacy_model.md           # Privacy + compliance guarantees│   │   ├── program.json
-│   │   ├── import/
-│   │   │   └── .gitkeep
-│   │   ├── src/
-│   │   │   └── main.leo
-│   ├── process_tax_compliance/
-│   │   ├── .env
-│   │   ├── README.md
-│   │   ├── process_tax_compliance.toml
-│   │   ├── program.json
-│   │   ├── import/
-│   │   │   └── .gitkeep
+└── README.md│   │   │   └── .gitkeep
 │   │   ├── src/
 │   │   │   └── main.leo
 │   ├── subdao_reserve/
