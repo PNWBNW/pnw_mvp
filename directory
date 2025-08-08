@@ -1,29 +1,41 @@
 pnw_mvp/
 ├── .gitignore
 ├── LICENSE_PNW_MVP.txt
-├── README.md
+├── README.md                          # Project overview + onboarding instructions
 ├── aleo_environment.md
-├── directory
-├── index.html
+├── directory.md                       # This file — updated regularly
+├── index.html                         # Web DApp entrypoint
+│
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml
+│       ├── deploy.yml
+│       └── test_and_build.yml
+│
 ├── scripts/
-│   ├── .license
-│   ├── deploy_crosschain.sh
-│   ├── deploy_pnw_mvp.sh
+│   ├── deploy_crosschain.sh           # Deploys Aleo + Stellar components
+│   ├── deploy_pnw_mvp.sh               # Aleo program deploy helper
+│   ├── repackage.sh                    # Gzip & checksum before deploy
 │   ├── submit_worker_hash.ts
 │   ├── verify_zpass_badge.ts
-│   ├── verify_zkpass_attestation.ts       # ✅ for workers
-│   └── verify_employer_attestation.ts     # ✅ NEW for employers
+│   ├── verify_zkpass_attestation.ts
+│   ├── verify_employer_attestation.ts
+│   ├── stellar_handler.js              # Handles Stellar Horizon API tx
+│   ├── stellar_tx_log.js               # Privacy-preserving tx logs
+│   ├── stellar_gas_check.js            # Estimates Stellar fee + tax
+│   └── crosschain_bridge.js            # Future: WASM-based Aleo↔Stellar relay
+│
 ├── front_end/
-│   ├── worker_submit.js
-│   ├── zpass_verifier.js
-│   ├── credential_loader.js               # ✅ loads worker credentials
-│   └── employer_submit.js                 # ✅ NEW handles employer profile input
+│   ├── worker_submit.js                # Worker onboarding form logic
+│   ├── employer_submit.js              # Employer onboarding form logic
+│   ├── credential_loader.js            # Loads + hashes credentials (Poseidon2)
+│   ├── stellar_ui.js                   # Payroll request + tx confirmation
+│   ├── paystub_viewer.js                # Retrieves Aleo paystub NFTs
+│   └── zpass_verifier.js
+│
 ├── zk_config/
 │   ├── circuit_config.json
 │   └── trusted_setup.ptau
+│
 ├── plonky2_prover/
 │   ├── Cargo.toml
 │   └── src/
@@ -33,77 +45,54 @@ pnw_mvp/
 │       ├── credential_helper.rs
 │       ├── inputs/
 │       │   ├── sample_worker.json
-│       │   └── sample_employer.json       # ✅ NEW sample
+│       │   └── sample_employer.json
 │       └── output/
 │           ├── proof.json
 │           └── hash.txt
-├── pnw_router/
-│   ├── .env
-│   ├── assembly.env
-│   ├── pnw_router.toml
-│   ├── program.json
-│   ├── assembly_main.aleo
+│
+├── pnw_router/                         # Routes payroll + compliance
 │   ├── main.leo
+│   ├── pnw_router.toml
 │   ├── constants/
 │   │   ├── action_ids.leo
 │   │   ├── tax_constants.leo
-│   ├── imports/
-│   │   └── .gitkeep
+│
 ├── src/
 │   ├── encoder.leo
+│   ├── aleo_gas_station/
+│   │   └── main.leo
+│   ├── stellar_gas_station/
+│   │   └── main.leo
 │   ├── employer_agreement/
-│   │   ├── .env
-│   │   ├── employer_agreement.toml
-│   │   ├── program.json
-│   │   ├── import/
-│   │   │   └── .gitkeep
-│   │   ├── src/
-│   │   │   └── main.leo
+│   │   └── main.leo
 │   ├── employer_registry/
-│   │   ├── .env
-│   │   ├── employer_registry.toml
-│   │   ├── program.json
-│   │   ├── imports/
-│   │   │   └── .gitkeep
-│   │   ├── src/
-│   │   │   └── main.leo
-│   ├── employer_profiles/                 # ✅ NEW MODULE
-│   │   ├── .env
-│   │   ├── program.json
-│   │   ├── readme.md
-│   │   ├── employer_profiles.toml
-│   │   ├── imports/
-│   │   │   └── .gitkeep
-│   │   ├── src/
-│   │   │   └── main.leo                   # 🎯 NFT commit, mint, revoke for employer
+│   │   └── main.leo
+│   ├── employer_profiles/
+│   │   └── main.leo
 │   ├── oversightdao_reserve/
-│   │   ├── .env
-│   │   ├── oversightdao_reserve.toml
-│   │   ├── program.json
-│   │   ├── import/
-│   │   │   └── .gitkeep
-│   │   ├── src/
-│   │   │   └── main.leo
+│   │   └── main.leo
 │   ├── oversightdao_nft/
-│   │   ├── .env
-│   │   ├── oversightdao_nft.toml
-│   │   ├── program.json
-│   │   ├── src/
-│   │   │   └── main.leo                   # 🎯 NFT logic for DAO badges
-│   ├── pncw_payroll/
-│   │   ├── .env
-│   │   ├── README.md
-│   │   ├── pncw_payroll.toml
-│   │   ├── program.json
-│   │   ├── import/
-│   │   │   └── .gitkeep
-│   │   ├── src/
-│   │   │   └── main.leo
-│   ├── pniw_payroll/
-│   │   ├── .env
-│   │   ├── README.md
-│   │   ├── pniw_payroll.toml
-│   │   ├── program.json
+│   │   └── main.leo
+│   ├── pncw_payroll/                    # Domestic payroll
+│   │   └── main.leo
+│   ├── pniw_payroll/                    # Migrant payroll
+│   │   └── main.leo
+│   ├── paystub_nft/                     # ZK receipt NFT
+│   │   └── main.leo
+│   ├── process_tax_compliance/
+│   │   └── main.leo
+│   ├── subdao_reserve/
+│   │   └── main.leo
+│   ├── weekly_payroll_pool/
+│   │   └── main.leo
+│   ├── worker_profiles/
+│   │   └── main.leo
+│
+└── docs/
+    ├── ui_workflow_employer.md          # Step-by-step employer UI flow
+    ├── ui_workflow_worker.md            # Step-by-step worker UI flow
+    ├── stellar_integration.md           # Cross-chain design notes
+    └── audit_privacy_model.md           # Privacy + compliance guarantees│   │   ├── program.json
 │   │   ├── import/
 │   │   │   └── .gitkeep
 │   │   ├── src/
