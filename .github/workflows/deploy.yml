@@ -12,7 +12,7 @@ jobs:
 
     env:
       NETWORK: testnet
-      SNARKOS_VERSION: v3.8.0
+      SNARKOS_VERSION: v4.5.1
       DEPLOYMENT_ROOT: ${{ github.workspace }}/pnw_router
       DEPLOYMENT_LOGS: ${{ github.workspace }}/deploy_logs
       ALEO_PRIVATE_KEY: ${{ secrets.ALEO_PRIVATE_KEY }}
